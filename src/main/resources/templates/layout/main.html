@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sl="https://shadleaf.dev/sl"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:fragment="layout(pageTitle, breadcrumb, content)">
 <head>
     <meta charset="UTF-8">
@@ -32,6 +33,23 @@
                         <sl:sidebar-menu-button th:href="@{/home}" th:active="${#slNav.current('/home')}" tooltip="Home">
                             <sl:slot name="icon-start"><sl:icon name="house"/></sl:slot>
                             Home
+                        </sl:sidebar-menu-button>
+                    </sl:sidebar-menu-item>
+                </sl:sidebar-menu>
+            </sl:sidebar-group>
+            <sl:sidebar-group id="nav-admin" sec:authorize="hasRole('ADMIN')">
+                <sl:sidebar-group-label>Administration</sl:sidebar-group-label>
+                <sl:sidebar-menu>
+                    <sl:sidebar-menu-item>
+                        <sl:sidebar-menu-button th:href="@{/admin/residents}" th:active="${#slNav.current('/admin/residents')}" tooltip="Residents">
+                            <sl:slot name="icon-start"><sl:icon name="users"/></sl:slot>
+                            Residents
+                        </sl:sidebar-menu-button>
+                    </sl:sidebar-menu-item>
+                    <sl:sidebar-menu-item>
+                        <sl:sidebar-menu-button th:href="@{/admin/staff}" th:active="${#slNav.current('/admin/staff')}" tooltip="Staff">
+                            <sl:slot name="icon-start"><sl:icon name="hard-hat"/></sl:slot>
+                            Staff
                         </sl:sidebar-menu-button>
                     </sl:sidebar-menu-item>
                 </sl:sidebar-menu>

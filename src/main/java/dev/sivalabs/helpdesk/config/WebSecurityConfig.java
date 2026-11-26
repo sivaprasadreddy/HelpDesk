@@ -26,8 +26,12 @@ class WebSecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) {
-        http.authorizeHttpRequests(r ->
-                r.requestMatchers(PUBLIC_RESOURCES).permitAll().anyRequest().authenticated());
+        http.authorizeHttpRequests(r -> r.requestMatchers(PUBLIC_RESOURCES)
+                .permitAll()
+                .requestMatchers("/admin/**")
+                .hasRole("ADMIN")
+                .anyRequest()
+                .authenticated());
 
         http.formLogin(formLogin ->
                 formLogin.loginPage("/login").defaultSuccessUrl("/home").permitAll());

@@ -1,0 +1,36 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sl="https://shadleaf.dev/sl"
+      th:replace="~{layout/main :: layout(${type.title}, ~{::breadcrumb}, ~{::#page-content})}">
+<body>
+<th:block th:ref="breadcrumb">
+    <sl:breadcrumb-item><sl:breadcrumb-link th:href="@{/home}">Home</sl:breadcrumb-link></sl:breadcrumb-item>
+    <sl:breadcrumb-separator/>
+    <sl:breadcrumb-item><sl:breadcrumb-page th:text="${type.title}">Residents</sl:breadcrumb-page></sl:breadcrumb-item>
+</th:block>
+<div id="page-content" class="stack">
+    <div class="toolbar">
+        <sl:button as="a" th:href="@{/admin/{p}/new(p=${type.path})}">
+            <sl:slot name="icon-start"><sl:icon name="plus"/></sl:slot>
+            <span th:text="|Add ${type.singular}|">Add Resident</span>
+        </sl:button>
+    </div>
+    <sl:table th:unless="${users.isEmpty()}">
+        <thead>
+        <tr><th>Name</th><th>Email</th><th>Created</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="u : ${users}">
+            <td th:text="${u.name}">Jane Doe</td>
+            <td th:text="${u.email}">jane@example.com</td>
+            <td th:text="${#temporals.format(u.createdAt, 'dd MMM yyyy', T(java.time.ZoneId).systemDefault())}">01 Jan 2026</td>
+        </tr>
+        </tbody>
+    </sl:table>
+    <sl:empty th:if="${users.isEmpty()}">
+        <sl:empty-header>
+            <sl:empty-media variant="icon"><sl:icon name="users"/></sl:empty-media>
+            <sl:empty-title level="2" th:text="|No ${type.title.toLowerCase()} yet|">No residents yet</sl:empty-title>
+        </sl:empty-header>
+    </sl:empty>
+</div>
+</body>
+</html>

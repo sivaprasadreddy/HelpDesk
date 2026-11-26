@@ -6,12 +6,18 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @ControllerAdvice
 class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     ModelAndView handle(ResourceNotFoundException e) {
+        return handleException(e, "error/404", HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    ModelAndView handle(NoResourceFoundException e) {
         return handleException(e, "error/404", HttpStatus.NOT_FOUND);
     }
 

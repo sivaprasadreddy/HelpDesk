@@ -1,6 +1,8 @@
 package dev.sivalabs.helpdesk.users;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,11 +28,22 @@ class UserService {
         return userRepository.findById(id).map(this::toUserDto);
     }
 
+    @Transactional(readOnly = true)
+    public List<UserDto> findUsersByRole(Role role) {
+        return userRepository.findByRoleOrderByNameAsc(role).stream()
+                .map(this::toUserDto)
+                .toList();
+    }
+
     @Transactional
     public void createUser(CreateUserCmd cmd) {
+        var email = cmd.email().trim().toLowerCase(Locale.ROOT);
+        if (userRepository.existsByEmailIgnoreCase(email)) {
+            throw new EmailAlreadyExistsException(email);
+        }
         var user = new UserEntity();
         user.setName(cmd.name());
-        user.setEmail(cmd.email());
+        user.setEmail(email);
         user.setPassword(passwordEncoder.encode(cmd.password()));
         user.setRole(cmd.role());
         user.setCreatedAt(Instant.now());

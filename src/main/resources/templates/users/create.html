@@ -1,0 +1,41 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sl="https://shadleaf.dev/sl"
+      th:replace="~{layout/main :: layout(|Add ${type.singular}|, ~{::breadcrumb}, ~{::#page-content})}">
+<body>
+<th:block th:ref="breadcrumb">
+    <sl:breadcrumb-item><sl:breadcrumb-link th:href="@{/home}">Home</sl:breadcrumb-link></sl:breadcrumb-item>
+    <sl:breadcrumb-separator/>
+    <sl:breadcrumb-item><sl:breadcrumb-link th:href="@{/admin/{p}(p=${type.path})}" th:text="${type.title}">Residents</sl:breadcrumb-link></sl:breadcrumb-item>
+    <sl:breadcrumb-separator/>
+    <sl:breadcrumb-item><sl:breadcrumb-page>Add</sl:breadcrumb-page></sl:breadcrumb-item>
+</th:block>
+<div id="page-content" class="form-card">
+    <sl:card>
+        <sl:card-content>
+            <form th:object="${user}" th:action="@{/admin/{p}(p=${type.path})}" method="post" novalidate class="form-stack">
+                <sl:form-errors/>
+                <sl:field th:field="*{name}">
+                    <sl:field-label>Name</sl:field-label>
+                    <sl:input autocomplete="off"/>
+                    <sl:field-error/>
+                </sl:field>
+                <sl:field th:field="*{email}">
+                    <sl:field-label>Email</sl:field-label>
+                    <sl:input type="email" autocomplete="off"/>
+                    <sl:field-error/>
+                </sl:field>
+                <sl:field th:field="*{password}">
+                    <sl:field-label>Initial password</sl:field-label>
+                    <sl:input type="password" autocomplete="new-password"/>
+                    <sl:field-description>At least 8 characters.</sl:field-description>
+                    <sl:field-error/>
+                </sl:field>
+                <div class="toolbar">
+                    <sl:button as="a" th:href="@{/admin/{p}(p=${type.path})}" variant="outline">Cancel</sl:button>
+                    <sl:button type="submit" th:text="|Create ${type.singular}|">Create</sl:button>
+                </div>
+            </form>
+        </sl:card-content>
+    </sl:card>
+</div>
+</body>
+</html>
