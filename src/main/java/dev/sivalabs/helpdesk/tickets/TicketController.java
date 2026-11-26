@@ -126,6 +126,14 @@ class TicketController {
                 accessPolicy.canAssignTicket(authentication.getPrincipal()) && ticket.status() != TicketStatus.CLOSED;
         model.addAttribute("canAssign", canAssign);
         model.addAttribute("canEdit", accessPolicy.canUpdateTicketDetails(authentication.getPrincipal()));
+        model.addAttribute("comments", ticketService.findComments(id, authentication.getPrincipal()));
+        model.addAttribute(
+                "canComment",
+                accessPolicy.canComment(authentication.getPrincipal(), ticket.createdBy(), ticket.assignedTo())
+                        && ticket.status() != TicketStatus.CLOSED);
+        if (!model.containsAttribute("commentForm")) {
+            model.addAttribute("commentForm", CommentForm.empty());
+        }
         if (canAssign) {
             model.addAttribute(
                     "activeStaff",
@@ -208,6 +216,30 @@ class TicketController {
         }
         addEditFormOptions(ticketService.getTicket(id, authentication.getPrincipal()), model);
         return EDIT_VIEW;
+    }
+
+    /** REQ-021: adds a comment; on a validation error the details page shows it with the text kept. */
+    @PostMapping("/{id:\\d+}/comments")
+    String addComment(
+            Authentication authentication,
+            @PathVariable Long id,
+            @Valid @ModelAttribute("commentForm") CommentForm form,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("commentForm", form);
+            redirectAttributes.addFlashAttribute(
+                    "org.springframework.validation.BindingResult.commentForm", bindingResult);
+            return "redirect:/tickets/" + id + "#comments";
+        }
+        try {
+            ticketService.addComment(
+                    id, AuthUtils.getCurrentUserIdOrThrow(), form.content(), authentication.getPrincipal());
+            redirectAttributes.addFlashAttribute("successMessage", "Comment added");
+        } catch (InvalidStatusTransitionException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/tickets/" + id + "#comments";
     }
 
     /** REQ-014: the resident's own tickets, optionally of one status ({@code ?status=OPEN}). */

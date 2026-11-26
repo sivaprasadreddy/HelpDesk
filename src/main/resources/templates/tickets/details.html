@@ -59,6 +59,37 @@
         </sl:card-footer>
     </sl:card>
 
+    <sl:card id="comments">
+        <sl:card-header>
+            <sl:card-title level="2" th:text="|Comments (${#lists.size(comments)})|">Comments (2)</sl:card-title>
+        </sl:card-header>
+        <sl:card-content class="stack">
+            <p th:if="${comments.empty}" class="muted">No comments yet.</p>
+            <ol th:unless="${comments.empty}" class="comment-list">
+                <li th:each="c : ${comments}" class="comment">
+                    <div class="comment-meta">
+                        <strong th:text="${c.authorName}">Ravi Kumar</strong>
+                        <sl:badge th:if="${c.byRaiser}" variant="outline">Raised the ticket</sl:badge>
+                        <span class="muted" th:text="${#temporals.format(c.createdAt, 'dd MMM yyyy, HH:mm')}">26 Nov 2026, 10:00</span>
+                    </div>
+                    <p class="comment-content" th:text="${c.content}">I will check this today.</p>
+                </li>
+            </ol>
+            <form th:if="${canComment}" th:object="${commentForm}" method="post"
+                  th:action="@{/tickets/{id}/comments(id=${ticket.id})}" novalidate class="form-stack">
+                <sl:field th:field="*{content}">
+                    <sl:field-label>Add a comment</sl:field-label>
+                    <sl:textarea rows="3" placeholder="Share an update or ask a question."/>
+                    <sl:field-error/>
+                </sl:field>
+                <div class="toolbar">
+                    <sl:button type="submit">Post Comment</sl:button>
+                </div>
+            </form>
+            <p th:if="${!canComment and ticket.status.name() == 'CLOSED'}" class="muted">This ticket is closed and takes no more comments.</p>
+        </sl:card-content>
+    </sl:card>
+
     <sl:card th:if="${canAssign}">
         <sl:card-header>
             <sl:card-title level="2" th:text="${ticket.assignedTo == null ? 'Assign ticket' : 'Reassign ticket'}">Assign ticket</sl:card-title>

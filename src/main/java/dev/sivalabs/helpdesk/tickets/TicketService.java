@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -40,10 +41,16 @@ class TicketService {
     private final CategoryAPI categoryAPI;
     private final UserAPI userAPI;
     private final AccessPolicy accessPolicy;
+    private final CommentRepository commentRepository;
 
     TicketService(
-            TicketRepository ticketRepository, CategoryAPI categoryAPI, UserAPI userAPI, AccessPolicy accessPolicy) {
+            TicketRepository ticketRepository,
+            CategoryAPI categoryAPI,
+            UserAPI userAPI,
+            AccessPolicy accessPolicy,
+            CommentRepository commentRepository) {
         this.ticketRepository = ticketRepository;
+        this.commentRepository = commentRepository;
         this.categoryAPI = categoryAPI;
         this.userAPI = userAPI;
         this.accessPolicy = accessPolicy;
@@ -212,6 +219,51 @@ class TicketService {
         t.setDescription(cmd.description().trim());
         t.setPriority(cmd.priority());
         t.setCategoryId(cmd.categoryId());
+    }
+
+    /** REQ-021: the ticket's comments, oldest first, if the principal may view the ticket. */
+    @Transactional(readOnly = true)
+    public List<CommentView> findComments(Long ticketId, Object principal) {
+        var ticket = loadVisible(ticketId, principal);
+        var comments = commentRepository.findByTicketIdOrderByCreatedAtAscIdAsc(ticketId);
+        var names = userAPI.findNamesByIds(
+                comments.stream().map(CommentEntity::getAuthorId).collect(Collectors.toSet()));
+        return comments.stream()
+                .map(c -> new CommentView(
+                        c.getId(),
+                        names.getOrDefault(c.getAuthorId(), "Unknown"),
+                        c.getAuthorId().equals(ticket.getCreatedBy()),
+                        c.getContent(),
+                        c.getCreatedAt()))
+                .toList();
+    }
+
+    /**
+     * REQ-021: adds a comment by {@code authorId}. ADMIN may comment on any ticket, STAFF on tickets assigned to
+     * them and USER on tickets they raised ({@code AccessPolicy#canComment}); others get not-found, as on the
+     * details page. A CLOSED ticket takes no more comments.
+     */
+    @Transactional
+    public void addComment(Long ticketId, Long authorId, String content, Object principal) {
+        var ticket = loadVisible(ticketId, principal);
+        if (!accessPolicy.canComment(principal, ticket.getCreatedBy(), ticket.getAssignedTo())) {
+            throw new AccessDeniedException("You cannot comment on ticket #" + ticketId);
+        }
+        if (ticket.getStatus() == TicketStatus.CLOSED) {
+            throw new InvalidStatusTransitionException("Ticket #" + ticketId + " is closed and takes no more comments");
+        }
+        var comment = new CommentEntity();
+        comment.setTicketId(ticketId);
+        comment.setAuthorId(authorId);
+        comment.setContent(content.trim());
+        commentRepository.save(comment);
+    }
+
+    private TicketEntity loadVisible(Long id, Object principal) {
+        return ticketRepository
+                .findById(id)
+                .filter(ticket -> accessPolicy.canViewTicket(principal, ticket.getCreatedBy(), ticket.getAssignedTo()))
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket #" + id + " not found"));
     }
 
     /** Whether any ticket exists at all. */
