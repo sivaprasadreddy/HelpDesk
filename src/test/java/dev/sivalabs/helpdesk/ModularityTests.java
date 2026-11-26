@@ -1,0 +1,21 @@
+package dev.sivalabs.helpdesk;
+
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.springframework.modulith.core.ApplicationModules;
+import org.springframework.modulith.docs.Documenter;
+
+@Order(2)
+class ModularityTests {
+    private final ApplicationModules modules = ApplicationModules.of(Application.class);
+
+    @Test
+    void verifyModuleStructure() {
+        modules.verify();
+    }
+
+    @Test
+    void shouldCreateModuleDocumentation() {
+        new Documenter(modules).writeDocumentation();
+    }
+}

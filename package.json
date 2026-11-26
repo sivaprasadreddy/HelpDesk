@@ -1,0 +1,5 @@
+{
+  "name": "helpdesk",
+  "private": true,
+  "web-types": "./shadleaf.web-types.json"
+}

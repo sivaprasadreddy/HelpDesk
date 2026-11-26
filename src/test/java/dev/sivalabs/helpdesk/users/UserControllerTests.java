@@ -1,0 +1,69 @@
+package dev.sivalabs.helpdesk.users;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+
+import dev.sivalabs.helpdesk.BaseIT;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
+
+@Sql("/test-data.sql")
+class UserControllerTests extends BaseIT {
+
+    @Test
+    void shouldRegisterUserSuccessfully() {
+        var result = mvc.post()
+                .uri("/registration")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("name", "testuser123")
+                .param("email", "testuser123@gmail.com")
+                .param("password", "testuser123");
+
+        assertThat(result).hasStatus(HttpStatus.FOUND);
+    }
+
+    @Test
+    void shouldRenderLoginPage() {
+        var result = mvc.get().uri("/login");
+
+        assertThat(result).hasStatusOk();
+        assertThat(result).bodyText().contains("Sign in").contains("name=\"_csrf\"");
+    }
+
+    @Test
+    void shouldShowLoginErrorMessage() {
+        var result = mvc.get().uri("/login?error");
+
+        assertThat(result).hasStatusOk();
+        assertThat(result).bodyText().contains("Invalid email or password.");
+    }
+
+    @Test
+    void shouldShowLoggedOutMessage() {
+        var result = mvc.get().uri("/login?logout");
+
+        assertThat(result).hasStatusOk();
+        assertThat(result).bodyText().contains("You have been logged out.");
+    }
+
+    @Test
+    void shouldShowValidationErrorsOnInvalidRegistration() {
+        var result = mvc.post()
+                .uri("/registration")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("name", "")
+                .param("email", "invalid-email")
+                .param("password", "secret");
+
+        assertThat(result).hasStatusOk();
+        assertThat(result)
+                .bodyText()
+                .contains("Name is required")
+                .contains("Invalid email address")
+                .contains("invalid-email");
+    }
+}
