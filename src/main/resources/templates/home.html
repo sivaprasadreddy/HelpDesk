@@ -6,8 +6,24 @@
         <sl:breadcrumb-page>Home</sl:breadcrumb-page>
     </sl:breadcrumb-item>
 </th:block>
-<div id="page-content">
-    <p>Welcome back, [[${#slUser.current.name}]].</p>
+<div id="page-content" class="stack">
+    <p class="welcome">Welcome back, [[${#slUser.current.name}]].</p>
+    <section th:unless="${shortcuts.empty}" aria-labelledby="shortcuts-heading" class="stack">
+        <h2 id="shortcuts-heading" class="section-heading">Shortcuts</h2>
+        <ul class="shortcut-grid">
+            <li th:each="s : ${shortcuts}">
+                <a class="shortcut" th:href="@{${s.href}}">
+                    <sl:card size="sm">
+                        <sl:card-header>
+                            <span class="shortcut-icon" aria-hidden="true"><sl:icon th:name="${s.icon}"/></span>
+                            <sl:card-title level="3" th:text="${s.title}">My tickets</sl:card-title>
+                            <sl:card-description th:text="${s.description}">Follow the progress of the tickets you raised.</sl:card-description>
+                        </sl:card-header>
+                    </sl:card>
+                </a>
+            </li>
+        </ul>
+    </section>
 </div>
 </body>
 </html>
