@@ -7,11 +7,10 @@ import static org.assertj.core.api.Assertions.tuple;
 import dev.sivalabs.helpdesk.BaseIT;
 import dev.sivalabs.helpdesk.users.Role;
 import dev.sivalabs.helpdesk.users.SecurityUser;
-import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import org.jspecify.annotations.Nullable;
@@ -64,14 +63,14 @@ class ResolutionTimesTests extends BaseIT {
         SecurityContextHolder.clearContext();
     }
 
-    /** A local time as the database stores it: UTC wall-clock time (Hibernate normalises instants). */
-    static Timestamp at(LocalDate day, int hour) {
+    /** A local time in the server's time zone, as an absolute instant for a {@code timestamptz} column. */
+    static OffsetDateTime at(LocalDate day, int hour) {
         var instant =
                 day.atTime(LocalTime.of(hour, 0)).atZone(ZoneId.systemDefault()).toInstant();
-        return Timestamp.valueOf(LocalDateTime.ofInstant(instant, ZoneOffset.UTC));
+        return instant.atOffset(ZoneOffset.UTC);
     }
 
-    void ticket(String priority, String status, Timestamp createdAt, @Nullable Timestamp resolvedAt) {
+    void ticket(String priority, String status, OffsetDateTime createdAt, @Nullable OffsetDateTime resolvedAt) {
         sql(
                 "insert into tickets(title, description, priority, status, category_id, created_by, created_at,"
                         + " resolved_at) values ('t', 'd', ?, ?, 1, 900, ?, ?)",

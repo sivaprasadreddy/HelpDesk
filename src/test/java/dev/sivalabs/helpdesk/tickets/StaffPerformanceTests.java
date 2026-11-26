@@ -6,11 +6,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import dev.sivalabs.helpdesk.BaseIT;
 import dev.sivalabs.helpdesk.users.Role;
 import dev.sivalabs.helpdesk.users.SecurityUser;
-import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import org.jspecify.annotations.Nullable;
@@ -69,14 +68,17 @@ class StaffPerformanceTests extends BaseIT {
         SecurityContextHolder.clearContext();
     }
 
-    static Timestamp at(LocalDate day, int hour) {
+    static OffsetDateTime at(LocalDate day, int hour) {
         var instant =
                 day.atTime(LocalTime.of(hour, 0)).atZone(ZoneId.systemDefault()).toInstant();
-        return Timestamp.valueOf(LocalDateTime.ofInstant(instant, ZoneOffset.UTC));
+        return instant.atOffset(ZoneOffset.UTC);
     }
 
     void ticket(
-            String status, @Nullable Long assignedTo, @Nullable Timestamp createdAt, @Nullable Timestamp resolvedAt) {
+            String status,
+            @Nullable Long assignedTo,
+            @Nullable OffsetDateTime createdAt,
+            @Nullable OffsetDateTime resolvedAt) {
         sql(
                 "insert into tickets(title, description, priority, status, category_id, created_by, assigned_to,"
                         + " created_at, resolved_at) values ('t', 'd', 'LOW', ?, 1, 900, ?, coalesce(?,"
