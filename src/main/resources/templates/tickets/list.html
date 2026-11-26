@@ -25,7 +25,28 @@
 
     <th:block th:unless="${totalCount == 0}">
         <div class="list-toolbar">
-            <nav class="status-filter" aria-label="Filter by status">
+            <form th:if="${adminView}" class="ticket-filters" method="get" th:action="@{/tickets}" role="search" aria-label="Filter tickets">
+                <sl:native-select name="status" aria-label="Status" size="sm">
+                    <option value="">All statuses</option>
+                    <option th:each="s : ${statuses}" th:value="${s}" th:text="${s.label}" th:selected="${filter.status == s}">Open</option>
+                </sl:native-select>
+                <sl:native-select name="priority" aria-label="Priority" size="sm">
+                    <option value="">All priorities</option>
+                    <option th:each="p : ${priorities}" th:value="${p}" th:text="${p.label}" th:selected="${filter.priority == p}">High</option>
+                </sl:native-select>
+                <sl:native-select name="category" aria-label="Category" size="sm">
+                    <option value="">All categories</option>
+                    <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.active ? c.name : c.name + ' (inactive)'}" th:selected="${filter.categoryId == c.id}">Plumbing</option>
+                </sl:native-select>
+                <sl:native-select name="assignee" aria-label="Assignee" size="sm">
+                    <option value="">All assignees</option>
+                    <option value="none" th:selected="${filter.unassigned}">Unassigned</option>
+                    <option th:each="u : ${staff}" th:value="${u.id}" th:text="${u.active ? u.name : u.name + ' (inactive)'}" th:selected="${filter.assigneeId == u.id}">Ravi Kumar</option>
+                </sl:native-select>
+                <sl:button type="submit" size="sm">Apply</sl:button>
+                <sl:button as="a" size="sm" variant="ghost" th:href="@{/tickets}" th:if="${filter.isActive()}">Clear</sl:button>
+            </form>
+            <nav th:unless="${adminView}" class="status-filter" aria-label="Filter by status">
                 <sl:button as="a" size="sm" th:href="@{${listUrl}}"
                            th:variant="${selectedStatus == null ? 'default' : 'outline'}"
                            th:aria-current="${selectedStatus == null ? 'page' : null}">
@@ -52,7 +73,8 @@
                 <th>Category</th>
                 <th>Priority</th>
                 <th>Status</th>
-                <th th:text="${showCreator ? 'Raised by' : 'Assigned to'}">Assigned to</th>
+                <th th:if="${showCreator}">Raised by</th>
+                <th th:if="${adminView or !showCreator}">Assigned to</th>
                 <sl:table-head sort="createdAt">Created</sl:table-head>
                 <sl:table-head sort="updatedAt">Last updated</sl:table-head>
             </tr>
@@ -71,14 +93,14 @@
                               th:text="${t.status.label}">Open</sl:badge>
                 </td>
                 <td th:if="${showCreator}" th:text="${t.creatorName}">Priya Nair</td>
-                <td th:unless="${showCreator}">
+                <td th:if="${adminView or !showCreator}">
                     <span th:if="${t.assigneeName != null}" th:text="${t.assigneeName}">Ravi Kumar</span>
                     <span th:unless="${t.assigneeName != null}" class="muted">Not yet assigned</span>
                 </td>
                 <td th:text="${#temporals.format(t.createdAt, 'dd MMM yyyy, HH:mm')}">26 Nov 2026, 10:00</td>
                 <td th:text="${#temporals.format(t.lastUpdatedAt, 'dd MMM yyyy, HH:mm')}">26 Nov 2026, 10:00</td>
             </tr>
-            <sl:table-empty colspan="8" th:if="${tickets.empty}">No tickets with this status.</sl:table-empty>
+            <sl:table-empty th:colspan="${adminView ? 9 : 8}" th:if="${tickets.empty}" th:text="${adminView ? 'No tickets match these filters.' : 'No tickets with this status.'}">No tickets with this status.</sl:table-empty>
             </tbody>
         </sl:table>
 

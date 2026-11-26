@@ -3,6 +3,7 @@ package dev.sivalabs.helpdesk.tickets;
 import dev.sivalabs.helpdesk.categories.CategoryAPI;
 import dev.sivalabs.helpdesk.users.AccessPolicy;
 import dev.sivalabs.helpdesk.users.AuthUtils;
+import dev.sivalabs.helpdesk.users.UserAPI;
 import jakarta.validation.Valid;
 import java.util.Locale;
 import org.jspecify.annotations.Nullable;
@@ -32,18 +33,20 @@ class TicketController {
     private final TicketService ticketService;
     private final CategoryAPI categoryAPI;
     private final AccessPolicy accessPolicy;
+    private final UserAPI userAPI;
 
-    TicketController(TicketService ticketService, CategoryAPI categoryAPI, AccessPolicy accessPolicy) {
+    TicketController(TicketService ticketService, CategoryAPI categoryAPI, AccessPolicy accessPolicy, UserAPI userAPI) {
         this.ticketService = ticketService;
         this.categoryAPI = categoryAPI;
         this.accessPolicy = accessPolicy;
+        this.userAPI = userAPI;
     }
 
     @GetMapping("/new")
     String newTicketForm(Authentication authentication, Model model) {
         requireCanCreate(authentication);
         model.addAttribute("ticket", CreateTicketForm.empty());
-        addFormOptions(model);
+        addFormOptions(authentication, model);
         return CREATE_VIEW;
     }
 
@@ -65,15 +68,44 @@ class TicketController {
                         AuthUtils.getCurrentUserIdOrThrow());
                 var id = ticketService.createTicket(cmd);
                 redirectAttributes.addFlashAttribute("successMessage", "Ticket #" + id + " created successfully");
-                return accessPolicy.canViewOwnTickets(authentication.getPrincipal())
-                        ? "redirect:/tickets/mine"
-                        : "redirect:/home";
+                return "redirect:" + ticketListUrl(authentication);
             } catch (InvalidTicketCategoryException e) {
                 bindingResult.rejectValue("categoryId", "category.invalid", "Choose an active category");
             }
         }
-        addFormOptions(model);
+        addFormOptions(authentication, model);
         return CREATE_VIEW;
+    }
+
+    /** REQ-016: every ticket, filtered by status, priority, category and assignee ({@code assignee=none}). */
+    @GetMapping
+    String allTickets(
+            Authentication authentication,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String priority,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String assignee,
+            @PageableDefault(size = 20) Pageable pageable,
+            Model model) {
+        if (!accessPolicy.canViewAllTickets(authentication.getPrincipal())) {
+            throw new AccessDeniedException("Only administrators can view all tickets");
+        }
+        var filter = TicketFilter.parse(status, priority, category, assignee);
+        model.addAttribute("pageTitle", "All Tickets");
+        model.addAttribute("listUrl", "/tickets");
+        model.addAttribute("adminView", true);
+        model.addAttribute("showCreator", true);
+        model.addAttribute("canCreate", true);
+        model.addAttribute("emptyTitle", "No tickets yet");
+        model.addAttribute("emptyDescription", "Tickets raised by residents will show up here.");
+        model.addAttribute("tickets", ticketService.findAllTickets(filter, pageable));
+        model.addAttribute("totalCount", ticketService.hasAnyTickets() ? 1 : 0);
+        model.addAttribute("filter", filter);
+        model.addAttribute("statuses", TicketStatus.values());
+        model.addAttribute("priorities", TicketPriority.values());
+        model.addAttribute("categories", categoryAPI.findAllCategories());
+        model.addAttribute("staff", userAPI.findStaffMembers());
+        return "tickets/list";
     }
 
     /** REQ-014: the resident's own tickets, optionally of one status ({@code ?status=OPEN}). */
@@ -118,6 +150,7 @@ class TicketController {
         var userId = AuthUtils.getCurrentUserIdOrThrow();
         var selected = parseStatus(status);
         var counts = ticketService.countByStatus(scope, userId);
+        model.addAttribute("adminView", false);
         model.addAttribute("tickets", ticketService.findTickets(scope, userId, selected, pageable));
         model.addAttribute("statuses", TicketStatus.values());
         model.addAttribute("selectedStatus", selected);
@@ -140,13 +173,19 @@ class TicketController {
         }
     }
 
+    /** The ticket list of the user's role: their own tickets for a resident, every ticket for an admin. */
+    private String ticketListUrl(Authentication authentication) {
+        return accessPolicy.canViewOwnTickets(authentication.getPrincipal()) ? "/tickets/mine" : "/tickets";
+    }
+
     private void requireCanCreate(Authentication authentication) {
         if (!accessPolicy.canCreateTicket(authentication.getPrincipal())) {
             throw new AccessDeniedException("Only administrators and residents can create tickets");
         }
     }
 
-    private void addFormOptions(Model model) {
+    private void addFormOptions(Authentication authentication, Model model) {
+        model.addAttribute("listUrl", ticketListUrl(authentication));
         model.addAttribute("priorities", TicketPriority.values());
         model.addAttribute("categories", categoryAPI.findActiveCategories());
     }

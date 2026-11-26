@@ -19,6 +19,11 @@ public class UserAPI {
         return userService.findActiveStaffIdsHandling(categoryId);
     }
 
+    /** Every staff member, active or not, ordered by name. */
+    public List<UserDto> findStaffMembers() {
+        return userService.findUsersByRole(Role.ROLE_STAFF);
+    }
+
     /** Display names by user id; ids that do not exist are left out. */
     public Map<Long, String> findNamesByIds(Collection<Long> ids) {
         return userService.findNamesByIds(ids);

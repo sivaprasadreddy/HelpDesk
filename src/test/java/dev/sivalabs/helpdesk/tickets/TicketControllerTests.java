@@ -58,6 +58,14 @@ class TicketControllerTests extends BaseIT {
     }
 
     @Test
+    void shouldCancelToTheRolesTicketList() {
+        assertThat(mvc.get().uri("/tickets/new").with(user(RESIDENT)))
+                .bodyText()
+                .contains("href=\"/tickets/mine\"");
+        assertThat(mvc.get().uri("/tickets/new").with(user(ADMIN))).bodyText().contains("href=\"/tickets\"");
+    }
+
+    @Test
     void shouldLetResidentCreateOpenUnassignedTicket() {
         var result = mvc.post()
                 .uri("/tickets")
@@ -93,7 +101,7 @@ class TicketControllerTests extends BaseIT {
                 .param("priority", "CRITICAL")
                 .param("categoryId", "6");
 
-        assertThat(result).hasStatus3xxRedirection().hasRedirectedUrl("/home");
+        assertThat(result).hasStatus3xxRedirection().hasRedirectedUrl("/tickets");
         assertThat(onlyTicket()).containsEntry("created_by", 1L).containsEntry("priority", "CRITICAL");
     }
 

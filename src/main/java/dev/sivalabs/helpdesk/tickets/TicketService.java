@@ -86,6 +86,19 @@ class TicketService {
         return toSummaries(page);
     }
 
+    /** REQ-016: a page of every ticket matching the filter, sorted as {@link #findTickets}. */
+    @Transactional(readOnly = true)
+    @PreAuthorize("@accessPolicy.canViewAllTickets(principal)")
+    public Page<TicketSummary> findAllTickets(TicketFilter filter, Pageable pageable) {
+        return toSummaries(ticketRepository.findAll(filter.toSpecification(), stableSort(pageable)));
+    }
+
+    /** Whether any ticket exists at all. */
+    @Transactional(readOnly = true)
+    public boolean hasAnyTickets() {
+        return ticketRepository.count() > 0;
+    }
+
     /** Number of tickets per status in the user's list, every status present (zero when none). */
     @Transactional(readOnly = true)
     public Map<TicketStatus, Long> countByStatus(TicketScope scope, Long userId) {

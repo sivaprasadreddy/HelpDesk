@@ -42,6 +42,14 @@ class AccessPolicyTests {
     }
 
     @Test
+    void viewAllTicketsList() {
+        assertThat(policy.canViewAllTickets(ADMIN)).isTrue();
+        assertThat(policy.canViewAllTickets(STAFF)).isFalse();
+        assertThat(policy.canViewAllTickets(RESIDENT)).isFalse();
+        assertThat(policy.canViewAllTickets(null)).isFalse();
+    }
+
+    @Test
     void viewTickets() {
         assertThat(policy.canViewTicket(ADMIN, CREATED_BY, ASSIGNED_TO)).isTrue();
         assertThat(policy.canViewTicket(STAFF, CREATED_BY, ASSIGNED_TO)).isTrue();

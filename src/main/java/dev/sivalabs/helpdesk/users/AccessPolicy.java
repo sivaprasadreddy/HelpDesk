@@ -40,6 +40,11 @@ public class AccessPolicy {
         return is(principal, Role.ROLE_STAFF);
     }
 
+    /** The list of every ticket, with filters, is the administrator's view. */
+    public boolean canViewAllTickets(@Nullable Object principal) {
+        return isAdmin(principal);
+    }
+
     public boolean canViewTicket(@Nullable Object principal, Long createdBy, @Nullable Long assignedTo) {
         return is(principal, Role.ROLE_ADMIN)
                 || (is(principal, Role.ROLE_STAFF) && isSelf(principal, assignedTo))
