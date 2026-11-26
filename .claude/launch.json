@@ -4,7 +4,7 @@
     {
       "name": "helpdesk",
       "runtimeExecutable": "./mvnw",
-      "runtimeArgs": ["spring-boot:run", "-Dspring-boot.run.profiles=local", "-Dspring-boot.run.arguments=--server.port=8081"],
+      "runtimeArgs": ["spring-boot:run", "-Dspring-boot.run.profiles=local", "-Dspring-boot.run.arguments=--server.port=8081 --spring.ai.ollama.embedding.model=qwen3-embedding:0.6b"],
       "port": 8081
     }
   ]

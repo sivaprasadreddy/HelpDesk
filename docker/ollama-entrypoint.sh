@@ -15,4 +15,8 @@ ollama pull qwen3:8b
 
 echo "Model qwen3:8b is ready."
 
+ollama pull qwen3-embedding:0.6b
+
+echo "Model qwen3-embedding:0.6b is ready."
+
 wait $OLLAMA_PID
