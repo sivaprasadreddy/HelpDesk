@@ -13,7 +13,7 @@ Status values: `TODO`, `IN_PROGRESS`, `DONE`.
 | REQ-004 | Seed data: sample staff, residents and tickets for local development (dev profile only)            | DONE   |
 | REQ-005 | Authentication: login and logout                                                                   | DONE   |
 | REQ-006 | ADMIN: list residents (USER) and staff (STAFF) on separate pages; only ADMIN can create a resident or staff member (no self-registration) | DONE   |
-| REQ-007 | Role-based authorization and access rules (permissions matrix)                                    | TODO   |
+| REQ-007 | Role-based authorization and access rules (permissions matrix)                                    | DONE   |
 | REQ-008 | Application shell: layout and role-based navigation                                                | IN_PROGRESS |
 | REQ-009 | ADMIN: manage ticket categories (list, add, update, deactivate)                                    | TODO   |
 | REQ-010 | ADMIN: manage staff members (update, deactivate)                                                    | TODO   |

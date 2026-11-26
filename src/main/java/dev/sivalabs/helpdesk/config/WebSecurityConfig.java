@@ -24,11 +24,15 @@ class WebSecurityConfig {
         "/login"
     };
 
+    /**
+     * Coarse URL rules: whole areas that only ADMIN may enter. Per-ticket rules ("assigned", "own")
+     * need the ticket, so they are checked with {@link dev.sivalabs.helpdesk.users.AccessPolicy}.
+     */
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http.authorizeHttpRequests(r -> r.requestMatchers(PUBLIC_RESOURCES)
                 .permitAll()
-                .requestMatchers("/admin/**")
+                .requestMatchers("/admin/**", "/analytics/**")
                 .hasRole("ADMIN")
                 .anyRequest()
                 .authenticated());
