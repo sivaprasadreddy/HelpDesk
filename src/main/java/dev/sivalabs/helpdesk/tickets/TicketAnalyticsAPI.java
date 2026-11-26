@@ -1,6 +1,7 @@
 package dev.sivalabs.helpdesk.tickets;
 
 import dev.sivalabs.helpdesk.categories.CategoryAPI;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -10,6 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,13 +78,52 @@ public class TicketAnalyticsAPI {
             throw new IllegalArgumentException("The period must be at most " + MAX_DAYS + " days");
         }
         var zone = ZoneId.systemDefault();
-        var start = from.atStartOfDay(zone).toInstant();
-        var end = to.plusDays(1).atStartOfDay(zone).toInstant();
+        var start = startOf(from);
+        var end = startOf(to.plusDays(1));
         var created = countPerDay(ticketRepository.findCreatedAtBetween(start, end), zone);
         var resolved = countPerDay(ticketRepository.findResolvedAtBetween(start, end), zone);
         return from.datesUntil(to.plusDays(1))
                 .map(d -> new DailyTicketFlow(d, created.getOrDefault(d, 0L), resolved.getOrDefault(d, 0L)))
                 .toList();
+    }
+
+    /**
+     * REQ-025: the average time from creation to resolution of the tickets resolved from {@code from} to
+     * {@code to} inclusive (server time zone), overall and per priority in severity order. As in
+     * {@link #getCreatedVsResolved}, a ticket counts from its last resolution; closing does not change it.
+     *
+     * @throws IllegalArgumentException when {@code to} is before {@code from}
+     */
+    @Transactional(readOnly = true)
+    @PreAuthorize("@accessPolicy.canViewAnalytics(principal)")
+    public ResolutionTimes getResolutionTimes(LocalDate from, LocalDate to) {
+        if (to.isBefore(from)) {
+            throw new IllegalArgumentException("The period ends before it starts");
+        }
+        var rows = ticketRepository.findResolutionsBetween(startOf(from), startOf(to.plusDays(1)));
+        var byPriority = rows.stream().collect(Collectors.groupingBy(TicketRepository.Resolution::getPriority));
+        var perPriority = Arrays.stream(TicketPriority.values())
+                .map(p -> {
+                    var group = byPriority.getOrDefault(p, List.of());
+                    return new ResolutionTimes.ByPriority(p, group.size(), average(group));
+                })
+                .toList();
+        return new ResolutionTimes(rows.size(), average(rows), perPriority);
+    }
+
+    private static @Nullable Duration average(List<TicketRepository.Resolution> rows) {
+        if (rows.isEmpty()) {
+            return null;
+        }
+        var totalSeconds = rows.stream()
+                .mapToLong(r ->
+                        Duration.between(r.getCreatedAt(), r.getResolvedAt()).toSeconds())
+                .sum();
+        return Duration.ofSeconds(Math.round((double) totalSeconds / rows.size()));
+    }
+
+    private static Instant startOf(LocalDate day) {
+        return day.atStartOfDay(ZoneId.systemDefault()).toInstant();
     }
 
     private static Map<LocalDate, Long> countPerDay(List<Instant> instants, ZoneId zone) {

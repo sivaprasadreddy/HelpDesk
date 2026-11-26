@@ -60,6 +60,20 @@ interface TicketRepository extends JpaRepository<TicketEntity, Long>, JpaSpecifi
     @Query("select t.resolvedAt from TicketEntity t where t.resolvedAt >= :from and t.resolvedAt < :to")
     List<Instant> findResolvedAtBetween(Instant from, Instant to);
 
+    @Query("""
+            select t.priority as priority, t.createdAt as createdAt, t.resolvedAt as resolvedAt from TicketEntity t
+            where t.resolvedAt >= :from and t.resolvedAt < :to
+            """)
+    List<Resolution> findResolutionsBetween(Instant from, Instant to);
+
+    interface Resolution {
+        TicketPriority getPriority();
+
+        Instant getCreatedAt();
+
+        Instant getResolvedAt();
+    }
+
     interface GroupCount<K> {
         K getGroupKey();
 
