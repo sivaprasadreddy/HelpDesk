@@ -1,4 +1,4 @@
-name: feedback-hub
+name: helpdesk
 services:
   postgres:
     image: postgres:19-alpine
