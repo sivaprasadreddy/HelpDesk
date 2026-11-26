@@ -1,13 +1,12 @@
 [tools]
 java = "temurin-25"
 maven = "3.10.2"
-node = "26"
 
 [settings]
 lockfile = true
 
 [env]
-DC_FILE = "compose.yml"
+DC_FILE = "docker/compose.yml"
 REGISTRY = "docker.io"
 IMAGE_NAME = "sivaprasadreddy/helpdesk"
 DOCKER_IMAGE_NAME = "{{env.REGISTRY}}/{{env.IMAGE_NAME}}"

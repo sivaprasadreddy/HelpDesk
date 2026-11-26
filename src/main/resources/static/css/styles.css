@@ -1,0 +1,49 @@
+/* The square behind the application's logo. */
+.app-logo {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    inline-size: 2rem;
+    block-size: 2rem;
+    border-radius: calc(var(--radius) - 2px);
+    background: var(--sidebar-primary);
+    color: var(--sidebar-primary-foreground);
+}
+.app-logo > svg { inline-size: 1rem; block-size: 1rem; }
+
+/* Main layout: the page inside the inset card. */
+.page { padding: 0 1rem 1rem; }
+.page > h1 { margin-block-end: 1rem; font-size: 1.5rem; font-weight: 600; }
+
+/* Public layout: login, registration and error pages. */
+.public-body { min-block-size: 100dvh; display: flex; flex-direction: column; }
+.public-page {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+.public-page:focus { outline: none; }
+.public-page > * { inline-size: 100%; }
+.auth-card { max-inline-size: 28rem; }
+
+.flash { margin-block-end: 1rem; }
+.form-stack { display: flex; flex-direction: column; gap: 1.25rem; }
+
+/* Landing page at "/". */
+.landing { max-inline-size: 64rem; display: flex; flex-direction: column; gap: 3rem; }
+.landing-hero { display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center; }
+.landing-hero > h1 { font-size: 2.25rem; font-weight: 700; line-height: 1.2; }
+.landing-hero > p { max-inline-size: 40rem; color: var(--muted-foreground); font-size: 1.125rem; }
+.landing-features { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); }
+.landing-banner {
+    display: block;
+    inline-size: 100%;
+    max-inline-size: 36rem;
+    block-size: auto;
+    margin-block-end: 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+}

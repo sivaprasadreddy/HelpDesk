@@ -1,0 +1,75 @@
+name: feedback-hub
+services:
+  postgres:
+    image: postgres:19-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+  
+  mailpit:
+    image: axllent/mailpit:v1.34
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  grafana-lgtm:
+    image: grafana/otel-lgtm:0.41.1
+    ports:
+      - "3000:3000"
+      - "4317:4317"
+      - "4318:4318"
+
+  ollama:
+    image: ollama/ollama:0.40.17
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    entrypoint: [ "/entrypoint.sh" ]
+    volumes:
+      - ollama_data:/root/.ollama
+      - ./ollama-entrypoint.sh:/entrypoint.sh:ro
+
+  helpdesk:
+    image: sivaprasadreddy/helpdesk
+    container_name: helpdesk
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/postgres
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      EMAIL_HOST: mailpit
+      EMAIL_PORT: 1025
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_AI_MODEL_CHAT: ${SPRING_AI_MODEL_CHAT:-ollama}
+      SPRING_AI_OLLAMA_BASE_URL: http://ollama:11434
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-your-openai-api-key}
+      TRACING_ENABLED: true
+      METRICS_EXPORT_URL: http://grafana-lgtm:4318/v1/metrics
+      TELEMETRY_ENABLED: true
+      TRACES_EXPORT_URL: http://grafana-lgtm:4318/v1/traces
+      LOGS_EXPORT_URL: http://grafana-lgtm:4318/v1/logs
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - mailpit
+      - rabbitmq
+      - ollama
+      - grafana-lgtm
+    restart: unless-stopped
+
+volumes:
+  ollama_data:

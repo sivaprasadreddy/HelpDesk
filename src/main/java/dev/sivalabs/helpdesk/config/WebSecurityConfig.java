@@ -11,16 +11,17 @@ import org.springframework.security.web.servlet.util.matcher.PathPatternRequestM
 @EnableWebSecurity
 class WebSecurityConfig {
     private static final String[] PUBLIC_RESOURCES = {
+        "/",
         "/css/**",
         "/js/**",
         "/images/**",
         "/webjars/**",
+        "/shadleaf/**",
         "/favicon.ico",
         "/actuator/health/**",
         "/actuator/info/**",
         "/error",
-        "/login",
-        "/registration"
+        "/login"
     };
 
     @Bean
@@ -28,7 +29,8 @@ class WebSecurityConfig {
         http.authorizeHttpRequests(r ->
                 r.requestMatchers(PUBLIC_RESOURCES).permitAll().anyRequest().authenticated());
 
-        http.formLogin(formLogin -> formLogin.loginPage("/login").permitAll());
+        http.formLogin(formLogin ->
+                formLogin.loginPage("/login").defaultSuccessUrl("/home").permitAll());
 
         http.logout(logout -> logout.logoutRequestMatcher(PathPatternRequestMatcher.pathPattern("/logout"))
                 .logoutSuccessUrl("/")

@@ -1,6 +1,10 @@
 package dev.sivalabs.helpdesk.config;
 
 import dev.sivalabs.helpdesk.users.Role;
+import dev.sivalabs.helpdesk.users.SecurityUser;
+import io.github.wimdeblauwe.shadleaf.security.CurrentUserResolver;
+import io.github.wimdeblauwe.shadleaf.security.DefaultCurrentUserResolver;
+import io.github.wimdeblauwe.shadleaf.security.ShadleafUser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -31,5 +35,16 @@ class SecurityConfig {
         authProvider.setPasswordEncoder(pe);
 
         return new ProviderManager(authProvider);
+    }
+
+    /**
+     * Shows the user's display name (not the email they sign in with) in Shadleaf's user menu and #slUser.
+     */
+    @Bean
+    CurrentUserResolver currentUserResolver() {
+        CurrentUserResolver fallback = new DefaultCurrentUserResolver();
+        return authentication -> authentication.getPrincipal() instanceof SecurityUser user
+                ? ShadleafUser.of(user.getName(), user.getUsername(), user.getUsername(), null)
+                : fallback.resolve(authentication);
     }
 }

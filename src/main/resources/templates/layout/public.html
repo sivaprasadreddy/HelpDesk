@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sl="https://shadleaf.dev/sl"
+      th:fragment="layout(pageTitle, content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="|${pageTitle} - #{app.name}|">HelpDesk</title>
+    <th:block th:replace="~{sl/layout :: theme-script}"></th:block>
+    <th:block th:replace="~{sl/layout :: assets}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body class="public-body">
+<sl:skip-link/>
+<sl:site-header>
+    <sl:button as="a" th:href="@{/}" variant="ghost">
+        <sl:slot name="icon-start"><span class="app-logo"><sl:icon name="life-buoy"/></span></sl:slot>
+        <strong th:text="#{app.name}">HelpDesk</strong>
+    </sl:button>
+    <sl:slot name="end">
+        <sl:theme-toggle/>
+        <sl:button th:unless="${#slUser.signedIn}" as="a" th:href="@{/login}" variant="outline" size="sm">Sign in</sl:button>
+        <sl:user-menu th:if="${#slUser.signedIn}" placement="header">
+            <sl:dropdown-menu-item as="a" th:href="@{/home}"><sl:icon name="layout-dashboard"/>Go to HelpDesk</sl:dropdown-menu-item>
+        </sl:user-menu>
+    </sl:slot>
+</sl:site-header>
+<main id="main" tabindex="-1" class="public-page">
+    <div th:replace="${content}"></div>
+</main>
+</body>
+</html>

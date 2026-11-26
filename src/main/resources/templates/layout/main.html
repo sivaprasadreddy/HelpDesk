@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sl="https://shadleaf.dev/sl"
+      th:fragment="layout(pageTitle, breadcrumb, content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="|${pageTitle} - #{app.name}|">HelpDesk</title>
+    <th:block th:replace="~{sl/layout :: theme-script}"></th:block>
+    <th:block th:replace="~{sl/layout :: assets}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<sl:skip-link/>
+<sl:sidebar-provider>
+    <sl:sidebar variant="inset" collapsible="icon">
+        <sl:sidebar-header>
+            <sl:sidebar-menu>
+                <sl:sidebar-menu-item>
+                    <sl:sidebar-menu-button th:href="@{/home}" size="lg" th:tooltip="#{app.name}">
+                        <sl:slot name="icon-start"><span class="app-logo"><sl:icon name="life-buoy"/></span></sl:slot>
+                        <strong th:text="#{app.name}">HelpDesk</strong>
+                        <small>Support desk</small>
+                    </sl:sidebar-menu-button>
+                </sl:sidebar-menu-item>
+            </sl:sidebar-menu>
+        </sl:sidebar-header>
+        <sl:sidebar-content>
+            <sl:sidebar-group id="nav-main">
+                <sl:sidebar-group-label>Platform</sl:sidebar-group-label>
+                <sl:sidebar-menu>
+                    <sl:sidebar-menu-item>
+                        <sl:sidebar-menu-button th:href="@{/home}" th:active="${#slNav.current('/home')}" tooltip="Home">
+                            <sl:slot name="icon-start"><sl:icon name="house"/></sl:slot>
+                            Home
+                        </sl:sidebar-menu-button>
+                    </sl:sidebar-menu-item>
+                </sl:sidebar-menu>
+            </sl:sidebar-group>
+        </sl:sidebar-content>
+        <sl:sidebar-footer>
+            <sl:user-menu/>
+        </sl:sidebar-footer>
+    </sl:sidebar>
+    <sl:sidebar-inset>
+        <sl:site-header>
+            <sl:sidebar-trigger/>
+            <sl:separator orientation="vertical"/>
+            <sl:breadcrumb>
+                <sl:breadcrumb-list>
+                    <th:block th:replace="${breadcrumb}"></th:block>
+                </sl:breadcrumb-list>
+            </sl:breadcrumb>
+            <sl:slot name="end"><sl:theme-toggle/></sl:slot>
+        </sl:site-header>
+        <div class="page">
+            <sl:alert th:if="${successMessage}" class="flash">
+                <sl:icon name="circle-check"/>
+                <sl:alert-title th:text="${successMessage}">Saved</sl:alert-title>
+            </sl:alert>
+            <sl:alert th:if="${errorMessage}" variant="destructive" class="flash">
+                <sl:icon name="circle-alert"/>
+                <sl:alert-title th:text="${errorMessage}">Failed</sl:alert-title>
+            </sl:alert>
+            <h1 th:text="${pageTitle}"></h1>
+            <div th:replace="${content}"></div>
+        </div>
+    </sl:sidebar-inset>
+</sl:sidebar-provider>
+<div id="modal-root"></div>
+</body>
+</html>

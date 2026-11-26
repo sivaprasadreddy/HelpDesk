@@ -18,7 +18,6 @@
         <spring-modulith.version>2.2.0</spring-modulith.version>
         <spring-ai.version>2.1.0</spring-ai.version>
         <tc-mailpit.version>1.4.0</tc-mailpit.version>
-        <font_awesome.version>7.3.0</font_awesome.version>
         <htmx.org.version>4.0.2</htmx.org.version>
         <htmx-spring-boot-thymeleaf.version>6.0.1</htmx-spring-boot-thymeleaf.version>
         <shadleaf-spring-boot-starter.version>1.1.0</shadleaf-spring-boot-starter.version>
@@ -91,10 +90,6 @@
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
         <dependency>
-            <groupId>nz.net.ultraq.thymeleaf</groupId>
-            <artifactId>thymeleaf-layout-dialect</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.thymeleaf.extras</groupId>
             <artifactId>thymeleaf-extras-springsecurity6</artifactId>
         </dependency>
@@ -161,11 +156,6 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>webjars-locator-lite</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>font-awesome</artifactId>
-            <version>${font_awesome.version}</version>
         </dependency>
         <dependency>
             <groupId>org.webjars.npm</groupId>

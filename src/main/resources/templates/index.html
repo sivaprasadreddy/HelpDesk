@@ -1,12 +1,43 @@
-<!DOCTYPE html>
-<html lang="en"
-      xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sl="https://shadleaf.dev/sl"
+      th:replace="~{layout/public :: layout('Welcome', ~{::#page-content})}">
 <body>
-<div layout:fragment="content">
-    <h1>Welcome</h1>
+<div id="page-content" class="landing">
+    <section class="landing-hero">
+        <img class="landing-banner" th:src="@{/images/helpdesk-banner.png}" width="1000" height="800"
+             alt="A support agent with a headset at a laptop, beside a list of tickets marked Open, In Progress, Resolved and Closed">
+        <h1>Customer support, in one place</h1>
+        <p th:text="|#{app.name} helps your team receive, track and resolve support requests, so no customer question gets lost.|">
+            HelpDesk helps your team receive, track and resolve support requests.
+        </p>
+        <sl:button th:unless="${#slUser.signedIn}" as="a" th:href="@{/login}" size="lg">
+            <sl:slot name="icon-start"><sl:icon name="log-in"/></sl:slot>
+            Sign in
+        </sl:button>
+        <sl:button th:if="${#slUser.signedIn}" as="a" th:href="@{/home}" size="lg">
+            <sl:slot name="icon-start"><sl:icon name="layout-dashboard"/></sl:slot>
+            Go to HelpDesk
+        </sl:button>
+    </section>
+    <div class="landing-features">
+        <sl:card>
+            <sl:card-header>
+                <sl:card-title level="2">Raise tickets</sl:card-title>
+                <sl:card-description>Customers describe their problem once and get a ticket to follow.</sl:card-description>
+            </sl:card-header>
+        </sl:card>
+        <sl:card>
+            <sl:card-header>
+                <sl:card-title level="2">Track progress</sl:card-title>
+                <sl:card-description>Every ticket has a status, an owner and a history of what happened.</sl:card-description>
+            </sl:card-header>
+        </sl:card>
+        <sl:card>
+            <sl:card-header>
+                <sl:card-title level="2">Resolve faster</sl:card-title>
+                <sl:card-description>Agents see their queue and get notified when customers reply.</sl:card-description>
+            </sl:card-header>
+        </sl:card>
+    </div>
 </div>
 </body>
 </html>
