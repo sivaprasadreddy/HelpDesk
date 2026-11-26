@@ -42,6 +42,8 @@ interface TicketRepository extends JpaRepository<TicketEntity, Long>, JpaSpecifi
             """)
     List<StatusCount> countByStatusForAssignee(Long assignedTo);
 
+    List<TicketEntity> findByAssignedToAndStatusInOrderByIdAsc(Long assignedTo, Collection<TicketStatus> statuses);
+
     interface StaffWorkload {
         Long getStaffId();
 

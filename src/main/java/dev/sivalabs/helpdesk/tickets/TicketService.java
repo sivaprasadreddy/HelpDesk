@@ -4,6 +4,7 @@ import dev.sivalabs.helpdesk.categories.CategoryAPI;
 import dev.sivalabs.helpdesk.categories.CategoryDto;
 import dev.sivalabs.helpdesk.shared.ResourceNotFoundException;
 import dev.sivalabs.helpdesk.users.AccessPolicy;
+import dev.sivalabs.helpdesk.users.StaffDeactivatedEvent;
 import dev.sivalabs.helpdesk.users.UserAPI;
 import java.time.Instant;
 import java.util.Comparator;
@@ -17,6 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -119,7 +121,7 @@ class TicketService {
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket #" + id + " not found"));
         var category = categoryAPI.findAllCategories().stream()
                 .filter(c -> c.id().equals(t.getCategoryId()))
-                .map(CategoryDto::name)
+                .map(TicketService::categoryLabel)
                 .findFirst()
                 .orElse("Unknown");
         var names = userAPI.findNamesByIds(Stream.of(t.getCreatedBy(), t.getAssignedTo())
@@ -266,6 +268,25 @@ class TicketService {
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket #" + id + " not found"));
     }
 
+    /**
+     * REQ-022: when a staff member is deactivated, each of their OPEN and IN_PROGRESS tickets goes to another
+     * active staff member handling its category (the same rule as for new tickets), or is left unassigned for an
+     * ADMIN when nobody does. RESOLVED and CLOSED tickets keep the assignee as a record of who did the work.
+     * Runs in the deactivating transaction.
+     *
+     * @return the number of tickets reassigned or unassigned
+     */
+    @EventListener
+    @Transactional
+    public int onStaffDeactivated(StaffDeactivatedEvent event) {
+        var tickets = ticketRepository.findByAssignedToAndStatusInOrderByIdAsc(event.staffId(), ACTIVE_STATUSES);
+        for (var t : tickets) {
+            t.setAssignedTo(chooseAssignee(t.getCategoryId()).orElse(null));
+            ticketRepository.flush(); // so the next ticket's choice sees this one's workload
+        }
+        return tickets.size();
+    }
+
     /** Whether any ticket exists at all. */
     @Transactional(readOnly = true)
     public boolean hasAnyTickets() {
@@ -295,10 +316,18 @@ class TicketService {
                 pageable.getPageNumber(), pageable.getPageSize(), sort.and(Sort.by(Sort.Order.desc("id"))));
     }
 
+    /**
+     * REQ-022: tickets keep a category that is deactivated later (it only stops taking new tickets), labelled so
+     * an ADMIN can recategorise them.
+     */
+    private static String categoryLabel(CategoryDto c) {
+        return c.active() ? c.name() : c.name() + " (inactive)";
+    }
+
     /** Resolves category and user names with one lookup each for the whole page. */
     private Page<TicketSummary> toSummaries(Page<TicketEntity> page) {
-        var categoryNames =
-                categoryAPI.findAllCategories().stream().collect(Collectors.toMap(CategoryDto::id, CategoryDto::name));
+        var categoryNames = categoryAPI.findAllCategories().stream()
+                .collect(Collectors.toMap(CategoryDto::id, TicketService::categoryLabel));
         var userIds = page.stream()
                 .flatMap(t -> Stream.of(t.getCreatedBy(), t.getAssignedTo()))
                 .filter(Objects::nonNull)

@@ -62,7 +62,8 @@ class StaffController {
     @PostMapping("/deactivate")
     String deactivate(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         userService.setStaffActive(id, false);
-        redirectAttributes.addFlashAttribute("successMessage", "Staff member deactivated");
+        redirectAttributes.addFlashAttribute(
+                "successMessage", "Staff member deactivated; their open tickets were reassigned");
         return REDIRECT_LIST;
     }
 

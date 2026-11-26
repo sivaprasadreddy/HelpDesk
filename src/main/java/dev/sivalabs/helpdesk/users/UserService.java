@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,11 +19,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 class UserService {
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
     private final PasswordEncoder passwordEncoder;
     private final CategoryAPI categoryService;
 
-    UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, CategoryAPI categoryService) {
+    UserService(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            CategoryAPI categoryService,
+            ApplicationEventPublisher eventPublisher) {
         this.userRepository = userRepository;
+        this.eventPublisher = eventPublisher;
         this.passwordEncoder = passwordEncoder;
         this.categoryService = categoryService;
     }
@@ -100,9 +107,16 @@ class UserService {
         user.setCategoryIds(cmd.categoryIds());
     }
 
+    /** Deactivating an active staff member publishes {@link StaffDeactivatedEvent}. */
     @Transactional
     public void setStaffActive(Long id, boolean active) {
-        loadStaff(id).setActive(active);
+        var staff = loadStaff(id);
+        var deactivating = staff.isActive() && !active;
+        staff.setActive(active);
+        if (deactivating) {
+            userRepository.flush();
+            eventPublisher.publishEvent(new StaffDeactivatedEvent(id));
+        }
     }
 
     private UserEntity loadStaff(Long id) {
