@@ -44,3 +44,51 @@ $ mise run start
 $ mise run stop
 $ mise run restart
 ```
+
+## Using the Application
+Start the application and its supporting services (PostgreSQL, Mailpit, RabbitMQ, Grafana LGTM, Ollama) with `mise run start`.
+
+| Service         | URL                      | Credentials       |
+|-----------------|--------------------------|-------------------|
+| HelpDesk        | http://localhost:8080    | see below         |
+| Mailpit         | http://localhost:8025    | none              |
+| RabbitMQ        | http://localhost:15672   | `guest` / `guest` |
+| Grafana         | http://localhost:3000    | none (anonymous)  |
+
+### Login credentials
+| Role     | Email                     | Password |
+|----------|---------------------------|----------|
+| Admin    | `admin@gmail.com`         | `admin`  |
+| Staff    | `ravi.staff@gmail.com`    | `secret` |
+| Resident | `priya@gmail.com`         | `secret` |
+
+The admin account is always created. The staff and resident accounts (and others: `anita.staff`, `mohan.staff`, `lakshmi.staff`, `arjun`, `meena`, all `@gmail.com` with password `secret`) are sample data loaded only with the `local` Spring profile.
+With `mise run start` (the `docker` profile), log in as admin and create residents and staff from **Residents** and **Staff** pages.
+
+### Checking emails in Mailpit
+The application sends email notifications on ticket events (created, assigned, status changed, etc.) to the concerned users.
+All emails are captured by Mailpit instead of being delivered.
+
+1. Open http://localhost:8025.
+2. Raise or update a ticket in HelpDesk.
+3. The email appears in the Mailpit inbox; click it to see the HTML/text content, headers and recipients.
+
+### Checking messages in RabbitMQ
+Ticket events are published to RabbitMQ and consumed to deliver notifications.
+
+1. Open http://localhost:15672 and log in with `guest` / `guest`.
+2. **Exchanges** tab: view the exchanges the application publishes to and their bindings.
+3. **Queues and Streams** tab: click a queue to see its message rates, ready/unacknowledged counts and consumers.
+4. To inspect messages, open a queue, expand **Get messages** and click **Get Message(s)**.
+   Messages are usually consumed immediately, so the queue is often empty; watch the message-rate charts while you create a ticket.
+   (Getting messages with the default *Nack message requeue true* mode leaves them in the queue.)
+
+### Viewing telemetry in Grafana
+The application exports traces, metrics and logs over OTLP to the Grafana LGTM stack (Tempo, Prometheus/Mimir, Loki).
+
+1. Open http://localhost:3000.
+2. Go to **Explore** (compass icon) and pick a data source:
+   - **Tempo**: traces. Use *Search* and filter by service name `helpdesk` to see HTTP requests, DB queries and RabbitMQ publish/consume spans.
+   - **Prometheus**: metrics. Use the metric browser and search for `http_server_requests` or `jvm_` to find request and JVM metrics (exact names depend on the OTLP export units).
+   - **Loki**: logs. Query `{service_name="helpdesk"}` to see the application logs; click a log line's trace ID to jump to the trace.
+3. **Drilldown** (Metrics, Logs, Traces) in the left menu offers query-less exploration of the same data.
