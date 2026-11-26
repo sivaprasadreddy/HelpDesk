@@ -64,3 +64,13 @@
 .filter-count { opacity: 0.7; font-variant-numeric: tabular-nums; }
 .table-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
 .table-footer .pagination { inline-size: auto; margin: 0; }
+
+/* Ticket details */
+.ticket-link { color: inherit; font-weight: 500; text-decoration: none; }
+.ticket-link:hover { text-decoration: underline; }
+.ticket-badges { display: flex; gap: 0.5rem; }
+.section-heading { font-size: 0.875rem; font-weight: 600; margin: 0 0 0.5rem; }
+.ticket-description { margin: 0; white-space: pre-line; }
+.ticket-meta { display: grid; grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr)); gap: 1rem; margin: 0; }
+.ticket-meta dt { font-size: 0.75rem; color: var(--muted-foreground); }
+.ticket-meta dd { margin: 0.125rem 0 0; }

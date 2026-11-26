@@ -1,0 +1,48 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sl="https://shadleaf.dev/sl"
+      th:replace="~{layout/main :: layout(|Ticket #${ticket.id}|, ~{::breadcrumb}, ~{::#page-content})}">
+<body>
+<th:block th:ref="breadcrumb">
+    <sl:breadcrumb-item><sl:breadcrumb-link th:href="@{/home}">Home</sl:breadcrumb-link></sl:breadcrumb-item>
+    <sl:breadcrumb-separator/>
+    <sl:breadcrumb-item><sl:breadcrumb-link th:href="@{${listUrl}}" th:text="${listTitle}">My Tickets</sl:breadcrumb-link></sl:breadcrumb-item>
+    <sl:breadcrumb-separator/>
+    <sl:breadcrumb-item><sl:breadcrumb-page th:text="|Ticket #${ticket.id}|">Ticket #100</sl:breadcrumb-page></sl:breadcrumb-item>
+</th:block>
+<div id="page-content" class="stack ticket-details">
+    <sl:card>
+        <sl:card-header border>
+            <sl:card-title level="1" th:text="${ticket.title}">Kitchen sink leaking</sl:card-title>
+            <sl:card-description>
+                <span th:text="|#${ticket.id}|">#100</span> · <span th:text="${ticket.categoryName}">Plumbing</span>
+            </sl:card-description>
+            <sl:card-action class="ticket-badges">
+                <sl:badge th:variant="${ticket.status.name() == 'OPEN' ? 'default' : (ticket.status.name() == 'IN_PROGRESS' ? 'secondary' : 'outline')}"
+                          th:text="${ticket.status.label}">Open</sl:badge>
+                <sl:badge th:variant="${ticket.priority.name() == 'CRITICAL' ? 'destructive' : (ticket.priority.name() == 'HIGH' ? 'default' : 'outline')}"
+                          th:text="|${ticket.priority.label} priority|">High priority</sl:badge>
+            </sl:card-action>
+        </sl:card-header>
+        <sl:card-content class="stack">
+            <section aria-labelledby="description-heading">
+                <h2 id="description-heading" class="section-heading">Description</h2>
+                <p class="ticket-description" th:text="${ticket.description}">Water is leaking under the kitchen sink.</p>
+            </section>
+            <dl class="ticket-meta">
+                <div><dt>Status</dt><dd th:text="${ticket.status.label}">Open</dd></div>
+                <div><dt>Priority</dt><dd th:text="${ticket.priority.label}">High</dd></div>
+                <div><dt>Category</dt><dd th:text="${ticket.categoryName}">Plumbing</dd></div>
+                <div><dt>Raised by</dt><dd th:text="${ticket.creatorName}">Priya Nair</dd></div>
+                <div><dt>Assigned to</dt>
+                    <dd th:if="${ticket.assigneeName != null}" th:text="${ticket.assigneeName}">Ravi Kumar</dd>
+                    <dd th:unless="${ticket.assigneeName != null}" class="muted">Not yet assigned</dd>
+                </div>
+                <div><dt>Created</dt><dd th:text="${#temporals.format(ticket.createdAt, 'dd MMM yyyy, HH:mm')}">26 Nov 2026, 10:00</dd></div>
+                <div><dt>Last updated</dt><dd th:text="${#temporals.format(ticket.lastUpdatedAt, 'dd MMM yyyy, HH:mm')}">26 Nov 2026, 10:00</dd></div>
+                <div th:if="${ticket.resolvedAt != null}"><dt>Resolved</dt><dd th:text="${#temporals.format(ticket.resolvedAt, 'dd MMM yyyy, HH:mm')}">26 Nov 2026, 12:00</dd></div>
+                <div th:if="${ticket.closedAt != null}"><dt>Closed</dt><dd th:text="${#temporals.format(ticket.closedAt, 'dd MMM yyyy, HH:mm')}">27 Nov 2026, 09:00</dd></div>
+            </dl>
+        </sl:card-content>
+    </sl:card>
+</div>
+</body>
+</html>

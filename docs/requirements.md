@@ -23,7 +23,7 @@ Status values: `TODO` (`📋`), `IN_PROGRESS` (`👷🏽`), `DONE` (`✅`).
 | ✅ | REQ-014 | USER: view own tickets and track their status                                                      | DONE   |
 | ✅ | REQ-015 | STAFF: view tickets assigned to them                                                               | DONE   |
 | ✅ | REQ-016 | ADMIN: view all tickets with filtering (status, priority, category, assignee)                      | DONE   |
-| 📋 | REQ-017 | Ticket details page                                                                                | TODO   |
+| ✅ | REQ-017 | Ticket details page                                                                                | DONE   |
 | 📋 | REQ-018 | Ticket status workflow (OPEN → IN_PROGRESS → RESOLVED → CLOSED) for STAFF (assigned) and ADMIN    | TODO   |
 | 📋 | REQ-019 | ADMIN: manually assign or reassign a ticket to any staff member                                    | TODO   |
 | 📋 | REQ-020 | ADMIN: update any ticket (status, priority, assignee, details)                                     | TODO   |

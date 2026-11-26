@@ -2,6 +2,8 @@ package dev.sivalabs.helpdesk.tickets;
 
 import dev.sivalabs.helpdesk.categories.CategoryAPI;
 import dev.sivalabs.helpdesk.categories.CategoryDto;
+import dev.sivalabs.helpdesk.shared.ResourceNotFoundException;
+import dev.sivalabs.helpdesk.users.AccessPolicy;
 import dev.sivalabs.helpdesk.users.UserAPI;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -35,11 +37,14 @@ class TicketService {
     private final TicketRepository ticketRepository;
     private final CategoryAPI categoryAPI;
     private final UserAPI userAPI;
+    private final AccessPolicy accessPolicy;
 
-    TicketService(TicketRepository ticketRepository, CategoryAPI categoryAPI, UserAPI userAPI) {
+    TicketService(
+            TicketRepository ticketRepository, CategoryAPI categoryAPI, UserAPI userAPI, AccessPolicy accessPolicy) {
         this.ticketRepository = ticketRepository;
         this.categoryAPI = categoryAPI;
         this.userAPI = userAPI;
+        this.accessPolicy = accessPolicy;
     }
 
     /**
@@ -91,6 +96,41 @@ class TicketService {
     @PreAuthorize("@accessPolicy.canViewAllTickets(principal)")
     public Page<TicketSummary> findAllTickets(TicketFilter filter, Pageable pageable) {
         return toSummaries(ticketRepository.findAll(filter.toSpecification(), stableSort(pageable)));
+    }
+
+    /**
+     * REQ-017: the ticket, if the principal may view it ({@code AccessPolicy#canViewTicket}). A ticket the principal
+     * may not view is reported as not found, so its existence does not leak.
+     */
+    @Transactional(readOnly = true)
+    public TicketDetails getTicket(Long id, Object principal) {
+        var t = ticketRepository
+                .findById(id)
+                .filter(ticket -> accessPolicy.canViewTicket(principal, ticket.getCreatedBy(), ticket.getAssignedTo()))
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket #" + id + " not found"));
+        var category = categoryAPI.findAllCategories().stream()
+                .filter(c -> c.id().equals(t.getCategoryId()))
+                .map(CategoryDto::name)
+                .findFirst()
+                .orElse("Unknown");
+        var names = userAPI.findNamesByIds(Stream.of(t.getCreatedBy(), t.getAssignedTo())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet()));
+        return new TicketDetails(
+                t.getId(),
+                t.getTitle(),
+                t.getDescription(),
+                category,
+                t.getPriority(),
+                t.getStatus(),
+                t.getCreatedBy(),
+                names.getOrDefault(t.getCreatedBy(), "Unknown"),
+                t.getAssignedTo(),
+                t.getAssignedTo() == null ? null : names.get(t.getAssignedTo()),
+                t.getCreatedAt(),
+                t.getUpdatedAt() == null ? t.getCreatedAt() : t.getUpdatedAt(),
+                t.getResolvedAt(),
+                t.getClosedAt());
     }
 
     /** Whether any ticket exists at all. */

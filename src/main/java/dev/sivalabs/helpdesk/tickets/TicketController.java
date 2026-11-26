@@ -16,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -108,6 +109,15 @@ class TicketController {
         return "tickets/list";
     }
 
+    /** REQ-017: one ticket; 404 when it does not exist or the user may not view it. */
+    @GetMapping("/{id:\\d+}")
+    String ticketDetails(Authentication authentication, @PathVariable Long id, Model model) {
+        model.addAttribute("ticket", ticketService.getTicket(id, authentication.getPrincipal()));
+        model.addAttribute("listUrl", ticketListUrl(authentication));
+        model.addAttribute("listTitle", ticketListTitle(authentication));
+        return "tickets/details";
+    }
+
     /** REQ-014: the resident's own tickets, optionally of one status ({@code ?status=OPEN}). */
     @GetMapping("/mine")
     String myTickets(
@@ -173,9 +183,19 @@ class TicketController {
         }
     }
 
-    /** The ticket list of the user's role: their own tickets for a resident, every ticket for an admin. */
+    /** The ticket list of the user's role: own tickets (USER), assigned tickets (STAFF), every ticket (ADMIN). */
     private String ticketListUrl(Authentication authentication) {
-        return accessPolicy.canViewOwnTickets(authentication.getPrincipal()) ? "/tickets/mine" : "/tickets";
+        var principal = authentication.getPrincipal();
+        if (accessPolicy.canViewOwnTickets(principal)) return "/tickets/mine";
+        if (accessPolicy.canViewAssignedTickets(principal)) return "/tickets/assigned";
+        return "/tickets";
+    }
+
+    private String ticketListTitle(Authentication authentication) {
+        var principal = authentication.getPrincipal();
+        if (accessPolicy.canViewOwnTickets(principal)) return "My Tickets";
+        if (accessPolicy.canViewAssignedTickets(principal)) return "Assigned to Me";
+        return "All Tickets";
     }
 
     private void requireCanCreate(Authentication authentication) {

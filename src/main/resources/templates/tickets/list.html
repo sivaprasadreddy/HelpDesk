@@ -82,7 +82,7 @@
             <tbody>
             <tr th:each="t : ${tickets}">
                 <td th:text="|#${t.id}|">#100</td>
-                <td th:text="${t.title}">Kitchen sink leaking</td>
+                <td><a class="ticket-link" th:href="@{/tickets/{id}(id=${t.id})}" th:text="${t.title}">Kitchen sink leaking</a></td>
                 <td th:text="${t.categoryName}">Plumbing</td>
                 <td>
                     <sl:badge th:variant="${t.priority.name() == 'CRITICAL' ? 'destructive' : (t.priority.name() == 'HIGH' ? 'default' : 'outline')}"
