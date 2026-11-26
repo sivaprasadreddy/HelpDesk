@@ -68,7 +68,7 @@ class TicketControllerTests extends BaseIT {
                 .param("priority", "HIGH")
                 .param("categoryId", "1");
 
-        assertThat(result).hasStatus3xxRedirection().hasRedirectedUrl("/home");
+        assertThat(result).hasStatus3xxRedirection().hasRedirectedUrl("/tickets/mine");
         assertThat(result).flash().containsKey("successMessage");
         var ticket = onlyTicket();
         assertThat(ticket)

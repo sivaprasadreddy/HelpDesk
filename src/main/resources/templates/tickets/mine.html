@@ -1,0 +1,91 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sl="https://shadleaf.dev/sl"
+      th:replace="~{layout/main :: layout('My Tickets', ~{::breadcrumb}, ~{::#page-content})}">
+<body>
+<th:block th:ref="breadcrumb">
+    <sl:breadcrumb-item><sl:breadcrumb-link th:href="@{/home}">Home</sl:breadcrumb-link></sl:breadcrumb-item>
+    <sl:breadcrumb-separator/>
+    <sl:breadcrumb-item><sl:breadcrumb-page>My Tickets</sl:breadcrumb-page></sl:breadcrumb-item>
+</th:block>
+<div id="page-content" class="stack">
+    <th:block th:if="${totalCount == 0}">
+        <sl:empty border>
+            <sl:empty-header>
+                <sl:empty-media variant="icon"><sl:icon name="ticket"/></sl:empty-media>
+                <sl:empty-title level="2">No tickets yet</sl:empty-title>
+                <sl:empty-description>Report an issue and follow its progress here.</sl:empty-description>
+            </sl:empty-header>
+            <sl:empty-content>
+                <sl:button as="a" th:href="@{/tickets/new}">
+                    <sl:slot name="icon-start"><sl:icon name="plus"/></sl:slot>
+                    New Ticket
+                </sl:button>
+            </sl:empty-content>
+        </sl:empty>
+    </th:block>
+
+    <th:block th:unless="${totalCount == 0}">
+        <div class="list-toolbar">
+            <nav class="status-filter" aria-label="Filter by status">
+                <sl:button as="a" size="sm" th:href="@{/tickets/mine}"
+                           th:variant="${selectedStatus == null ? 'default' : 'outline'}"
+                           th:aria-current="${selectedStatus == null ? 'page' : null}">
+                    All <span class="filter-count" th:text="${totalCount}">3</span>
+                </sl:button>
+                <sl:button as="a" size="sm" th:each="s : ${statuses}"
+                           th:href="@{/tickets/mine(status=${s})}"
+                           th:variant="${selectedStatus == s ? 'default' : 'outline'}"
+                           th:aria-current="${selectedStatus == s ? 'page' : null}">
+                    [[${s.label}]] <span class="filter-count" th:text="${statusCounts[s]}">1</span>
+                </sl:button>
+            </nav>
+            <sl:button as="a" th:href="@{/tickets/new}">
+                <sl:slot name="icon-start"><sl:icon name="plus"/></sl:slot>
+                New Ticket
+            </sl:button>
+        </div>
+
+        <sl:table th:page="${tickets}">
+            <thead>
+            <tr>
+                <sl:table-head sort="id">#</sl:table-head>
+                <sl:table-head sort="title">Title</sl:table-head>
+                <th>Category</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Assigned to</th>
+                <sl:table-head sort="createdAt">Created</sl:table-head>
+                <sl:table-head sort="updatedAt">Last updated</sl:table-head>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="t : ${tickets}">
+                <td th:text="|#${t.id}|">#100</td>
+                <td th:text="${t.title}">Kitchen sink leaking</td>
+                <td th:text="${t.categoryName}">Plumbing</td>
+                <td>
+                    <sl:badge th:variant="${t.priority.name() == 'CRITICAL' ? 'destructive' : (t.priority.name() == 'HIGH' ? 'default' : 'outline')}"
+                              th:text="${t.priority.label}">High</sl:badge>
+                </td>
+                <td>
+                    <sl:badge th:variant="${t.status.name() == 'OPEN' ? 'default' : (t.status.name() == 'IN_PROGRESS' ? 'secondary' : 'outline')}"
+                              th:text="${t.status.label}">Open</sl:badge>
+                </td>
+                <td>
+                    <span th:if="${t.assigneeName != null}" th:text="${t.assigneeName}">Ravi Kumar</span>
+                    <span th:unless="${t.assigneeName != null}" class="muted">Not yet assigned</span>
+                </td>
+                <td th:text="${#temporals.format(t.createdAt, 'dd MMM yyyy, HH:mm')}">26 Nov 2026, 10:00</td>
+                <td th:text="${#temporals.format(t.lastUpdatedAt, 'dd MMM yyyy, HH:mm')}">26 Nov 2026, 10:00</td>
+            </tr>
+            <sl:table-empty colspan="8" th:if="${tickets.empty}">No tickets with this status.</sl:table-empty>
+            </tbody>
+        </sl:table>
+
+        <div class="table-footer" th:if="${tickets.totalPages > 1}">
+            <sl:pagination-summary th:page="${tickets}"/>
+            <sl:pagination th:page="${tickets}" aria-label="Ticket pages"/>
+        </div>
+    </th:block>
+</div>
+</body>
+</html>

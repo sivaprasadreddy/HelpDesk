@@ -30,6 +30,11 @@ public class AccessPolicy {
         return is(principal, Role.ROLE_ADMIN) || is(principal, Role.ROLE_USER);
     }
 
+    /** The "My Tickets" list is the resident's view; ADMIN sees every ticket and STAFF their assigned ones. */
+    public boolean canViewOwnTickets(@Nullable Object principal) {
+        return is(principal, Role.ROLE_USER);
+    }
+
     public boolean canViewTicket(@Nullable Object principal, Long createdBy, @Nullable Long assignedTo) {
         return is(principal, Role.ROLE_ADMIN)
                 || (is(principal, Role.ROLE_STAFF) && isSelf(principal, assignedTo))

@@ -4,6 +4,10 @@ import dev.sivalabs.helpdesk.categories.CategoryAPI;
 import dev.sivalabs.helpdesk.users.AccessPolicy;
 import dev.sivalabs.helpdesk.users.AuthUtils;
 import jakarta.validation.Valid;
+import java.util.Locale;
+import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -13,9 +17,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/** Creating tickets: ADMIN and USER only (see {@link AccessPolicy#canCreateTicket}). */
+/**
+ * Creating tickets (ADMIN and USER, see {@link AccessPolicy#canCreateTicket}) and the resident's own ticket list
+ * ({@link AccessPolicy#canViewOwnTickets}).
+ */
 @Controller
 @RequestMapping("/tickets")
 class TicketController {
@@ -56,13 +64,50 @@ class TicketController {
                         AuthUtils.getCurrentUserIdOrThrow());
                 var id = ticketService.createTicket(cmd);
                 redirectAttributes.addFlashAttribute("successMessage", "Ticket #" + id + " created successfully");
-                return "redirect:/home";
+                return accessPolicy.canViewOwnTickets(authentication.getPrincipal())
+                        ? "redirect:/tickets/mine"
+                        : "redirect:/home";
             } catch (InvalidTicketCategoryException e) {
                 bindingResult.rejectValue("categoryId", "category.invalid", "Choose an active category");
             }
         }
         addFormOptions(model);
         return CREATE_VIEW;
+    }
+
+    /** REQ-014: the resident's own tickets, optionally of one status ({@code ?status=OPEN}). */
+    @GetMapping("/mine")
+    String myTickets(
+            Authentication authentication,
+            @RequestParam(required = false) String status,
+            @PageableDefault(size = 20) Pageable pageable,
+            Model model) {
+        if (!accessPolicy.canViewOwnTickets(authentication.getPrincipal())) {
+            throw new AccessDeniedException("Only residents have a list of their own tickets");
+        }
+        var userId = AuthUtils.getCurrentUserIdOrThrow();
+        var selected = parseStatus(status);
+        var counts = ticketService.countByStatusCreatedBy(userId);
+        model.addAttribute("tickets", ticketService.findTicketsCreatedBy(userId, selected, pageable));
+        model.addAttribute("statuses", TicketStatus.values());
+        model.addAttribute("selectedStatus", selected);
+        model.addAttribute("statusCounts", counts);
+        model.addAttribute(
+                "totalCount",
+                counts.values().stream().mapToLong(Long::longValue).sum());
+        return "tickets/mine";
+    }
+
+    /** An unknown status shows every ticket rather than an error page. */
+    private static @Nullable TicketStatus parseStatus(@Nullable String status) {
+        if (status == null || status.isBlank()) {
+            return null;
+        }
+        try {
+            return TicketStatus.valueOf(status.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     private void requireCanCreate(Authentication authentication) {

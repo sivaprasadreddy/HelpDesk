@@ -35,6 +35,12 @@
                             Home
                         </sl:sidebar-menu-button>
                     </sl:sidebar-menu-item>
+                    <sl:sidebar-menu-item sec:authorize="@accessPolicy.canViewOwnTickets(principal)">
+                        <sl:sidebar-menu-button th:href="@{/tickets/mine}" th:active="${#slNav.current('/tickets/mine')}" tooltip="My Tickets">
+                            <sl:slot name="icon-start"><sl:icon name="ticket"/></sl:slot>
+                            My Tickets
+                        </sl:sidebar-menu-button>
+                    </sl:sidebar-menu-item>
                     <sl:sidebar-menu-item sec:authorize="@accessPolicy.canCreateTicket(principal)">
                         <sl:sidebar-menu-button th:href="@{/tickets/new}" th:active="${#slNav.current('/tickets/new')}" tooltip="New Ticket">
                             <sl:slot name="icon-start"><sl:icon name="circle-plus"/></sl:slot>

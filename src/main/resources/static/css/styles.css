@@ -56,3 +56,10 @@
 .row-actions { display: inline-flex; gap: 0.5rem; justify-content: flex-end; }
 .badge-list { display: flex; flex-wrap: wrap; gap: 0.25rem; }
 .muted { color: var(--muted-foreground); }
+
+/* Ticket lists. */
+.list-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; }
+.status-filter { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.filter-count { opacity: 0.7; font-variant-numeric: tabular-nums; }
+.table-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
+.table-footer .pagination { inline-size: auto; margin: 0; }

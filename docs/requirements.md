@@ -20,7 +20,7 @@ Status values: `TODO` (`📋`), `IN_PROGRESS` (`👷🏽`), `DONE` (`✅`).
 | ✅ | REQ-011 | ADMIN: assign one or more categories to a staff member                                             | DONE   |
 | ✅ | REQ-012 | Create ticket (ADMIN, USER) with title, description, priority and active category                 | DONE   |
 | ✅ | REQ-013 | Automatic assignment of new tickets to an active staff member handling the category               | DONE   |
-| 📋 | REQ-014 | USER: view own tickets and track their status                                                      | TODO   |
+| ✅ | REQ-014 | USER: view own tickets and track their status                                                      | DONE   |
 | 📋 | REQ-015 | STAFF: view tickets assigned to them                                                               | TODO   |
 | 📋 | REQ-016 | ADMIN: view all tickets with filtering (status, priority, category, assignee)                      | TODO   |
 | 📋 | REQ-017 | Ticket details page                                                                                | TODO   |

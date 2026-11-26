@@ -3,11 +3,14 @@ package dev.sivalabs.helpdesk.users;
 import dev.sivalabs.helpdesk.categories.CategoryAPI;
 import dev.sivalabs.helpdesk.shared.ResourceNotFoundException;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,6 +63,15 @@ class UserService {
     @Transactional(readOnly = true)
     public List<Long> findActiveStaffIdsHandling(Long categoryId) {
         return userRepository.findActiveStaffIdsByCategoryId(categoryId);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<Long, String> findNamesByIds(Collection<Long> ids) {
+        if (ids.isEmpty()) {
+            return Map.of();
+        }
+        return userRepository.findAllById(ids).stream()
+                .collect(Collectors.toMap(UserEntity::getId, UserEntity::getName));
     }
 
     @Transactional(readOnly = true)

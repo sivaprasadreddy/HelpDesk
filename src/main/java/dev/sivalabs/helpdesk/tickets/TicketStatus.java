@@ -1,8 +1,18 @@
 package dev.sivalabs.helpdesk.tickets;
 
 public enum TicketStatus {
-    OPEN,
-    IN_PROGRESS,
-    RESOLVED,
-    CLOSED
+    OPEN("Open"),
+    IN_PROGRESS("In progress"),
+    RESOLVED("Resolved"),
+    CLOSED("Closed");
+
+    private final String label;
+
+    TicketStatus(String label) {
+        this.label = label;
+    }
+
+    public String getLabel() {
+        return label;
+    }
 }
