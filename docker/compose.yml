@@ -32,6 +32,9 @@ services:
       - "3000:3000"
       - "4317:4317"
       - "4318:4318"
+    volumes:
+      - ./grafana/dashboards.yaml:/otel-lgtm/grafana/conf/provisioning/dashboards/spring-boot-4.yaml:ro
+      - ./grafana/spring-boot-4-dashboard.json:/otel-lgtm/dashboards/spring-boot-4-dashboard.json:ro
 
 #  ollama:
 #    image: ollama/ollama:0.40.17

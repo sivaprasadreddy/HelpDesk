@@ -1,0 +1,9 @@
+apiVersion: 1
+
+providers:
+  - name: "Spring Boot 4"
+    type: file
+    allowUiUpdates: true
+    options:
+      path: /otel-lgtm/dashboards/spring-boot-4-dashboard.json
+      foldersFromFilesStructure: false
