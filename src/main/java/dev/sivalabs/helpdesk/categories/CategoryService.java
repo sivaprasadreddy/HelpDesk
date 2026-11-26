@@ -29,6 +29,11 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
+    public boolean isActiveCategory(Long id) {
+        return categoryRepository.existsByIdAndActiveTrue(id);
+    }
+
+    @Transactional(readOnly = true)
     public CategoryDto getCategory(Long id) {
         return toDto(load(id));
     }

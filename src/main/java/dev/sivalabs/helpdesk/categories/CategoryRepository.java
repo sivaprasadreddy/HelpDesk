@@ -8,6 +8,8 @@ interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
 
     List<CategoryEntity> findByActiveTrueOrderByNameAsc();
 
+    boolean existsByIdAndActiveTrue(Long id);
+
     boolean existsByNameIgnoreCase(String name);
 
     boolean existsByNameIgnoreCaseAndIdNot(String name, Long id);

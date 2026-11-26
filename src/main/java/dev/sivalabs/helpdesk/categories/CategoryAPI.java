@@ -19,4 +19,9 @@ public class CategoryAPI {
     public List<CategoryDto> findActiveCategories() {
         return categoryService.findActiveCategories();
     }
+
+    /** Whether a category with this id exists and is active (new tickets may only use active categories). */
+    public boolean isActiveCategory(Long id) {
+        return categoryService.isActiveCategory(id);
+    }
 }

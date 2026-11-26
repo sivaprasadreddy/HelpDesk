@@ -1,0 +1,48 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sl="https://shadleaf.dev/sl"
+      th:replace="~{layout/main :: layout('New Ticket', ~{::breadcrumb}, ~{::#page-content})}">
+<body>
+<th:block th:ref="breadcrumb">
+    <sl:breadcrumb-item><sl:breadcrumb-link th:href="@{/home}">Home</sl:breadcrumb-link></sl:breadcrumb-item>
+    <sl:breadcrumb-separator/>
+    <sl:breadcrumb-item><sl:breadcrumb-page>New Ticket</sl:breadcrumb-page></sl:breadcrumb-item>
+</th:block>
+<div id="page-content" class="form-card">
+    <sl:card>
+        <sl:card-content>
+            <form th:object="${ticket}" th:action="@{/tickets}" method="post" novalidate class="form-stack">
+                <sl:form-errors/>
+                <sl:field th:field="*{title}">
+                    <sl:field-label>Title</sl:field-label>
+                    <sl:input autocomplete="off" placeholder="e.g. Kitchen sink leaking"/>
+                    <sl:field-error/>
+                </sl:field>
+                <sl:field th:field="*{categoryId}">
+                    <sl:field-label>Category</sl:field-label>
+                    <sl:native-select class="full-width">
+                        <option value="">Select a category</option>
+                        <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}">Plumbing</option>
+                    </sl:native-select>
+                    <sl:field-error/>
+                </sl:field>
+                <sl:field th:field="*{priority}">
+                    <sl:field-label>Priority</sl:field-label>
+                    <sl:native-select class="full-width">
+                        <option th:each="p : ${priorities}" th:value="${p}" th:text="${p.label}">Medium</option>
+                    </sl:native-select>
+                    <sl:field-error/>
+                </sl:field>
+                <sl:field th:field="*{description}">
+                    <sl:field-label>Description</sl:field-label>
+                    <sl:textarea rows="5" placeholder="Describe the issue and where it is (block, flat, floor)."/>
+                    <sl:field-error/>
+                </sl:field>
+                <div class="toolbar">
+                    <sl:button as="a" th:href="@{/home}" variant="outline">Cancel</sl:button>
+                    <sl:button type="submit">Create Ticket</sl:button>
+                </div>
+            </form>
+        </sl:card-content>
+    </sl:card>
+</div>
+</body>
+</html>
