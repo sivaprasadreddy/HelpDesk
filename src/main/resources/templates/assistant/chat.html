@@ -1,0 +1,61 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sl="https://shadleaf.dev/sl"
+      th:replace="~{layout/main :: layout('Assistant', ~{::breadcrumb}, ~{::#page-content})}">
+<body>
+<th:block th:ref="breadcrumb">
+    <sl:breadcrumb-item><sl:breadcrumb-link th:href="@{/home}">Home</sl:breadcrumb-link></sl:breadcrumb-item>
+    <sl:breadcrumb-separator/>
+    <sl:breadcrumb-item><sl:breadcrumb-page>Assistant</sl:breadcrumb-page></sl:breadcrumb-item>
+</th:block>
+<div id="page-content" class="assistant">
+    <sl:card>
+        <sl:card-header border>
+            <sl:card-title level="1">Ask the assistant</sl:card-title>
+            <sl:card-description>Questions about community rules, amenities, maintenance and emergencies, answered from the community's documents.</sl:card-description>
+            <sl:card-action th:unless="${turns.empty}">
+                <form method="post" th:action="@{/assistant/clear}">
+                    <sl:button type="submit" variant="outline" size="sm">
+                        <sl:slot name="icon-start"><sl:icon name="rotate-ccw"/></sl:slot>
+                        New conversation
+                    </sl:button>
+                </form>
+            </sl:card-action>
+        </sl:card-header>
+        <sl:card-content class="stack">
+            <sl:empty th:if="${turns.empty}">
+                <sl:empty-header>
+                    <sl:empty-media variant="icon"><sl:icon name="message-circle"/></sl:empty-media>
+                    <sl:empty-title level="2">How can I help?</sl:empty-title>
+                    <sl:empty-description>Try "When is the swimming pool open?" or "How many pets can I keep?"</sl:empty-description>
+                </sl:empty-header>
+            </sl:empty>
+            <ol th:unless="${turns.empty}" class="chat-log" aria-label="Conversation" aria-live="polite">
+                <li th:each="t, it : ${turns}" th:id="${it.last ? 'latest' : null}"
+                    th:class="|chat-turn ${t.user ? 'chat-turn-user' : 'chat-turn-assistant'}${t.error ? ' chat-turn-error' : ''}|">
+                    <span class="chat-author" th:text="${t.user ? 'You' : 'Assistant'}">You</span>
+                    <p class="chat-text" th:text="${t.text}">When is the swimming pool open?</p>
+                    <p th:unless="${t.sources.empty}" class="chat-sources">
+                        <span class="muted">Sources:</span>
+                        <sl:badge th:each="s : ${t.sources}" variant="outline" th:text="${s}">Amenities - Swimming pool</sl:badge>
+                    </p>
+                </li>
+            </ol>
+        </sl:card-content>
+        <sl:card-footer>
+            <form th:object="${form}" method="post" th:action="@{/assistant}" novalidate class="chat-form">
+                <sl:field th:field="*{message}">
+                    <sl:field-label>Your question</sl:field-label>
+                    <sl:textarea rows="2" placeholder="Ask about rules, amenities, maintenance..."/>
+                    <sl:field-error/>
+                </sl:field>
+                <div class="toolbar">
+                    <sl:button type="submit">
+                        <sl:slot name="icon-start"><sl:icon name="send"/></sl:slot>
+                        Send
+                    </sl:button>
+                </div>
+            </form>
+        </sl:card-footer>
+    </sl:card>
+</div>
+</body>
+</html>

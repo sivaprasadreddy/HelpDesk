@@ -17,6 +17,12 @@ public class TestAiConfig {
 
     @Bean
     @Primary
+    FakeChatModel fakeChatModel() {
+        return new FakeChatModel();
+    }
+
+    @Bean
+    @Primary
     EmbeddingModel testEmbeddingModel() {
         return new BagOfWordsEmbeddingModel();
     }

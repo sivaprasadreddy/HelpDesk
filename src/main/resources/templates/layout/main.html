@@ -59,6 +59,12 @@
                             New Ticket
                         </sl:sidebar-menu-button>
                     </sl:sidebar-menu-item>
+                    <sl:sidebar-menu-item>
+                        <sl:sidebar-menu-button th:href="@{/assistant}" th:active="${#slNav.current('/assistant')}" tooltip="Assistant">
+                            <sl:slot name="icon-start"><sl:icon name="message-circle"/></sl:slot>
+                            Assistant
+                        </sl:sidebar-menu-button>
+                    </sl:sidebar-menu-item>
                 </sl:sidebar-menu>
             </sl:sidebar-group>
             <sl:sidebar-group id="nav-admin" sec:authorize="hasRole('ADMIN')">
