@@ -5,6 +5,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
+      TZ: ${APP_TIMEZONE:-Asia/Kolkata}
+      PGTZ: ${APP_TIMEZONE:-Asia/Kolkata}
     ports:
       - "5432:5432"
   
