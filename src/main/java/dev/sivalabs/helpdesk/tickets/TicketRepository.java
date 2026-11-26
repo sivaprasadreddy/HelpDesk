@@ -1,5 +1,6 @@
 package dev.sivalabs.helpdesk.tickets;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -52,6 +53,12 @@ interface TicketRepository extends JpaRepository<TicketEntity, Long>, JpaSpecifi
 
     @Query("select t.categoryId as groupKey, count(t) as tickets from TicketEntity t group by t.categoryId")
     List<GroupCount<Long>> countGroupedByCategory();
+
+    @Query("select t.createdAt from TicketEntity t where t.createdAt >= :from and t.createdAt < :to")
+    List<Instant> findCreatedAtBetween(Instant from, Instant to);
+
+    @Query("select t.resolvedAt from TicketEntity t where t.resolvedAt >= :from and t.resolvedAt < :to")
+    List<Instant> findResolvedAtBetween(Instant from, Instant to);
 
     interface GroupCount<K> {
         K getGroupKey();

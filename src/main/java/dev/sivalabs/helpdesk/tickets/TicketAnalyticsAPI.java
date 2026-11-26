@@ -1,6 +1,10 @@
 package dev.sivalabs.helpdesk.tickets;
 
 import dev.sivalabs.helpdesk.categories.CategoryAPI;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -49,6 +53,41 @@ public class TicketAnalyticsAPI {
                 .toList();
         var total = statuses.stream().mapToLong(CountByGroup::count).sum();
         return new TicketBreakdowns(total, statuses, priorities, categories);
+    }
+
+    /** The longest period {@link #getCreatedVsResolved} reports on, in days. */
+    public static final int MAX_DAYS = 366;
+
+    /**
+     * REQ-024: tickets created and resolved on each day from {@code from} to {@code to} inclusive, days without
+     * either included as zeros. Days are in the server's time zone, the one dates are shown in. A ticket counts
+     * as resolved on the day it was last resolved; one reopened and not yet resolved again does not count.
+     *
+     * @throws IllegalArgumentException when {@code to} is before {@code from} or the period exceeds {@link #MAX_DAYS}
+     */
+    @Transactional(readOnly = true)
+    @PreAuthorize("@accessPolicy.canViewAnalytics(principal)")
+    public List<DailyTicketFlow> getCreatedVsResolved(LocalDate from, LocalDate to) {
+        if (to.isBefore(from)) {
+            throw new IllegalArgumentException("The period ends before it starts");
+        }
+        var days = ChronoUnit.DAYS.between(from, to) + 1;
+        if (days > MAX_DAYS) {
+            throw new IllegalArgumentException("The period must be at most " + MAX_DAYS + " days");
+        }
+        var zone = ZoneId.systemDefault();
+        var start = from.atStartOfDay(zone).toInstant();
+        var end = to.plusDays(1).atStartOfDay(zone).toInstant();
+        var created = countPerDay(ticketRepository.findCreatedAtBetween(start, end), zone);
+        var resolved = countPerDay(ticketRepository.findResolvedAtBetween(start, end), zone);
+        return from.datesUntil(to.plusDays(1))
+                .map(d -> new DailyTicketFlow(d, created.getOrDefault(d, 0L), resolved.getOrDefault(d, 0L)))
+                .toList();
+    }
+
+    private static Map<LocalDate, Long> countPerDay(List<Instant> instants, ZoneId zone) {
+        return instants.stream()
+                .collect(Collectors.groupingBy(i -> LocalDate.ofInstant(i, zone), Collectors.counting()));
     }
 
     private static <K> Map<K, Long> toMap(List<TicketRepository.GroupCount<K>> rows) {
