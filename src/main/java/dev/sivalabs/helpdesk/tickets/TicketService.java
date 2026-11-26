@@ -122,6 +122,7 @@ class TicketService {
                 t.getId(),
                 t.getTitle(),
                 t.getDescription(),
+                t.getCategoryId(),
                 category,
                 t.getPriority(),
                 t.getStatus(),
@@ -191,6 +192,26 @@ class TicketService {
         }
         t.setAssignedTo(staffId);
         return true;
+    }
+
+    /**
+     * REQ-020: updates the ticket's title, description, priority and category. The category must be active, or
+     * the one the ticket already has (so a ticket in a deactivated category can still be edited). Changing the
+     * category does not reassign the ticket.
+     */
+    @Transactional
+    @PreAuthorize("@accessPolicy.canUpdateTicketDetails(principal)")
+    public void updateTicket(UpdateTicketCmd cmd) {
+        var t = ticketRepository
+                .findById(cmd.id())
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket #" + cmd.id() + " not found"));
+        if (!cmd.categoryId().equals(t.getCategoryId()) && !categoryAPI.isActiveCategory(cmd.categoryId())) {
+            throw new InvalidTicketCategoryException(cmd.categoryId());
+        }
+        t.setTitle(cmd.title().trim());
+        t.setDescription(cmd.description().trim());
+        t.setPriority(cmd.priority());
+        t.setCategoryId(cmd.categoryId());
     }
 
     /** Whether any ticket exists at all. */

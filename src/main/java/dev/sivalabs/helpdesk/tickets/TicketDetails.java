@@ -8,6 +8,7 @@ public record TicketDetails(
         Long id,
         String title,
         String description,
+        Long categoryId,
         String categoryName,
         TicketPriority priority,
         TicketStatus status,

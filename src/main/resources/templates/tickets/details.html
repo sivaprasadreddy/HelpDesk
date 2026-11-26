@@ -20,6 +20,10 @@
                           th:text="${ticket.status.label}">Open</sl:badge>
                 <sl:badge th:variant="${ticket.priority.name() == 'CRITICAL' ? 'destructive' : (ticket.priority.name() == 'HIGH' ? 'default' : 'outline')}"
                           th:text="|${ticket.priority.label} priority|">High priority</sl:badge>
+                <sl:button th:if="${canEdit}" as="a" size="sm" variant="outline" th:href="@{/tickets/{id}/edit(id=${ticket.id})}">
+                    <sl:slot name="icon-start"><sl:icon name="pencil"/></sl:slot>
+                    Edit
+                </sl:button>
             </sl:card-action>
         </sl:card-header>
         <sl:card-content class="stack">

@@ -6,6 +6,7 @@ import dev.sivalabs.helpdesk.users.AuthUtils;
 import dev.sivalabs.helpdesk.users.UserAPI;
 import dev.sivalabs.helpdesk.users.UserDto;
 import jakarta.validation.Valid;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
@@ -33,6 +34,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/tickets")
 class TicketController {
     private static final String CREATE_VIEW = "tickets/create";
+    private static final String EDIT_VIEW = "tickets/edit";
     private final TicketService ticketService;
     private final CategoryAPI categoryAPI;
     private final AccessPolicy accessPolicy;
@@ -123,6 +125,7 @@ class TicketController {
         var canAssign =
                 accessPolicy.canAssignTicket(authentication.getPrincipal()) && ticket.status() != TicketStatus.CLOSED;
         model.addAttribute("canAssign", canAssign);
+        model.addAttribute("canEdit", accessPolicy.canUpdateTicketDetails(authentication.getPrincipal()));
         if (canAssign) {
             model.addAttribute(
                     "activeStaff",
@@ -172,6 +175,39 @@ class TicketController {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/tickets/" + id;
+    }
+
+    /** REQ-020: the form to edit a ticket's details (ADMIN only). */
+    @GetMapping("/{id:\\d+}/edit")
+    String editTicketForm(Authentication authentication, @PathVariable Long id, Model model) {
+        requireCanUpdateDetails(authentication);
+        var ticket = ticketService.getTicket(id, authentication.getPrincipal());
+        model.addAttribute("form", UpdateTicketForm.of(ticket, ticket.categoryId()));
+        addEditFormOptions(ticket, model);
+        return EDIT_VIEW;
+    }
+
+    @PostMapping("/{id:\\d+}/edit")
+    String updateTicket(
+            Authentication authentication,
+            @PathVariable Long id,
+            @Valid @ModelAttribute("form") UpdateTicketForm form,
+            BindingResult bindingResult,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+        requireCanUpdateDetails(authentication);
+        if (!bindingResult.hasErrors()) {
+            try {
+                ticketService.updateTicket(
+                        new UpdateTicketCmd(id, form.title(), form.description(), form.priority(), form.categoryId()));
+                redirectAttributes.addFlashAttribute("successMessage", "Ticket #" + id + " updated successfully");
+                return "redirect:/tickets/" + id;
+            } catch (InvalidTicketCategoryException e) {
+                bindingResult.rejectValue("categoryId", "category.invalid", "Choose an active category");
+            }
+        }
+        addEditFormOptions(ticketService.getTicket(id, authentication.getPrincipal()), model);
+        return EDIT_VIEW;
     }
 
     /** REQ-014: the resident's own tickets, optionally of one status ({@code ?status=OPEN}). */
@@ -252,6 +288,26 @@ class TicketController {
         if (accessPolicy.canViewOwnTickets(principal)) return "My Tickets";
         if (accessPolicy.canViewAssignedTickets(principal)) return "Assigned to Me";
         return "All Tickets";
+    }
+
+    private void requireCanUpdateDetails(Authentication authentication) {
+        if (!accessPolicy.canUpdateTicketDetails(authentication.getPrincipal())) {
+            throw new AccessDeniedException("Only administrators can edit tickets");
+        }
+    }
+
+    /** Active categories, plus the ticket's own category if it has been deactivated since. */
+    private void addEditFormOptions(TicketDetails ticket, Model model) {
+        var categories = new ArrayList<>(categoryAPI.findActiveCategories());
+        if (categories.stream().noneMatch(c -> c.id().equals(ticket.categoryId()))) {
+            categoryAPI.findAllCategories().stream()
+                    .filter(c -> c.id().equals(ticket.categoryId()))
+                    .findFirst()
+                    .ifPresent(c -> categories.addFirst(c));
+        }
+        model.addAttribute("ticket", ticket);
+        model.addAttribute("categories", categories);
+        model.addAttribute("priorities", TicketPriority.values());
     }
 
     private void requireCanCreate(Authentication authentication) {
