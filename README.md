@@ -30,6 +30,19 @@ Administrators oversee the whole process and use analytics to monitor support pe
 | Build & Testing  | Maven, JUnit, Testcontainers, ArchUnit, Taikai  |
 | DevOps & Tooling | Docker, Docker Compose, Mise, Renovate, GitHub Actions |
 
+## Screenshots
+
+| | |
+|---|---|
+| **Login**<br>![Login](docs/assets/login.png) | **Home**<br>![Home](docs/assets/home.png) |
+| **All tickets (admin)**<br>![All tickets](docs/assets/tickets.png) | **Ticket details**<br>![Ticket details](docs/assets/ticket-details.png) |
+| **New ticket with images**<br>![New ticket](docs/assets/create-ticket.png) | **AI assistant (RAG)**<br>![Assistant](docs/assets/assistant.png) |
+| **Categories**<br>![Categories](docs/assets/categories.png) | **Staff**<br>![Staff](docs/assets/staff.png) |
+
+**Analytics dashboard**
+
+![Analytics dashboard](docs/assets/analytics.png)
+
 ## Local Development
 This project uses [mise](https://mise.jdx.dev/) to install the required SDKs and run common tasks defined in `mise.toml`.
 
