@@ -101,6 +101,7 @@
 
 /* Assistant chat */
 .assistant { max-width: 48rem; }
+.chat-log:empty { display: none; }
 .chat-log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.75rem; }
 .chat-turn { max-width: 85%; padding: 0.625rem 0.875rem; border-radius: var(--radius, 0.5rem); border: 1px solid var(--border); }
 .chat-turn-user { align-self: flex-end; background: var(--muted); }
@@ -108,6 +109,7 @@
 .chat-turn-error { border-color: var(--destructive); }
 .chat-author { display: block; font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); }
 .chat-text { margin: 0.25rem 0 0; white-space: pre-line; }
+.chat-thinking { display: flex; align-items: center; gap: 0.5rem; color: var(--muted-foreground); }
 .chat-sources { display: flex; flex-wrap: wrap; align-items: center; gap: 0.375rem; margin: 0.5rem 0 0; font-size: 0.75rem; }
 
 .ticket-draft { margin: 0.75rem 0 0; padding: 0.75rem; border: 1px dashed var(--border); border-radius: var(--radius, 0.5rem); display: flex; flex-direction: column; gap: 0.5rem; }

@@ -21,50 +21,27 @@
             </sl:card-action>
         </sl:card-header>
         <sl:card-content class="stack">
-            <sl:empty th:if="${turns.empty}">
+            <sl:empty id="chat-empty" th:if="${turns.empty}">
                 <sl:empty-header>
                     <sl:empty-media variant="icon"><sl:icon name="message-circle"/></sl:empty-media>
                     <sl:empty-title level="2">How can I help?</sl:empty-title>
                     <sl:empty-description>Try "When is the swimming pool open?" or "How many pets can I keep?"</sl:empty-description>
                 </sl:empty-header>
             </sl:empty>
-            <ol th:unless="${turns.empty}" class="chat-log" aria-label="Conversation" aria-live="polite">
-                <li th:each="t, it : ${turns}" th:id="${it.last ? 'latest' : null}"
-                    th:class="|chat-turn ${t.user ? 'chat-turn-user' : 'chat-turn-assistant'}${t.error ? ' chat-turn-error' : ''}|">
-                    <span class="chat-author" th:text="${t.user ? 'You' : 'Assistant'}">You</span>
-                    <p class="chat-text" th:text="${t.text}">When is the swimming pool open?</p>
-                    <div th:each="d : ${t.drafts}" class="ticket-draft" th:with="createdId=${createdTickets.get(d.id)}">
-                        <p class="ticket-draft-label">Draft ticket</p>
-                        <dl class="ticket-draft-fields">
-                            <div><dt>Title</dt><dd th:text="${d.title}">Kitchen sink leaking</dd></div>
-                            <div><dt>Category</dt><dd th:text="${d.categoryName}">Plumbing</dd></div>
-                            <div><dt>Priority</dt><dd th:text="${d.priority.label}">High</dd></div>
-                            <div class="ticket-draft-description"><dt>Description</dt><dd th:text="${d.description}">Water drips under the sink.</dd></div>
-                        </dl>
-                        <form th:if="${createdId == null}" method="post" th:action="@{/assistant/drafts/{id}/create(id=${d.id})}">
-                            <sl:button type="submit" size="sm">
-                                <sl:slot name="icon-start"><sl:icon name="circle-plus"/></sl:slot>
-                                Create ticket
-                            </sl:button>
-                        </form>
-                        <sl:button th:unless="${createdId == null}" as="a" size="sm" variant="secondary"
-                                   th:href="@{/tickets/{id}(id=${createdId})}">
-                            <sl:slot name="icon-start"><sl:icon name="ticket"/></sl:slot>
-                            <span th:text="|View ticket #${createdId}|">View ticket #100</span>
-                        </sl:button>
-                    </div>
-                    <p th:unless="${t.sources.empty}" class="chat-sources">
-                        <span class="muted">Sources:</span>
-                        <sl:badge th:each="s : ${t.sources}" variant="outline" th:text="${s}">Amenities - Swimming pool</sl:badge>
-                    </p>
-                </li>
+            <ol id="chat-log" class="chat-log" aria-label="Conversation" aria-live="polite">
+                <th:block th:each="t : ${turns}"><li th:replace="~{assistant/fragments :: turn(${t})}"></li></th:block>
+                <th:block th:each="p : ${pendingReplies}"><li th:replace="~{assistant/fragments :: pending(${p})}"></li></th:block>
             </ol>
+            <span id="latest"></span>
         </sl:card-content>
         <sl:card-footer>
-            <form th:object="${form}" method="post" th:action="@{/assistant}" novalidate class="chat-form">
+            <form th:object="${form}" method="post" th:action="@{/assistant}" class="chat-form"
+                  th:hx-post="@{/assistant}" hx-target="#chat-log" hx-swap="beforeend"
+                  hx-on:htmx:after:request="this.reset(); document.getElementById('chat-empty')?.remove()"
+                  hx-on:htmx:after:swap="this.scrollIntoView({block: 'end'})">
                 <sl:field th:field="*{message}">
                     <sl:field-label>Your question</sl:field-label>
-                    <sl:textarea rows="2" placeholder="Ask about rules, amenities, maintenance..."/>
+                    <sl:textarea rows="2" required maxlength="2000" placeholder="Ask about rules, amenities, maintenance..."/>
                     <sl:field-error/>
                 </sl:field>
                 <div class="toolbar">
@@ -76,6 +53,7 @@
             </form>
         </sl:card-footer>
     </sl:card>
+    <script th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
 </div>
 </body>
 </html>

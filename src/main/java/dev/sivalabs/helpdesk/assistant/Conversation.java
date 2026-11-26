@@ -4,9 +4,11 @@ import jakarta.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * The signed-in user's conversation with the assistant, kept in their HTTP session: it ends when they sign out, and
@@ -18,6 +20,7 @@ final class Conversation implements Serializable {
 
     private final ArrayList<ChatTurn> turns = new ArrayList<>();
     private final HashMap<String, Long> createdTickets = new HashMap<>();
+    private final LinkedHashMap<String, PendingReply> pending = new LinkedHashMap<>();
 
     static Conversation of(HttpSession session) {
         if (session.getAttribute(ATTRIBUTE) instanceof Conversation conversation) {
@@ -51,6 +54,24 @@ final class Conversation implements Serializable {
 
     synchronized void markCreated(String draftId, Long ticketId) {
         createdTickets.put(draftId, ticketId);
+    }
+
+    /** Adds the user's question and keeps it pending until {@link #takePending} asks for its answer. */
+    synchronized PendingReply ask(String question) {
+        var reply = new PendingReply(UUID.randomUUID().toString(), question, List.copyOf(turns));
+        add(ChatTurn.user(question));
+        pending.put(reply.id(), reply);
+        return reply;
+    }
+
+    /** The questions still waiting for an answer, oldest first. */
+    synchronized List<PendingReply> pending() {
+        return List.copyOf(pending.values());
+    }
+
+    /** Removes and returns a pending question, so it is answered once. */
+    synchronized Optional<PendingReply> takePending(String id) {
+        return Optional.ofNullable(pending.remove(id));
     }
 
     synchronized void add(ChatTurn turn) {

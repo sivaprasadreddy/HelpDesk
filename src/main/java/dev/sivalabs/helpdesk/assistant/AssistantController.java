@@ -3,6 +3,7 @@ package dev.sivalabs.helpdesk.assistant;
 import dev.sivalabs.helpdesk.shared.ResourceNotFoundException;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /** The assistant's chat page, for every signed-in user; ADMIN and USER can also raise tickets through it. */
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/assistant")
 class AssistantController {
     private static final String VIEW = "assistant/chat";
+    private static final String FRAGMENTS = "assistant/fragments";
     private final AssistantService assistantService;
 
     AssistantController(AssistantService assistantService) {
@@ -31,30 +34,65 @@ class AssistantController {
         return VIEW;
     }
 
+    /**
+     * Takes the question without waiting for the model. With htmx, answers with the question and a spinner to add to
+     * the conversation; the spinner then asks for the answer ({@link #reply}). Without JavaScript, answers the
+     * question here and shows the whole page again.
+     */
     @PostMapping
     String ask(
             Authentication authentication,
             HttpSession session,
+            @RequestHeader(value = "HX-Request", required = false) @Nullable String htmx,
             @Valid @ModelAttribute("form") AskForm form,
             BindingResult bindingResult,
             Model model) {
         var conversation = Conversation.of(session);
         if (bindingResult.hasErrors()) {
+            if (htmx != null) {
+                model.addAttribute(
+                        "message", bindingResult.getFieldErrors().getFirst().getDefaultMessage());
+                return FRAGMENTS + " :: notice";
+            }
             populate(model, conversation, authentication);
             return VIEW;
         }
-        var question = form.message().strip();
-        var history = conversation.turns();
-        conversation.add(ChatTurn.user(question));
-        try {
-            var reply = assistantService.ask(history, question, authentication.getPrincipal());
-            conversation.add(ChatTurn.assistant(reply));
-        } catch (AssistantUnavailableException e) {
-            conversation.add(
-                    ChatTurn.failure(
-                            "Sorry, I can't answer right now because the AI service is not available. Please try again later."));
+        var pending = conversation.ask(form.message().strip());
+        if (htmx != null) {
+            model.addAttribute("turn", conversation.turns().getLast());
+            model.addAttribute("pending", pending);
+            return FRAGMENTS + " :: sent";
         }
+        answer(conversation, pending, authentication);
         return "redirect:/assistant#latest";
+    }
+
+    /** Answers a pending question and returns the answer to put in place of its spinner. */
+    @GetMapping("/replies/{id}")
+    String reply(Authentication authentication, HttpSession session, @PathVariable String id, Model model) {
+        var conversation = Conversation.of(session);
+        var pending = conversation.takePending(id);
+        if (pending.isEmpty()) {
+            // Already answered, for example by a second tab: the latest turn is the answer.
+            model.addAttribute("turn", conversation.turns().getLast());
+        } else {
+            model.addAttribute("turn", answer(conversation, pending.get(), authentication));
+        }
+        model.addAttribute("createdTickets", conversation.createdTickets());
+        return FRAGMENTS + " :: answer";
+    }
+
+    private ChatTurn answer(Conversation conversation, PendingReply pending, Authentication authentication) {
+        ChatTurn turn;
+        try {
+            var reply = assistantService.ask(pending.history(), pending.question(), authentication.getPrincipal());
+            turn = ChatTurn.assistant(reply);
+        } catch (AssistantUnavailableException e) {
+            turn = ChatTurn.failure(
+                    "Sorry, I can't answer right now because the AI service is not available. Please try again later.");
+        }
+        conversation.add(turn);
+        return turn;
     }
 
     /** Creates the ticket of a draft the assistant proposed in this conversation, once. */
@@ -79,6 +117,7 @@ class AssistantController {
 
     private void populate(Model model, Conversation conversation, Authentication authentication) {
         model.addAttribute("turns", conversation.turns());
+        model.addAttribute("pendingReplies", conversation.pending());
         model.addAttribute("createdTickets", conversation.createdTickets());
         model.addAttribute("canCreateTickets", assistantService.canCreateTickets(authentication.getPrincipal()));
     }

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sl="https://shadleaf.dev/sl">
+<body>
+
+<!--/* One message of the conversation. Needs createdTickets (draft id to ticket id). */-->
+<li th:fragment="turn(t)"
+    th:class="|chat-turn ${t.user ? 'chat-turn-user' : 'chat-turn-assistant'}${t.error ? ' chat-turn-error' : ''}|">
+    <span class="chat-author" th:text="${t.user ? 'You' : 'Assistant'}">You</span>
+    <p class="chat-text" th:text="${t.text}">When is the swimming pool open?</p>
+    <div th:each="d : ${t.drafts}" class="ticket-draft" th:with="createdId=${createdTickets.get(d.id)}">
+        <p class="ticket-draft-label">Draft ticket</p>
+        <dl class="ticket-draft-fields">
+            <div><dt>Title</dt><dd th:text="${d.title}">Kitchen sink leaking</dd></div>
+            <div><dt>Category</dt><dd th:text="${d.categoryName}">Plumbing</dd></div>
+            <div><dt>Priority</dt><dd th:text="${d.priority.label}">High</dd></div>
+            <div class="ticket-draft-description"><dt>Description</dt><dd th:text="${d.description}">Water drips under the sink.</dd></div>
+        </dl>
+        <form th:if="${createdId == null}" method="post" th:action="@{/assistant/drafts/{id}/create(id=${d.id})}">
+            <sl:button type="submit" size="sm">
+                <sl:slot name="icon-start"><sl:icon name="circle-plus"/></sl:slot>
+                Create ticket
+            </sl:button>
+        </form>
+        <sl:button th:unless="${createdId == null}" as="a" size="sm" variant="secondary"
+                   th:href="@{/tickets/{id}(id=${createdId})}">
+            <sl:slot name="icon-start"><sl:icon name="ticket"/></sl:slot>
+            <span th:text="|View ticket #${createdId}|">View ticket #100</span>
+        </sl:button>
+    </div>
+    <p th:unless="${t.sources.empty}" class="chat-sources">
+        <span class="muted">Sources:</span>
+        <sl:badge th:each="s : ${t.sources}" variant="outline" th:text="${s}">Amenities - Swimming pool</sl:badge>
+    </p>
+</li>
+
+<!--/* A question still being answered: a spinner that loads the answer in its place. */-->
+<li th:fragment="pending(p)" class="chat-turn chat-turn-assistant chat-turn-pending"
+    th:hx-get="@{/assistant/replies/{id}(id=${p.id})}" hx-trigger="load" hx-swap="outerHTML"
+    hx-on:htmx:after:swap="document.querySelector('.chat-form')?.scrollIntoView({block: 'end'})">
+    <span class="chat-author">Assistant</span>
+    <p class="chat-text chat-thinking"><sl:spinner aria-label="The assistant is answering"/> Thinking...</p>
+</li>
+
+<!--/* What sending a question adds to the conversation. */-->
+<th:block th:fragment="sent">
+    <li th:replace="~{:: turn(${turn})}"></li>
+    <li th:replace="~{:: pending(${pending})}"></li>
+</th:block>
+
+<!--/* The answer that replaces a spinner. */-->
+<th:block th:fragment="answer">
+    <li th:replace="~{:: turn(${turn})}"></li>
+</th:block>
+
+<!--/* A message that is not part of the conversation, such as a validation error. */-->
+<li th:fragment="notice" class="chat-turn chat-turn-assistant chat-turn-error">
+    <p class="chat-text" th:text="${message}">Type a question</p>
+</li>
+
+</body>
+</html>

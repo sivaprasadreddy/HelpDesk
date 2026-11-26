@@ -125,4 +125,67 @@ class AssistantControllerTests extends BaseIT {
                 .contains("How can I help?")
                 .doesNotContain("When is the gym open?");
     }
+
+    @Test
+    void shouldShowTheQuestionAndASpinnerBeforeTheModelAnswers() throws Exception {
+        var session = new MockHttpSession();
+
+        var sent = mvc.post()
+                .uri("/assistant")
+                .session(session)
+                .header("HX-Request", "true")
+                .with(user(RESIDENT))
+                .with(csrf())
+                .param("message", "When is the gym open?")
+                .exchange();
+
+        assertThat(sent).hasStatusOk();
+        var body = sent.getResponse().getContentAsString();
+        assertThat(body)
+                .contains("When is the gym open?")
+                .contains("chat-turn-pending")
+                .doesNotContain("<html");
+        assertThat(chatModel.lastPrompt()).as("the model is not called yet").isNull();
+        var matcher = java.util.regex.Pattern.compile("hx-get=\"(/assistant/replies/[0-9a-f-]+)\"")
+                .matcher(body);
+        assertThat(matcher.find()).isTrue();
+        var replyUrl = matcher.group(1);
+
+        // A reload while the answer is pending keeps the spinner.
+        assertThat(mvc.get().uri("/assistant").session(session).with(user(RESIDENT)))
+                .bodyText()
+                .contains(replyUrl);
+
+        var reply = mvc.get().uri(replyUrl).session(session).with(user(RESIDENT));
+        assertThat(reply)
+                .hasStatusOk()
+                .bodyText()
+                .contains("Test answer to: When is the gym open?")
+                .doesNotContain("chat-turn-pending");
+        assertThat(mvc.get().uri("/assistant").session(session).with(user(RESIDENT)))
+                .bodyText()
+                .contains("Test answer to: When is the gym open?")
+                .doesNotContain(replyUrl);
+
+        // Asking for the same reply again does not call the model a second time.
+        chatModel.reset();
+        assertThat(mvc.get().uri(replyUrl).session(session).with(user(RESIDENT)))
+                .bodyText()
+                .contains("Test answer to: When is the gym open?");
+        assertThat(chatModel.lastPrompt()).isNull();
+    }
+
+    @Test
+    void shouldReturnAValidationNoticeToHtmx() {
+        assertThat(mvc.post()
+                        .uri("/assistant")
+                        .header("HX-Request", "true")
+                        .with(user(RESIDENT))
+                        .with(csrf())
+                        .param("message", " "))
+                .hasStatusOk()
+                .bodyText()
+                .contains("Type a question")
+                .doesNotContain("<html");
+    }
 }
