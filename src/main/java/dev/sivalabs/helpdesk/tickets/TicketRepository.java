@@ -29,6 +29,18 @@ interface TicketRepository extends JpaRepository<TicketEntity, Long> {
             """)
     List<StatusCount> countByStatusForCreator(Long createdBy);
 
+    Page<TicketEntity> findByAssignedTo(Long assignedTo, Pageable pageable);
+
+    Page<TicketEntity> findByAssignedToAndStatus(Long assignedTo, TicketStatus status, Pageable pageable);
+
+    /** Number of tickets per status assigned to the user; statuses with none are absent. */
+    @Query("""
+            select t.status as status, count(t) as tickets from TicketEntity t
+            where t.assignedTo = :assignedTo
+            group by t.status
+            """)
+    List<StatusCount> countByStatusForAssignee(Long assignedTo);
+
     interface StaffWorkload {
         Long getStaffId();
 

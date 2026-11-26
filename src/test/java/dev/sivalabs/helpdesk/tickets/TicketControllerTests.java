@@ -66,7 +66,8 @@ class TicketControllerTests extends BaseIT {
                 .param("title", "  Kitchen sink leaking ")
                 .param("description", "Water drips under the sink in A-101.")
                 .param("priority", "HIGH")
-                .param("categoryId", "1");
+                .param("categoryId", "1")
+                .exchange();
 
         assertThat(result).hasStatus3xxRedirection().hasRedirectedUrl("/tickets/mine");
         assertThat(result).flash().containsKey("successMessage");

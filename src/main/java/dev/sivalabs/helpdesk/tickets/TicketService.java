@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -64,26 +65,39 @@ class TicketService {
     }
 
     /**
-     * A page of the tickets the user raised, optionally only those in one status. Sorts by the columns the list
-     * offers ({@link #SORTABLE}), newest first otherwise, with the id last for a stable order across pages.
+     * A page of the tickets the user raised or is assigned, optionally only those in one status. Sorts by the
+     * columns the list offers ({@link #SORTABLE}), newest first otherwise, with the id last for a stable order
+     * across pages.
      */
     @Transactional(readOnly = true)
-    public Page<TicketSummary> findTicketsCreatedBy(Long userId, @Nullable TicketStatus status, Pageable pageable) {
+    public Page<TicketSummary> findTickets(
+            TicketScope scope, Long userId, @Nullable TicketStatus status, Pageable pageable) {
         var stable = stableSort(pageable);
-        var page = status == null
-                ? ticketRepository.findByCreatedBy(userId, stable)
-                : ticketRepository.findByCreatedByAndStatus(userId, status, stable);
+        var page = switch (scope) {
+            case RAISED_BY ->
+                status == null
+                        ? ticketRepository.findByCreatedBy(userId, stable)
+                        : ticketRepository.findByCreatedByAndStatus(userId, status, stable);
+            case ASSIGNED_TO ->
+                status == null
+                        ? ticketRepository.findByAssignedTo(userId, stable)
+                        : ticketRepository.findByAssignedToAndStatus(userId, status, stable);
+        };
         return toSummaries(page);
     }
 
-    /** Number of tickets per status raised by the user, every status present (zero when none). */
+    /** Number of tickets per status in the user's list, every status present (zero when none). */
     @Transactional(readOnly = true)
-    public Map<TicketStatus, Long> countByStatusCreatedBy(Long userId) {
+    public Map<TicketStatus, Long> countByStatus(TicketScope scope, Long userId) {
         var counts = new EnumMap<TicketStatus, Long>(TicketStatus.class);
         for (var s : TicketStatus.values()) {
             counts.put(s, 0L);
         }
-        ticketRepository.countByStatusForCreator(userId).forEach(c -> counts.put(c.getStatus(), c.getTickets()));
+        var rows = switch (scope) {
+            case RAISED_BY -> ticketRepository.countByStatusForCreator(userId);
+            case ASSIGNED_TO -> ticketRepository.countByStatusForAssignee(userId);
+        };
+        rows.forEach(c -> counts.put(c.getStatus(), c.getTickets()));
         return counts;
     }
 
@@ -95,22 +109,23 @@ class TicketService {
                 pageable.getPageNumber(), pageable.getPageSize(), sort.and(Sort.by(Sort.Order.desc("id"))));
     }
 
-    /** Resolves category and assignee names with one lookup each for the whole page. */
+    /** Resolves category and user names with one lookup each for the whole page. */
     private Page<TicketSummary> toSummaries(Page<TicketEntity> page) {
         var categoryNames =
                 categoryAPI.findAllCategories().stream().collect(Collectors.toMap(CategoryDto::id, CategoryDto::name));
-        var assigneeIds = page.stream()
-                .map(TicketEntity::getAssignedTo)
+        var userIds = page.stream()
+                .flatMap(t -> Stream.of(t.getCreatedBy(), t.getAssignedTo()))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
-        var assigneeNames = userAPI.findNamesByIds(assigneeIds);
+        var userNames = userAPI.findNamesByIds(userIds);
         return page.map(t -> new TicketSummary(
                 t.getId(),
                 t.getTitle(),
                 categoryNames.getOrDefault(t.getCategoryId(), "Unknown"),
                 t.getPriority(),
                 t.getStatus(),
-                t.getAssignedTo() == null ? null : assigneeNames.get(t.getAssignedTo()),
+                userNames.getOrDefault(t.getCreatedBy(), "Unknown"),
+                t.getAssignedTo() == null ? null : userNames.get(t.getAssignedTo()),
                 t.getCreatedAt(),
                 t.getUpdatedAt() == null ? t.getCreatedAt() : t.getUpdatedAt()));
     }

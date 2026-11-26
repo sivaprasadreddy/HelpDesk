@@ -1,15 +1,15 @@
 -- Sample data for local development only (loaded by the 'local' profile).
 -- Repeatable migration: runs after all versioned migrations; safe to re-run.
--- All accounts use the same password as the admin account.
+-- All non-admin accounts use the password "secret".
 
 insert into users(id, email, password, name, role) values
-(2, 'ravi.staff@gmail.com',   '$2a$10$hKDVYxLefVHV/vtuPhWD3OigtRyOykRLDdUAp80Z1crSoS1lFqaFS', 'Ravi Kumar',     'ROLE_STAFF'),
-(3, 'anita.staff@gmail.com',  '$2a$10$hKDVYxLefVHV/vtuPhWD3OigtRyOykRLDdUAp80Z1crSoS1lFqaFS', 'Anita Sharma',   'ROLE_STAFF'),
-(4, 'mohan.staff@gmail.com',  '$2a$10$hKDVYxLefVHV/vtuPhWD3OigtRyOykRLDdUAp80Z1crSoS1lFqaFS', 'Mohan Das',      'ROLE_STAFF'),
-(5, 'lakshmi.staff@gmail.com','$2a$10$hKDVYxLefVHV/vtuPhWD3OigtRyOykRLDdUAp80Z1crSoS1lFqaFS', 'Lakshmi Iyer',   'ROLE_STAFF'),
-(6, 'priya@gmail.com',        '$2a$10$hKDVYxLefVHV/vtuPhWD3OigtRyOykRLDdUAp80Z1crSoS1lFqaFS', 'Priya Nair',     'ROLE_USER'),
-(7, 'arjun@gmail.com',        '$2a$10$hKDVYxLefVHV/vtuPhWD3OigtRyOykRLDdUAp80Z1crSoS1lFqaFS', 'Arjun Reddy',    'ROLE_USER'),
-(8, 'meena@gmail.com',        '$2a$10$hKDVYxLefVHV/vtuPhWD3OigtRyOykRLDdUAp80Z1crSoS1lFqaFS', 'Meena Pillai',   'ROLE_USER')
+(2, 'ravi.staff@gmail.com',   '$2a$10$/f2/DJU4m8Ir0r7LIGIEYOTAsCLlHledjBLG.0M02sAeJY2s7DdmW', 'Ravi Kumar',     'ROLE_STAFF'),
+(3, 'anita.staff@gmail.com',  '$2a$10$/f2/DJU4m8Ir0r7LIGIEYOTAsCLlHledjBLG.0M02sAeJY2s7DdmW', 'Anita Sharma',   'ROLE_STAFF'),
+(4, 'mohan.staff@gmail.com',  '$2a$10$/f2/DJU4m8Ir0r7LIGIEYOTAsCLlHledjBLG.0M02sAeJY2s7DdmW', 'Mohan Das',      'ROLE_STAFF'),
+(5, 'lakshmi.staff@gmail.com','$2a$10$/f2/DJU4m8Ir0r7LIGIEYOTAsCLlHledjBLG.0M02sAeJY2s7DdmW', 'Lakshmi Iyer',   'ROLE_STAFF'),
+(6, 'priya@gmail.com',        '$2a$10$/f2/DJU4m8Ir0r7LIGIEYOTAsCLlHledjBLG.0M02sAeJY2s7DdmW', 'Priya Nair',     'ROLE_USER'),
+(7, 'arjun@gmail.com',        '$2a$10$/f2/DJU4m8Ir0r7LIGIEYOTAsCLlHledjBLG.0M02sAeJY2s7DdmW', 'Arjun Reddy',    'ROLE_USER'),
+(8, 'meena@gmail.com',        '$2a$10$/f2/DJU4m8Ir0r7LIGIEYOTAsCLlHledjBLG.0M02sAeJY2s7DdmW', 'Meena Pillai',   'ROLE_USER')
 on conflict do nothing;
 
 insert into staff_categories(user_id, category_id) values

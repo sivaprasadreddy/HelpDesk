@@ -21,8 +21,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
- * Creating tickets (ADMIN and USER, see {@link AccessPolicy#canCreateTicket}) and the resident's own ticket list
- * ({@link AccessPolicy#canViewOwnTickets}).
+ * Creating tickets (ADMIN and USER, see {@link AccessPolicy#canCreateTicket}), the resident's own ticket list
+ * ({@link AccessPolicy#canViewOwnTickets}) and the staff member's assigned list
+ * ({@link AccessPolicy#canViewAssignedTickets}).
  */
 @Controller
 @RequestMapping("/tickets")
@@ -85,17 +86,46 @@ class TicketController {
         if (!accessPolicy.canViewOwnTickets(authentication.getPrincipal())) {
             throw new AccessDeniedException("Only residents have a list of their own tickets");
         }
+        model.addAttribute("pageTitle", "My Tickets");
+        model.addAttribute("listUrl", "/tickets/mine");
+        model.addAttribute("showCreator", false);
+        model.addAttribute("canCreate", true);
+        model.addAttribute("emptyTitle", "No tickets yet");
+        model.addAttribute("emptyDescription", "Report an issue and follow its progress here.");
+        return renderList(TicketScope.RAISED_BY, status, pageable, model);
+    }
+
+    /** REQ-015: the tickets assigned to the signed-in staff member, optionally of one status. */
+    @GetMapping("/assigned")
+    String assignedTickets(
+            Authentication authentication,
+            @RequestParam(required = false) String status,
+            @PageableDefault(size = 20) Pageable pageable,
+            Model model) {
+        if (!accessPolicy.canViewAssignedTickets(authentication.getPrincipal())) {
+            throw new AccessDeniedException("Only staff members have tickets assigned to them");
+        }
+        model.addAttribute("pageTitle", "Assigned to Me");
+        model.addAttribute("listUrl", "/tickets/assigned");
+        model.addAttribute("showCreator", true);
+        model.addAttribute("canCreate", false);
+        model.addAttribute("emptyTitle", "No tickets assigned to you");
+        model.addAttribute("emptyDescription", "New tickets in your categories will show up here.");
+        return renderList(TicketScope.ASSIGNED_TO, status, pageable, model);
+    }
+
+    private String renderList(TicketScope scope, @Nullable String status, Pageable pageable, Model model) {
         var userId = AuthUtils.getCurrentUserIdOrThrow();
         var selected = parseStatus(status);
-        var counts = ticketService.countByStatusCreatedBy(userId);
-        model.addAttribute("tickets", ticketService.findTicketsCreatedBy(userId, selected, pageable));
+        var counts = ticketService.countByStatus(scope, userId);
+        model.addAttribute("tickets", ticketService.findTickets(scope, userId, selected, pageable));
         model.addAttribute("statuses", TicketStatus.values());
         model.addAttribute("selectedStatus", selected);
         model.addAttribute("statusCounts", counts);
         model.addAttribute(
                 "totalCount",
                 counts.values().stream().mapToLong(Long::longValue).sum());
-        return "tickets/mine";
+        return "tickets/list";
     }
 
     /** An unknown status shows every ticket rather than an error page. */

@@ -1,20 +1,20 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sl="https://shadleaf.dev/sl"
-      th:replace="~{layout/main :: layout('My Tickets', ~{::breadcrumb}, ~{::#page-content})}">
+      th:replace="~{layout/main :: layout(${pageTitle}, ~{::breadcrumb}, ~{::#page-content})}">
 <body>
 <th:block th:ref="breadcrumb">
     <sl:breadcrumb-item><sl:breadcrumb-link th:href="@{/home}">Home</sl:breadcrumb-link></sl:breadcrumb-item>
     <sl:breadcrumb-separator/>
-    <sl:breadcrumb-item><sl:breadcrumb-page>My Tickets</sl:breadcrumb-page></sl:breadcrumb-item>
+    <sl:breadcrumb-item><sl:breadcrumb-page th:text="${pageTitle}">My Tickets</sl:breadcrumb-page></sl:breadcrumb-item>
 </th:block>
 <div id="page-content" class="stack">
     <th:block th:if="${totalCount == 0}">
         <sl:empty border>
             <sl:empty-header>
                 <sl:empty-media variant="icon"><sl:icon name="ticket"/></sl:empty-media>
-                <sl:empty-title level="2">No tickets yet</sl:empty-title>
-                <sl:empty-description>Report an issue and follow its progress here.</sl:empty-description>
+                <sl:empty-title level="2" th:text="${emptyTitle}">No tickets yet</sl:empty-title>
+                <sl:empty-description th:text="${emptyDescription}">Report an issue and follow its progress here.</sl:empty-description>
             </sl:empty-header>
-            <sl:empty-content>
+            <sl:empty-content th:if="${canCreate}">
                 <sl:button as="a" th:href="@{/tickets/new}">
                     <sl:slot name="icon-start"><sl:icon name="plus"/></sl:slot>
                     New Ticket
@@ -26,19 +26,19 @@
     <th:block th:unless="${totalCount == 0}">
         <div class="list-toolbar">
             <nav class="status-filter" aria-label="Filter by status">
-                <sl:button as="a" size="sm" th:href="@{/tickets/mine}"
+                <sl:button as="a" size="sm" th:href="@{${listUrl}}"
                            th:variant="${selectedStatus == null ? 'default' : 'outline'}"
                            th:aria-current="${selectedStatus == null ? 'page' : null}">
                     All <span class="filter-count" th:text="${totalCount}">3</span>
                 </sl:button>
                 <sl:button as="a" size="sm" th:each="s : ${statuses}"
-                           th:href="@{/tickets/mine(status=${s})}"
+                           th:href="@{${listUrl}(status=${s})}"
                            th:variant="${selectedStatus == s ? 'default' : 'outline'}"
                            th:aria-current="${selectedStatus == s ? 'page' : null}">
-                    [[${s.label}]] <span class="filter-count" th:text="${statusCounts[s]}">1</span>
+                    [[${s.label}]] <span class="filter-count" th:text="${statusCounts.get(s)}">1</span>
                 </sl:button>
             </nav>
-            <sl:button as="a" th:href="@{/tickets/new}">
+            <sl:button as="a" th:href="@{/tickets/new}" th:if="${canCreate}">
                 <sl:slot name="icon-start"><sl:icon name="plus"/></sl:slot>
                 New Ticket
             </sl:button>
@@ -52,7 +52,7 @@
                 <th>Category</th>
                 <th>Priority</th>
                 <th>Status</th>
-                <th>Assigned to</th>
+                <th th:text="${showCreator ? 'Raised by' : 'Assigned to'}">Assigned to</th>
                 <sl:table-head sort="createdAt">Created</sl:table-head>
                 <sl:table-head sort="updatedAt">Last updated</sl:table-head>
             </tr>
@@ -70,7 +70,8 @@
                     <sl:badge th:variant="${t.status.name() == 'OPEN' ? 'default' : (t.status.name() == 'IN_PROGRESS' ? 'secondary' : 'outline')}"
                               th:text="${t.status.label}">Open</sl:badge>
                 </td>
-                <td>
+                <td th:if="${showCreator}" th:text="${t.creatorName}">Priya Nair</td>
+                <td th:unless="${showCreator}">
                     <span th:if="${t.assigneeName != null}" th:text="${t.assigneeName}">Ravi Kumar</span>
                     <span th:unless="${t.assigneeName != null}" class="muted">Not yet assigned</span>
                 </td>

@@ -35,6 +35,11 @@ public class AccessPolicy {
         return is(principal, Role.ROLE_USER);
     }
 
+    /** The "Assigned to me" list is the staff member's view of their work. */
+    public boolean canViewAssignedTickets(@Nullable Object principal) {
+        return is(principal, Role.ROLE_STAFF);
+    }
+
     public boolean canViewTicket(@Nullable Object principal, Long createdBy, @Nullable Long assignedTo) {
         return is(principal, Role.ROLE_ADMIN)
                 || (is(principal, Role.ROLE_STAFF) && isSelf(principal, assignedTo))
