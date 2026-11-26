@@ -6,12 +6,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import dev.sivalabs.helpdesk.BaseIT;
 import dev.sivalabs.helpdesk.users.Role;
 import dev.sivalabs.helpdesk.users.SecurityUser;
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,13 +56,12 @@ class CreatedVsResolvedTests extends BaseIT {
         SecurityContextHolder.clearContext();
     }
 
-    /** A local time of day as the database stores it: UTC wall-clock time (Hibernate normalises instants). */
-    static Timestamp at(LocalDate day, LocalTime time) {
-        var instant = day.atTime(time).atZone(ZoneId.systemDefault()).toInstant();
-        return Timestamp.valueOf(LocalDateTime.ofInstant(instant, ZoneOffset.UTC));
+    /** A local time of day in the server's time zone, as an absolute instant for a {@code timestamptz} column. */
+    static OffsetDateTime at(LocalDate day, LocalTime time) {
+        return day.atTime(time).atZone(ZoneId.systemDefault()).toOffsetDateTime();
     }
 
-    void ticket(Timestamp createdAt, @Nullable Timestamp resolvedAt) {
+    void ticket(OffsetDateTime createdAt, @Nullable OffsetDateTime resolvedAt) {
         sql(
                 "insert into tickets(title, description, priority, status, category_id, created_by, created_at,"
                         + " resolved_at) values ('t', 'd', 'LOW', ?, 1, 900, ?, ?)",
