@@ -10,7 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-@Import(TestcontainersConfig.class)
+@Import({TestcontainersConfig.class, TestAiConfig.class})
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 public abstract class BaseIT {
