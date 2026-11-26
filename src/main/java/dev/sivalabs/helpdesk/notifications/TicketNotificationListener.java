@@ -19,8 +19,9 @@ import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.Context;
@@ -28,9 +29,9 @@ import org.thymeleaf.context.Context;
 /**
  * Emails the people concerned by each ticket event, with a copy to the help desk administrator
  * ({@code helpdesk.notifications.cc}). The content is an HTML Thymeleaf template per event under
- * {@code templates/email/}, sharing {@code email/layout.html}. Runs after the change is committed,
- * asynchronously; Spring Modulith keeps the event until the email is sent, so a mail server outage does not lose
- * it.
+ * {@code templates/email/}, sharing {@code email/layout.html}. The events arrive from RabbitMQ (the
+ * {@value NotificationMessagingConfig#QUEUE} queue), so emails go out after the change is committed and off the
+ * request thread. A failed send is retried; one that keeps failing goes to the dead-letter queue.
  *
  * <p>Concerned are the resident who raised the ticket and its assignee, plus the previous assignee on a
  * reassignment; the user who made the change is not told about it. When nobody is left, the administrator gets
@@ -38,6 +39,7 @@ import org.thymeleaf.context.Context;
  */
 @Component
 @EnableConfigurationProperties(NotificationProperties.class)
+@RabbitListener(queues = NotificationMessagingConfig.QUEUE)
 class TicketNotificationListener {
     private static final Logger LOG = LoggerFactory.getLogger(TicketNotificationListener.class);
 
@@ -54,7 +56,7 @@ class TicketNotificationListener {
         this.properties = properties;
     }
 
-    @ApplicationModuleListener
+    @RabbitHandler
     public void on(TicketCreatedEvent event) {
         var t = event.ticket();
         notify(
@@ -65,7 +67,7 @@ class TicketNotificationListener {
                 Map.of());
     }
 
-    @ApplicationModuleListener
+    @RabbitHandler
     public void on(TicketAssignedEvent event) {
         var t = event.ticket();
         var vars = new HashMap<String, Object>();
@@ -78,7 +80,7 @@ class TicketNotificationListener {
                 vars);
     }
 
-    @ApplicationModuleListener
+    @RabbitHandler
     public void on(TicketStatusChangedEvent event) {
         var t = event.ticket();
         notify(
@@ -89,7 +91,7 @@ class TicketNotificationListener {
                 Map.<String, Object>of("previousStatus", event.previousStatus()));
     }
 
-    @ApplicationModuleListener
+    @RabbitHandler
     public void on(TicketUpdatedEvent event) {
         var t = event.ticket();
         notify(
@@ -100,7 +102,7 @@ class TicketNotificationListener {
                 Map.of());
     }
 
-    @ApplicationModuleListener
+    @RabbitHandler
     public void on(TicketCommentAddedEvent event) {
         var t = event.ticket();
         notify(

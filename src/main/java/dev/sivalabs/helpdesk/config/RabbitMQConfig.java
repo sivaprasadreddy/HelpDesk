@@ -1,30 +1,20 @@
 package dev.sivalabs.helpdesk.config;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Messages are JSON, with the payload's class in the {@code __TypeId__} header so a listener gets the right
+ * record back. Only the classes of published events (the tickets module) are trusted for that. Each module
+ * declares its own exchanges and queues.
+ */
 @Configuration
 class RabbitMQConfig {
-    public static final String EXCHANGE = "helpdesk.exchange";
-    public static final String QUEUE = "helpdesk.queue";
-    public static final String ROUTING_KEY = "helpdesk.routingkey";
 
     @Bean
-    Queue queue() {
-        return new Queue(QUEUE, true);
-    }
-
-    @Bean
-    TopicExchange exchange() {
-        return new TopicExchange(EXCHANGE);
-    }
-
-    @Bean
-    Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY);
+    MessageConverter jsonMessageConverter() {
+        return new JacksonJsonMessageConverter("dev.sivalabs.helpdesk.tickets");
     }
 }

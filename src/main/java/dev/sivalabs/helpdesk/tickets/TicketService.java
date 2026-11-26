@@ -22,7 +22,6 @@ import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -51,7 +50,7 @@ class TicketService {
     private final UserAPI userAPI;
     private final AccessPolicy accessPolicy;
     private final CommentRepository commentRepository;
-    private final ApplicationEventPublisher events;
+    private final TicketEventPublisher ticketEvents;
 
     TicketService(
             TicketRepository ticketRepository,
@@ -59,8 +58,8 @@ class TicketService {
             UserAPI userAPI,
             AccessPolicy accessPolicy,
             CommentRepository commentRepository,
-            ApplicationEventPublisher events) {
-        this.events = events;
+            TicketEventPublisher ticketEvents) {
+        this.ticketEvents = ticketEvents;
         this.ticketRepository = ticketRepository;
         this.commentRepository = commentRepository;
         this.categoryAPI = categoryAPI;
@@ -103,7 +102,7 @@ class TicketService {
                     cmd.priority(),
                     saved.getAssignedTo());
         }
-        events.publishEvent(new TicketCreatedEvent(TicketSnapshot.of(saved), cmd.createdBy()));
+        ticketEvents.publish(new TicketCreatedEvent(TicketSnapshot.of(saved), cmd.createdBy()));
         return saved.getId();
     }
 
@@ -211,7 +210,7 @@ class TicketService {
         }
         t.setStatus(target);
         LOG.info("Ticket #{} moved {} -> {} by user {}", id, expected, target, userIdOf(principal));
-        events.publishEvent(new TicketStatusChangedEvent(TicketSnapshot.of(t), expected, userIdOf(principal)));
+        ticketEvents.publish(new TicketStatusChangedEvent(TicketSnapshot.of(t), expected, userIdOf(principal)));
     }
 
     /**
@@ -246,7 +245,7 @@ class TicketService {
                 previous == null ? "nobody" : "staff " + previous,
                 staffId,
                 AuthUtils.getCurrentUserId());
-        events.publishEvent(new TicketAssignedEvent(TicketSnapshot.of(t), previous, AuthUtils.getCurrentUserId()));
+        ticketEvents.publish(new TicketAssignedEvent(TicketSnapshot.of(t), previous, AuthUtils.getCurrentUserId()));
         return true;
     }
 
@@ -275,7 +274,7 @@ class TicketService {
                 AuthUtils.getCurrentUserId(),
                 cmd.priority(),
                 cmd.categoryId());
-        events.publishEvent(new TicketUpdatedEvent(TicketSnapshot.of(t), AuthUtils.getCurrentUserId()));
+        ticketEvents.publish(new TicketUpdatedEvent(TicketSnapshot.of(t), AuthUtils.getCurrentUserId()));
     }
 
     /** The ticket's comments, oldest first, if the principal may view the ticket. */
@@ -316,7 +315,7 @@ class TicketService {
         comment.setContent(content.trim());
         commentRepository.save(comment);
         LOG.info("Comment {} added to ticket #{} by user {}", comment.getId(), ticketId, authorId);
-        events.publishEvent(new TicketCommentAddedEvent(TicketSnapshot.of(ticket), comment.getContent(), authorId));
+        ticketEvents.publish(new TicketCommentAddedEvent(TicketSnapshot.of(ticket), comment.getContent(), authorId));
     }
 
     private static @Nullable Long userIdOf(Object principal) {
@@ -355,7 +354,7 @@ class TicketService {
             } else {
                 LOG.info("Ticket #{} handed over from staff {} to staff {}", t.getId(), previous, t.getAssignedTo());
             }
-            events.publishEvent(new TicketAssignedEvent(TicketSnapshot.of(t), previous, null));
+            ticketEvents.publish(new TicketAssignedEvent(TicketSnapshot.of(t), previous, null));
         }
         return tickets.size();
     }
