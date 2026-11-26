@@ -1,0 +1,10 @@
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{email/layout :: layout(~{::h1}, ~{::#content})}">
+<body>
+<h1 style="margin:0 0 16px;font-size:18px;line-height:1.4;" th:text="|Ticket #${ticket.id} updated|">Ticket #1 updated</h1>
+<div id="content">
+    <p style="margin:0;font-size:14px;line-height:1.6;">
+        <strong th:text="${actorName ?: 'The system'}">Administrator</strong> updated the ticket's details.
+    </p>
+</div>
+</body>
+</html>

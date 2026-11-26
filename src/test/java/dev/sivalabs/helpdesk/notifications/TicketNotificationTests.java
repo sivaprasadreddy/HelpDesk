@@ -75,7 +75,7 @@ class TicketNotificationTests extends BaseIT {
                         () -> {
                             try {
                                 verify(emailAPI, atLeastOnce())
-                                        .send(
+                                        .sendHtml(
                                                 anyString(),
                                                 to.capture(),
                                                 cc.capture(),
@@ -115,7 +115,10 @@ class TicketNotificationTests extends BaseIT {
         // Priya raised it herself, so only the assignee (Anita: no open work) is told; admin copied.
         assertThat(sent.to()).containsExactly("anita@example.com");
         assertThat(sent.cc()).containsExactly(CC);
-        assertThat(sent.body()).contains("raised by Priya Nair").contains("Assigned to: Anita Sharma");
+        assertThat(sent.body())
+                .contains("<strong>Priya Nair</strong> raised a new ticket.")
+                .contains("Anita Sharma")
+                .contains("<html");
     }
 
     @Test
@@ -131,7 +134,7 @@ class TicketNotificationTests extends BaseIT {
         var sent = awaitEmail("Ticket #1 is now In progress");
         assertThat(sent.to()).containsExactly("priya@example.com");
         assertThat(sent.cc()).containsExactly(CC);
-        assertThat(sent.body()).contains("moved from Open to In progress").contains("Changed by Ravi Kumar");
+        assertThat(sent.body()).contains("moved from <strong>Open</strong>").contains("Changed by Ravi Kumar.");
     }
 
     @Test
@@ -146,7 +149,9 @@ class TicketNotificationTests extends BaseIT {
         var sent = awaitEmail("Ticket #1 assigned");
         assertThat(sent.to()).containsExactly("priya@example.com", "anita@example.com", "ravi@example.com");
         assertThat(sent.cc()).containsExactly(CC);
-        assertThat(sent.body()).contains("now assigned to Anita Sharma (previously Ravi Kumar)");
+        assertThat(sent.body())
+                .contains("<strong>Anita Sharma</strong> (previously <span>Ravi Kumar</span>).")
+                .contains("Changed by Administrator.");
     }
 
     @Test
@@ -164,7 +169,9 @@ class TicketNotificationTests extends BaseIT {
         var sent = awaitEmail("Ticket #1 updated");
         assertThat(sent.to()).containsExactly("priya@example.com", "ravi@example.com");
         assertThat(sent.cc()).containsExactly(CC);
-        assertThat(sent.body()).contains("Priority: Critical");
+        assertThat(sent.body())
+                .contains("<strong>Administrator</strong> updated the ticket")
+                .contains("Critical");
     }
 
     @Test
@@ -180,9 +187,9 @@ class TicketNotificationTests extends BaseIT {
         assertThat(sent.to()).containsExactly("ravi@example.com");
         assertThat(sent.cc()).containsExactly(CC);
         assertThat(sent.body())
-                .contains("Priya Nair commented")
+                .contains("<strong>Priya Nair</strong> commented:")
                 .contains("Any update?")
-                .contains("/tickets/1");
+                .contains("href=\"http://localhost:8080/tickets/1\"");
     }
 
     @Test
@@ -209,6 +216,7 @@ class TicketNotificationTests extends BaseIT {
                 .exchange();
 
         Thread.sleep(1000);
-        verify(emailAPI, org.mockito.Mockito.never()).send(anyString(), anyList(), anyList(), anyString(), anyString());
+        verify(emailAPI, org.mockito.Mockito.never())
+                .sendHtml(anyString(), anyList(), anyList(), anyString(), anyString());
     }
 }

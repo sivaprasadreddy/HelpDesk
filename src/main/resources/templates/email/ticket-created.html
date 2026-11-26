@@ -1,0 +1,11 @@
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{email/layout :: layout(~{::h1}, ~{::#content})}">
+<body>
+<h1 style="margin:0 0 16px;font-size:18px;line-height:1.4;" th:text="|New ticket #${ticket.id}|">New ticket #1</h1>
+<div id="content">
+    <p style="margin:0;font-size:14px;line-height:1.6;">
+        <strong th:text="${creatorName}">Priya Nair</strong> raised a new ticket.
+        <th:block th:if="${ticket.assignedTo == null}">Nobody handles its category yet, so an administrator will assign it.</th:block>
+    </p>
+</div>
+</body>
+</html>

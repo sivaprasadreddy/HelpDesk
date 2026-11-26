@@ -10,8 +10,10 @@ import dev.sivalabs.helpdesk.tickets.TicketUpdatedEvent;
 import dev.sivalabs.helpdesk.users.UserAPI;
 import dev.sivalabs.helpdesk.users.UserContact;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
@@ -20,11 +22,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Component;
+import org.thymeleaf.ITemplateEngine;
+import org.thymeleaf.context.Context;
 
 /**
  * Emails the people concerned by each ticket event, with a copy to the help desk administrator
- * ({@code helpdesk.notifications.cc}). Runs after the change is committed, asynchronously; Spring Modulith keeps
- * the event until the email is sent, so a mail server outage does not lose it.
+ * ({@code helpdesk.notifications.cc}). The content is an HTML Thymeleaf template per event under
+ * {@code templates/email/}, sharing {@code email/layout.html}. Runs after the change is committed,
+ * asynchronously; Spring Modulith keeps the event until the email is sent, so a mail server outage does not lose
+ * it.
  *
  * <p>Concerned are the resident who raised the ticket and its assignee, plus the previous assignee on a
  * reassignment; the user who made the change is not told about it. When nobody is left, the administrator gets
@@ -37,11 +43,14 @@ class TicketNotificationListener {
 
     private final EmailAPI emailAPI;
     private final UserAPI userAPI;
+    private final ITemplateEngine templateEngine;
     private final NotificationProperties properties;
 
-    TicketNotificationListener(EmailAPI emailAPI, UserAPI userAPI, NotificationProperties properties) {
+    TicketNotificationListener(
+            EmailAPI emailAPI, UserAPI userAPI, ITemplateEngine templateEngine, NotificationProperties properties) {
         this.emailAPI = emailAPI;
         this.userAPI = userAPI;
+        this.templateEngine = templateEngine;
         this.properties = properties;
     }
 
@@ -52,41 +61,21 @@ class TicketNotificationListener {
                 event,
                 Arrays.asList(t.createdBy(), t.assignedTo()),
                 "Ticket #%d created: %s".formatted(t.id(), t.title()),
-                names -> """
-                        Ticket #%d "%s" was raised by %s.
-
-                        Priority: %s
-                        Status: %s
-                        Assigned to: %s
-                        """.formatted(
-                                t.id(),
-                                t.title(),
-                                names.name(t.createdBy()),
-                                t.priority().getLabel(),
-                                t.status().getLabel(),
-                                names.nameOrNobody(t.assignedTo())));
+                "email/ticket-created",
+                Map.of());
     }
 
     @ApplicationModuleListener
     public void on(TicketAssignedEvent event) {
         var t = event.ticket();
+        var vars = new HashMap<String, Object>();
+        vars.put("previousAssigneeId", event.previousAssigneeId());
         notify(
                 event,
                 Arrays.asList(t.createdBy(), t.assignedTo(), event.previousAssigneeId()),
                 "Ticket #%d assigned: %s".formatted(t.id(), t.title()),
-                names -> """
-                        Ticket #%d "%s" is now assigned to %s%s.
-                        %s
-                        """.formatted(
-                                t.id(),
-                                t.title(),
-                                names.nameOrNobody(t.assignedTo()),
-                                event.previousAssigneeId() == null
-                                        ? ""
-                                        : " (previously " + names.name(event.previousAssigneeId()) + ")",
-                                event.actorId() == null
-                                        ? "The previous assignee was deactivated, so the work was handed over."
-                                        : "Changed by " + names.name(event.actorId()) + "."));
+                "email/ticket-assigned",
+                vars);
     }
 
     @ApplicationModuleListener
@@ -96,15 +85,8 @@ class TicketNotificationListener {
                 event,
                 Arrays.asList(t.createdBy(), t.assignedTo()),
                 "Ticket #%d is now %s: %s".formatted(t.id(), t.status().getLabel(), t.title()),
-                names -> """
-                        Ticket #%d "%s" moved from %s to %s.
-                        Changed by %s.
-                        """.formatted(
-                                t.id(),
-                                t.title(),
-                                event.previousStatus().getLabel(),
-                                t.status().getLabel(),
-                                names.nameOrSystem(event.actorId())));
+                "email/ticket-status-changed",
+                Map.<String, Object>of("previousStatus", event.previousStatus()));
     }
 
     @ApplicationModuleListener
@@ -114,17 +96,8 @@ class TicketNotificationListener {
                 event,
                 Arrays.asList(t.createdBy(), t.assignedTo()),
                 "Ticket #%d updated: %s".formatted(t.id(), t.title()),
-                names -> """
-                        The details of ticket #%d "%s" were updated by %s.
-
-                        Priority: %s
-                        Status: %s
-                        """.formatted(
-                                t.id(),
-                                t.title(),
-                                names.nameOrSystem(event.actorId()),
-                                t.priority().getLabel(),
-                                t.status().getLabel()));
+                "email/ticket-updated",
+                Map.of());
     }
 
     @ApplicationModuleListener
@@ -134,14 +107,23 @@ class TicketNotificationListener {
                 event,
                 Arrays.asList(t.createdBy(), t.assignedTo()),
                 "New comment on ticket #%d: %s".formatted(t.id(), t.title()),
-                names -> """
-                        %s commented on ticket #%d "%s":
-
-                        %s
-                        """.formatted(names.nameOrSystem(event.actorId()), t.id(), t.title(), event.comment()));
+                "email/ticket-comment-added",
+                Map.<String, Object>of("comment", event.comment()));
     }
 
-    private void notify(TicketEvent event, List<Long> concerned, String subject, Body body) {
+    /**
+     * Every template gets the {@code ticket} snapshot, {@code subject}, {@code ticketUrl} and the names
+     * {@code creatorName}, {@code assigneeName} ("Not assigned yet" when nobody), {@code actorName} ({@code null}
+     * when the system acted) and, for a reassignment, {@code previousAssigneeName}; plus the event's own
+     * {@code extra} variables.
+     */
+    private void notify(
+            TicketEvent event,
+            List<@Nullable Long> concerned,
+            String subject,
+            String template,
+            Map<String, Object> extra) {
+        var t = event.ticket();
         var ids = new LinkedHashSet<Long>();
         concerned.stream().filter(Objects::nonNull).forEach(ids::add);
         var everyone = new LinkedHashSet<>(ids);
@@ -149,7 +131,6 @@ class TicketNotificationListener {
             everyone.add(event.actorId());
         }
         var contacts = userAPI.findContactsByIds(everyone);
-        var names = new Names(contacts);
 
         var to = ids.stream()
                 .filter(id -> !id.equals(event.actorId()))
@@ -164,29 +145,27 @@ class TicketNotificationListener {
             to = cc;
             cc = List.of();
         }
-        var text = body.render(names) + "\nView the ticket: " + properties.baseUrl() + "/tickets/"
-                + event.ticket().id() + "\n";
-        emailAPI.send(properties.from(), to, cc, subject, text);
+
+        var context = new Context(Locale.ENGLISH);
+        context.setVariables(extra);
+        context.setVariable("ticket", t);
+        context.setVariable("subject", subject);
+        context.setVariable("ticketUrl", properties.baseUrl() + "/tickets/" + t.id());
+        context.setVariable("creatorName", name(contacts, t.createdBy()));
+        context.setVariable(
+                "assigneeName", t.assignedTo() == null ? "Not assigned yet" : name(contacts, t.assignedTo()));
+        context.setVariable("actorName", event.actorId() == null ? null : name(contacts, event.actorId()));
+        if (extra.get("previousAssigneeId") instanceof Long previous) {
+            context.setVariable("previousAssigneeName", name(userAPI.findContactsByIds(List.of(previous)), previous));
+        }
+        var html = templateEngine.process(template, context);
+
+        emailAPI.sendHtml(properties.from(), to, cc, subject, html);
         LOG.info("Sent '{}' to {} (cc {})", subject, to, cc);
     }
 
-    @FunctionalInterface
-    private interface Body {
-        String render(Names names);
-    }
-
-    private record Names(Map<Long, UserContact> contacts) {
-        String name(@Nullable Long id) {
-            var c = id == null ? null : contacts.get(id);
-            return c == null ? "Unknown" : c.name();
-        }
-
-        String nameOrNobody(@Nullable Long id) {
-            return id == null ? "nobody yet (an administrator will assign it)" : name(id);
-        }
-
-        String nameOrSystem(@Nullable Long id) {
-            return id == null ? "the system" : name(id);
-        }
+    private static String name(Map<Long, UserContact> contacts, Long id) {
+        var c = contacts.get(id);
+        return c == null ? "Unknown" : c.name();
     }
 }

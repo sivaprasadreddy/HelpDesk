@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(heading, content)" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${subject}">HelpDesk</title>
+</head>
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#18181b;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:24px 0;">
+    <tr>
+        <td align="center">
+            <table role="presentation" width="600" cellpadding="0" cellspacing="0"
+                   style="max-width:600px;width:100%;background:#ffffff;border:1px solid #e4e4e7;border-radius:8px;">
+                <tr>
+                    <td style="padding:20px 24px;border-bottom:1px solid #e4e4e7;font-size:14px;font-weight:600;">HelpDesk</td>
+                </tr>
+                <tr>
+                    <td style="padding:24px;">
+                        <h1 style="margin:0 0 16px;font-size:18px;line-height:1.4;" th:replace="${heading}">Heading</h1>
+                        <div th:replace="${content}">Content</div>
+                        <table role="presentation" cellpadding="0" cellspacing="0"
+                               style="margin-top:20px;width:100%;font-size:14px;border-top:1px solid #e4e4e7;">
+                            <tr>
+                                <td style="padding:8px 0 4px;color:#71717a;width:120px;">Ticket</td>
+                                <td style="padding:8px 0 4px;" th:text="|#${ticket.id} ${ticket.title}|">#1 Power outage</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:4px 0;color:#71717a;">Status</td>
+                                <td style="padding:4px 0;" th:text="${ticket.status.label}">Open</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:4px 0;color:#71717a;">Priority</td>
+                                <td style="padding:4px 0;" th:text="${ticket.priority.label}">High</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:4px 0;color:#71717a;">Raised by</td>
+                                <td style="padding:4px 0;" th:text="${creatorName}">Priya Nair</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:4px 0;color:#71717a;">Assigned to</td>
+                                <td style="padding:4px 0;" th:text="${assigneeName}">Ravi Kumar</td>
+                            </tr>
+                        </table>
+                        <p style="margin:24px 0 0;">
+                            <a th:href="${ticketUrl}" href="#"
+                               style="display:inline-block;background:#18181b;color:#ffffff;text-decoration:none;padding:10px 16px;border-radius:6px;font-size:14px;">View ticket</a>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:16px 24px;border-top:1px solid #e4e4e7;font-size:12px;color:#71717a;">
+                        You are receiving this because you are involved in this ticket.
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

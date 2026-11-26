@@ -1,0 +1,13 @@
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{email/layout :: layout(~{::h1}, ~{::#content})}">
+<body>
+<h1 style="margin:0 0 16px;font-size:18px;line-height:1.4;" th:text="|Ticket #${ticket.id} is now ${ticket.status.label}|">Ticket #1 is now In progress</h1>
+<div id="content">
+    <p style="margin:0;font-size:14px;line-height:1.6;">
+        The ticket moved from <strong th:text="${previousStatus.label}">Open</strong>
+        to <strong th:text="${ticket.status.label}">In progress</strong>.
+    </p>
+    <p style="margin:12px 0 0;font-size:14px;line-height:1.6;color:#52525b;"
+       th:text="|Changed by ${actorName ?: 'the system'}.|">Changed by Ravi Kumar.</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{email/layout :: layout(~{::h1}, ~{::#content})}">
+<body>
+<h1 style="margin:0 0 16px;font-size:18px;line-height:1.4;" th:text="|Ticket #${ticket.id} assigned|">Ticket #1 assigned</h1>
+<div id="content">
+    <p style="margin:0;font-size:14px;line-height:1.6;">
+        The ticket is now assigned to <strong th:text="${assigneeName}">Anita Sharma</strong><th:block
+            th:if="${previousAssigneeName != null}"> (previously <span th:text="${previousAssigneeName}">Ravi Kumar</span>)</th:block>.
+    </p>
+    <p style="margin:12px 0 0;font-size:14px;line-height:1.6;color:#52525b;"
+       th:text="${actorName == null ? 'The previous assignee was deactivated, so the work was handed over.' : 'Changed by ' + actorName + '.'}">
+        Changed by Administrator.</p>
+</div>
+</body>
+</html>
