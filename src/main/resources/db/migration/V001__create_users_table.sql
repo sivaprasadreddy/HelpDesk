@@ -7,11 +7,13 @@ create table users
     password   text      not null,
     name       text      not null,
     role       text      not null,
+    active     boolean   not null default true,
     created_at timestamp not null default CURRENT_TIMESTAMP,
     updated_at timestamp,
     version    bigint       not null default 0,
     primary key (id),
-    constraint user_email_unique unique (email)
+    constraint user_email_unique unique (email),
+    constraint user_role_check check (role in ('ROLE_ADMIN', 'ROLE_STAFF', 'ROLE_USER'))
 );
 
 insert into users(id, email, password, name, role, created_at) values

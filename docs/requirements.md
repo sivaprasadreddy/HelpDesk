@@ -7,7 +7,7 @@ Status values: `TODO`, `IN_PROGRESS`, `DONE`.
 
 | REQ_ID  | Title                                                                                              | Status |
 |---------|----------------------------------------------------------------------------------------------------|--------|
-| REQ-001 | Database schema and migrations for users, roles, categories, tickets and comments                  | IN_PROGRESS |
+| REQ-001 | Database schema and migrations for users, roles, categories, tickets and comments                  | DONE   |
 | REQ-002 | Seed data: roles (ADMIN, STAFF, USER) and initial ADMIN account                                    | DONE   |
 | REQ-003 | Seed data: default ticket categories (Plumbing, Electrical, Carpentry, Housekeeping, Security, Lift Maintenance, Gardening) | TODO   |
 | REQ-004 | Seed data: sample staff, residents and tickets for local development (dev profile only)            | TODO   |
