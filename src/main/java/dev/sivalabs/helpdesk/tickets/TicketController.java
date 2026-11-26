@@ -4,8 +4,10 @@ import dev.sivalabs.helpdesk.categories.CategoryAPI;
 import dev.sivalabs.helpdesk.users.AccessPolicy;
 import dev.sivalabs.helpdesk.users.AuthUtils;
 import dev.sivalabs.helpdesk.users.UserAPI;
+import dev.sivalabs.helpdesk.users.UserDto;
 import jakarta.validation.Valid;
 import java.util.Locale;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -118,6 +120,14 @@ class TicketController {
                 "canChangeStatus",
                 accessPolicy.canUpdateTicketStatus(authentication.getPrincipal(), ticket.assignedTo())
                         && !ticket.status().nextStatuses().isEmpty());
+        var canAssign =
+                accessPolicy.canAssignTicket(authentication.getPrincipal()) && ticket.status() != TicketStatus.CLOSED;
+        model.addAttribute("canAssign", canAssign);
+        if (canAssign) {
+            model.addAttribute(
+                    "activeStaff",
+                    userAPI.findStaffMembers().stream().filter(UserDto::active).toList());
+        }
         model.addAttribute("listUrl", ticketListUrl(authentication));
         model.addAttribute("listTitle", ticketListTitle(authentication));
         return "tickets/details";
@@ -135,6 +145,30 @@ class TicketController {
             ticketService.changeStatus(id, from, to, authentication.getPrincipal());
             redirectAttributes.addFlashAttribute("successMessage", "Ticket #" + id + " moved to " + to.getLabel());
         } catch (InvalidStatusTransitionException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/tickets/" + id;
+    }
+
+    /** REQ-019: assigns or reassigns the ticket to an active staff member (ADMIN only). */
+    @PostMapping("/{id:\\d+}/assignee")
+    String assignTicket(
+            Authentication authentication,
+            @PathVariable Long id,
+            @RequestParam Long staffId,
+            RedirectAttributes redirectAttributes) {
+        if (!accessPolicy.canAssignTicket(authentication.getPrincipal())) {
+            throw new AccessDeniedException("Only administrators can assign tickets");
+        }
+        try {
+            var changed = ticketService.assignTicket(id, staffId);
+            var name = userAPI.findNamesByIds(Set.of(staffId)).getOrDefault(staffId, "the staff member");
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    changed
+                            ? "Ticket #" + id + " assigned to " + name
+                            : "Ticket #" + id + " is already assigned to " + name);
+        } catch (InvalidAssigneeException | InvalidStatusTransitionException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/tickets/" + id;

@@ -168,6 +168,31 @@ class TicketService {
         t.setStatus(target);
     }
 
+    /**
+     * REQ-019: assigns the ticket to an active staff member, whether or not they handle its category. A CLOSED
+     * ticket keeps its assignee.
+     *
+     * @return {@code false} when the ticket was already assigned to that staff member
+     */
+    @Transactional
+    @PreAuthorize("@accessPolicy.canAssignTicket(principal)")
+    public boolean assignTicket(Long id, Long staffId) {
+        var t = ticketRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket #" + id + " not found"));
+        if (t.getStatus() == TicketStatus.CLOSED) {
+            throw new InvalidStatusTransitionException("Ticket #" + id + " is closed and cannot be reassigned");
+        }
+        if (!userAPI.isActiveStaff(staffId)) {
+            throw new InvalidAssigneeException(staffId);
+        }
+        if (staffId.equals(t.getAssignedTo())) {
+            return false;
+        }
+        t.setAssignedTo(staffId);
+        return true;
+    }
+
     /** Whether any ticket exists at all. */
     @Transactional(readOnly = true)
     public boolean hasAnyTickets() {

@@ -75,3 +75,4 @@
 .ticket-meta dt { font-size: 0.75rem; color: var(--muted-foreground); }
 .ticket-meta dd { margin: 0.125rem 0 0; }
 .status-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: flex-end; }
+.assign-form { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }

@@ -24,6 +24,11 @@ public class UserAPI {
         return userService.findUsersByRole(Role.ROLE_STAFF);
     }
 
+    /** Whether the id is a staff member who is active (and so can be given tickets). */
+    public boolean isActiveStaff(Long id) {
+        return findStaffMembers().stream().anyMatch(u -> u.id().equals(id) && u.active());
+    }
+
     /** Display names by user id; ids that do not exist are left out. */
     public Map<Long, String> findNamesByIds(Collection<Long> ids) {
         return userService.findNamesByIds(ids);

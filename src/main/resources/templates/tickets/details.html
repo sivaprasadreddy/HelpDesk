@@ -54,6 +54,23 @@
             </form>
         </sl:card-footer>
     </sl:card>
+
+    <sl:card th:if="${canAssign}">
+        <sl:card-header>
+            <sl:card-title level="2" th:text="${ticket.assignedTo == null ? 'Assign ticket' : 'Reassign ticket'}">Assign ticket</sl:card-title>
+            <sl:card-description>Any active staff member can be chosen, even outside the ticket's category.</sl:card-description>
+        </sl:card-header>
+        <sl:card-content>
+            <form method="post" th:action="@{/tickets/{id}/assignee(id=${ticket.id})}" class="assign-form">
+                <sl:native-select name="staffId" aria-label="Staff member" required>
+                    <option value="" th:selected="${ticket.assignedTo == null}">Choose a staff member</option>
+                    <option th:each="u : ${activeStaff}" th:value="${u.id}" th:text="${u.name}"
+                            th:selected="${u.id == ticket.assignedTo}">Ravi Kumar</option>
+                </sl:native-select>
+                <sl:button type="submit" th:text="${ticket.assignedTo == null ? 'Assign' : 'Reassign'}">Assign</sl:button>
+            </form>
+        </sl:card-content>
+    </sl:card>
 </div>
 </body>
 </html>
