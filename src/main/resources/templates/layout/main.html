@@ -41,6 +41,12 @@
                 <sl:sidebar-group-label>Administration</sl:sidebar-group-label>
                 <sl:sidebar-menu>
                     <sl:sidebar-menu-item>
+                        <sl:sidebar-menu-button th:href="@{/admin/categories}" th:active="${#slNav.current('/admin/categories')}" tooltip="Categories">
+                            <sl:slot name="icon-start"><sl:icon name="tags"/></sl:slot>
+                            Categories
+                        </sl:sidebar-menu-button>
+                    </sl:sidebar-menu-item>
+                    <sl:sidebar-menu-item>
                         <sl:sidebar-menu-button th:href="@{/admin/residents}" th:active="${#slNav.current('/admin/residents')}" tooltip="Residents">
                             <sl:slot name="icon-start"><sl:icon name="users"/></sl:slot>
                             Residents

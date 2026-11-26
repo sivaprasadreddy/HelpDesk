@@ -1,0 +1,50 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sl="https://shadleaf.dev/sl"
+      th:replace="~{layout/main :: layout('Categories', ~{::breadcrumb}, ~{::#page-content})}">
+<body>
+<th:block th:ref="breadcrumb">
+    <sl:breadcrumb-item><sl:breadcrumb-link th:href="@{/home}">Home</sl:breadcrumb-link></sl:breadcrumb-item>
+    <sl:breadcrumb-separator/>
+    <sl:breadcrumb-item><sl:breadcrumb-page>Categories</sl:breadcrumb-page></sl:breadcrumb-item>
+</th:block>
+<div id="page-content" class="stack">
+    <div class="toolbar">
+        <sl:button as="a" th:href="@{/admin/categories/new}">
+            <sl:slot name="icon-start"><sl:icon name="plus"/></sl:slot>
+            Add Category
+        </sl:button>
+    </div>
+    <sl:table th:unless="${categories.isEmpty()}">
+        <thead>
+        <tr><th>Name</th><th>Description</th><th>Status</th><sl:table-head align="end">Actions</sl:table-head></tr>
+        </thead>
+        <tbody>
+        <tr th:each="c : ${categories}">
+            <td th:text="${c.name}">Plumbing</td>
+            <td th:text="${c.description}">Leaks</td>
+            <td>
+                <sl:badge th:if="${c.active}" variant="secondary">Active</sl:badge>
+                <sl:badge th:unless="${c.active}" variant="outline">Inactive</sl:badge>
+            </td>
+            <td data-align="end">
+                <div class="row-actions">
+                    <sl:button as="a" th:href="@{/admin/categories/{id}/edit(id=${c.id})}" variant="outline" size="sm">Edit</sl:button>
+                    <form th:if="${c.active}" method="post" th:action="@{/admin/categories/{id}/deactivate(id=${c.id})}">
+                        <sl:button type="submit" variant="destructive" size="sm">Deactivate</sl:button>
+                    </form>
+                    <form th:unless="${c.active}" method="post" th:action="@{/admin/categories/{id}/activate(id=${c.id})}">
+                        <sl:button type="submit" variant="secondary" size="sm">Activate</sl:button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </sl:table>
+    <sl:empty th:if="${categories.isEmpty()}">
+        <sl:empty-header>
+            <sl:empty-media variant="icon"><sl:icon name="tags"/></sl:empty-media>
+            <sl:empty-title level="2">No categories yet</sl:empty-title>
+        </sl:empty-header>
+    </sl:empty>
+</div>
+</body>
+</html>
