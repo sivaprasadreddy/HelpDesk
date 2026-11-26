@@ -29,7 +29,7 @@ Status values: `TODO` (`📋`), `IN_PROGRESS` (`👷🏽`), `DONE` (`✅`).
 | ✅ | REQ-020 | ADMIN: update any ticket (status, priority, assignee, details)                                     | DONE   |
 | ✅ | REQ-021 | Ticket comments (ADMIN: any, STAFF: assigned, USER: own)                                           | DONE   |
 | ✅ | REQ-022 | Handling of tickets whose assignee or category is deactivated                                      | DONE   |
-| 📋 | REQ-023 | Analytics: tickets by status, priority and category                                                | TODO   |
+| ✅ | REQ-023 | Analytics: tickets by status, priority and category                                                | DONE   |
 | 📋 | REQ-024 | Analytics: tickets created vs. resolved over time                                                  | TODO   |
 | 📋 | REQ-025 | Analytics: average resolution time                                                                 | TODO   |
 | 📋 | REQ-026 | Analytics: workload and performance per staff member                                               | TODO   |

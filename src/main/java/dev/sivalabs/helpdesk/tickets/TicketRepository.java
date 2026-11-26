@@ -44,6 +44,21 @@ interface TicketRepository extends JpaRepository<TicketEntity, Long>, JpaSpecifi
 
     List<TicketEntity> findByAssignedToAndStatusInOrderByIdAsc(Long assignedTo, Collection<TicketStatus> statuses);
 
+    @Query("select t.status as groupKey, count(t) as tickets from TicketEntity t group by t.status")
+    List<GroupCount<TicketStatus>> countGroupedByStatus();
+
+    @Query("select t.priority as groupKey, count(t) as tickets from TicketEntity t group by t.priority")
+    List<GroupCount<TicketPriority>> countGroupedByPriority();
+
+    @Query("select t.categoryId as groupKey, count(t) as tickets from TicketEntity t group by t.categoryId")
+    List<GroupCount<Long>> countGroupedByCategory();
+
+    interface GroupCount<K> {
+        K getGroupKey();
+
+        long getTickets();
+    }
+
     interface StaffWorkload {
         Long getStaffId();
 
