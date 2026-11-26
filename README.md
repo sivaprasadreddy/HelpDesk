@@ -11,8 +11,21 @@ Administrators oversee the whole process and use analytics to monitor support pe
 
 ## Docs
 - [Project Overview](docs/project.md)
-- [Tech Stack](docs/tech-stack.md)
 - [Requirements](docs/requirements.md)
+
+## Tech Stack
+| Area             | Technologies                                    |
+|------------------|-------------------------------------------------|
+| Language         | Java                                            |
+| Framework        | Spring Boot, Spring Modulith, Spring Security   |
+| AI               | Spring AI, Ollama/OpenAI                        |
+| Persistence      | Spring Data JPA, PostgreSQL, Flyway             |
+| Messaging        | RabbitMQ                                        |
+| Email            | JavaMail, Mailpit                               |
+| Observability    | BootUI, OpenTelemetry, Grafana LGTM, Prometheus         |
+| UI               | Thymeleaf, Shadleaf                     |
+| Build & Testing  | Maven, JUnit, Testcontainers, ArchUnit, Taikai  |
+| DevOps & Tooling | Docker, Docker Compose, Mise, Renovate, GitHub Actions |
 
 ## Local Development
 This project uses [mise](https://mise.jdx.dev/) to install the required SDKs and run common tasks defined in `mise.toml`.
