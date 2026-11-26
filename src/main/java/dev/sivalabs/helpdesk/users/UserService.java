@@ -26,13 +26,19 @@ class UserService {
     private final ApplicationEventPublisher eventPublisher;
     private final PasswordEncoder passwordEncoder;
     private final CategoryAPI categoryService;
+    private final ResidentProfileRepository residentProfileRepository;
+    private final StaffProfileRepository staffProfileRepository;
 
     UserService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             CategoryAPI categoryService,
-            ApplicationEventPublisher eventPublisher) {
+            ApplicationEventPublisher eventPublisher,
+            ResidentProfileRepository residentProfileRepository,
+            StaffProfileRepository staffProfileRepository) {
         this.userRepository = userRepository;
+        this.residentProfileRepository = residentProfileRepository;
+        this.staffProfileRepository = staffProfileRepository;
         this.eventPublisher = eventPublisher;
         this.passwordEncoder = passwordEncoder;
         this.categoryService = categoryService;
@@ -45,14 +51,14 @@ class UserService {
 
     @Transactional(readOnly = true)
     public Optional<UserDto> findById(Long id) {
-        return userRepository.findById(id).map(this::toUserDto);
+        return userRepository.findById(id).map(u -> toUserDto(u, Profiles.load(this, List.of(u))));
     }
 
     @Transactional(readOnly = true)
     public List<UserDto> findUsersByRole(Role role) {
-        return userRepository.findByRoleOrderByNameAsc(role).stream()
-                .map(this::toUserDto)
-                .toList();
+        var users = userRepository.findByRoleOrderByNameAsc(role);
+        var profiles = Profiles.load(this, users);
+        return users.stream().map(u -> toUserDto(u, profiles)).toList();
     }
 
     @Transactional
@@ -69,6 +75,15 @@ class UserService {
         user.setRole(cmd.role());
         user.setCreatedAt(Instant.now());
         userRepository.save(user);
+        var mobile = ProfileFields.clean(cmd.mobile());
+        var address = ProfileFields.clean(cmd.permanentAddress());
+        switch (cmd.role()) {
+            case ROLE_USER ->
+                residentProfileRepository.save(new ResidentProfileEntity(
+                        user.getId(), ProfileFields.clean(cmd.flatNumber()), mobile, address));
+            case ROLE_STAFF -> staffProfileRepository.save(new StaffProfileEntity(user.getId(), mobile, address));
+            case ROLE_ADMIN -> {}
+        }
         LOG.info("Created {} account {}", cmd.role(), user.getId());
     }
 
@@ -99,7 +114,8 @@ class UserService {
 
     @Transactional(readOnly = true)
     public UserDto getStaffMember(Long id) {
-        return toUserDto(loadStaff(id));
+        var staff = loadStaff(id);
+        return toUserDto(staff, Profiles.load(this, List.of(staff)));
     }
 
     /**
@@ -121,6 +137,16 @@ class UserService {
         user.setName(cmd.name().trim());
         user.setEmail(email);
         user.setCategoryIds(cmd.categoryIds());
+        var mobile = ProfileFields.clean(cmd.mobile());
+        var address = ProfileFields.clean(cmd.permanentAddress());
+        staffProfileRepository
+                .findById(user.getId())
+                .ifPresentOrElse(
+                        p -> {
+                            p.setMobile(mobile);
+                            p.setPermanentAddress(address);
+                        },
+                        () -> staffProfileRepository.save(new StaffProfileEntity(user.getId(), mobile, address)));
         LOG.info("Staff member {} updated; handles categories {}", cmd.id(), cmd.categoryIds());
     }
 
@@ -144,7 +170,44 @@ class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("Staff member " + id + " not found"));
     }
 
-    private UserDto toUserDto(UserEntity user) {
+    /** Residents' and staff profiles of a batch of users, by user id. */
+    private record Profiles(Map<Long, ResidentProfileEntity> residents, Map<Long, StaffProfileEntity> staff) {
+        static Profiles load(UserService service, Collection<UserEntity> users) {
+            var residentIds = idsWithRole(users, Role.ROLE_USER);
+            var staffIds = idsWithRole(users, Role.ROLE_STAFF);
+            Map<Long, ResidentProfileEntity> residents = residentIds.isEmpty()
+                    ? Map.of()
+                    : service.residentProfileRepository.findAllById(residentIds).stream()
+                            .collect(Collectors.toMap(ResidentProfileEntity::getUserId, p -> p));
+            Map<Long, StaffProfileEntity> staff = staffIds.isEmpty()
+                    ? Map.of()
+                    : service.staffProfileRepository.findAllById(staffIds).stream()
+                            .collect(Collectors.toMap(StaffProfileEntity::getUserId, p -> p));
+            return new Profiles(residents, staff);
+        }
+
+        private static List<Long> idsWithRole(Collection<UserEntity> users, Role role) {
+            return users.stream()
+                    .filter(u -> u.getRole() == role)
+                    .map(UserEntity::getId)
+                    .toList();
+        }
+    }
+
+    private UserDto toUserDto(UserEntity user, Profiles profiles) {
+        String flatNumber = null;
+        String mobile = null;
+        String address = null;
+        var resident = profiles.residents().get(user.getId());
+        var staff = profiles.staff().get(user.getId());
+        if (resident != null) {
+            flatNumber = resident.getFlatNumber();
+            mobile = resident.getMobile();
+            address = resident.getPermanentAddress();
+        } else if (staff != null) {
+            mobile = staff.getMobile();
+            address = staff.getPermanentAddress();
+        }
         return new UserDto(
                 user.getId(),
                 user.getName(),
@@ -152,6 +215,9 @@ class UserService {
                 user.getRole(),
                 user.isActive(),
                 Set.copyOf(user.getCategoryIds()),
-                user.getCreatedAt());
+                user.getCreatedAt(),
+                flatNumber,
+                mobile,
+                address);
     }
 }

@@ -39,3 +39,16 @@ insert into comments(id, ticket_id, author_id, content, created_at) values
 (4, 6, 3, 'Lift reset and serviced. Running normally now.',      CURRENT_TIMESTAMP - interval '13 days'),
 (5, 7, 4, 'Trimming scheduled for this weekend.',                CURRENT_TIMESTAMP - interval '2 days')
 on conflict do nothing;
+
+insert into staff_profiles(user_id, mobile, permanent_address) values
+(2, '9840011122', '12 Gandhi Street, Chennai'),
+(3, '9840022233', '45 MG Road, Bengaluru'),
+(4, '9840033344', '7 Temple Road, Madurai'),
+(5, '9840044455', '3 Lake View, Coimbatore')
+on conflict do nothing;
+
+insert into resident_profiles(user_id, flat_number, mobile, permanent_address) values
+(6, 'A-101', '9900011122', '21 Marine Drive, Kochi'),
+(7, 'B-204', '9900022233', '8 Banjara Hills, Hyderabad'),
+(8, 'C-305', '9900033344', null)
+on conflict do nothing;

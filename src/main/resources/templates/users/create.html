@@ -29,6 +29,22 @@
                     <sl:field-description>At least 8 characters.</sl:field-description>
                     <sl:field-error/>
                 </sl:field>
+                <sl:field th:if="${type.path == 'residents'}" th:field="*{flatNumber}">
+                    <sl:field-label>Flat number</sl:field-label>
+                    <sl:input autocomplete="off" placeholder="e.g. A-101"/>
+                    <sl:field-error/>
+                </sl:field>
+                <sl:field th:field="*{mobile}">
+                    <sl:field-label>Mobile</sl:field-label>
+                    <sl:input type="tel" autocomplete="off" placeholder="e.g. 9876543210"/>
+                    <sl:field-error/>
+                </sl:field>
+                <sl:field th:field="*{permanentAddress}">
+                    <sl:field-label>Permanent address</sl:field-label>
+                    <sl:textarea rows="3"/>
+                    <sl:field-description>Optional.</sl:field-description>
+                    <sl:field-error/>
+                </sl:field>
                 <div class="toolbar">
                     <sl:button as="a" th:href="@{/admin/{p}(p=${type.path})}" variant="outline">Cancel</sl:button>
                     <sl:button type="submit" th:text="|Create ${type.singular}|">Create</sl:button>

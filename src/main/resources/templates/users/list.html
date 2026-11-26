@@ -17,6 +17,8 @@
         <thead>
         <tr>
             <th>Name</th><th>Email</th>
+            <th th:unless="${isStaff}">Flat</th>
+            <th>Mobile</th>
             <th th:if="${isStaff}">Categories</th>
             <th>Status</th><th>Created</th>
             <sl:table-head th:if="${isStaff}" align="end">Actions</sl:table-head>
@@ -26,6 +28,8 @@
         <tr th:each="u : ${users}">
             <td th:text="${u.name}">Jane Doe</td>
             <td th:text="${u.email}">jane@example.com</td>
+            <td th:unless="${isStaff}" th:text="${u.flatNumber ?: '-'}">A-101</td>
+            <td th:text="${u.mobile ?: '-'}">9876543210</td>
             <td th:if="${isStaff}">
                 <div class="badge-list">
                     <th:block th:each="cid : ${u.categoryIds}" th:with="catName=${categoryNames.get(cid)}"><sl:badge variant="outline">[[${catName}]]</sl:badge></th:block>

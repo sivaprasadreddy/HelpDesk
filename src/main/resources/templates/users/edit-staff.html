@@ -23,6 +23,17 @@
                     <sl:input type="email" autocomplete="off"/>
                     <sl:field-error/>
                 </sl:field>
+                <sl:field th:field="*{mobile}">
+                    <sl:field-label>Mobile</sl:field-label>
+                    <sl:input type="tel" autocomplete="off" placeholder="e.g. 9876543210"/>
+                    <sl:field-error/>
+                </sl:field>
+                <sl:field th:field="*{permanentAddress}">
+                    <sl:field-label>Permanent address</sl:field-label>
+                    <sl:textarea rows="3"/>
+                    <sl:field-description>Optional.</sl:field-description>
+                    <sl:field-error/>
+                </sl:field>
                 <sl:field th:field="*{categoryIds}">
                     <sl:field-label>Categories</sl:field-label>
                     <sl:combobox multiple auto-highlight placeholder="Add a category" empty="No categories found.">

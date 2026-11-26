@@ -58,9 +58,20 @@ class UserController {
             Model model,
             RedirectAttributes redirectAttributes) {
         var type = UserType.of(userType);
+        if (type.role() == Role.ROLE_USER
+                && (form.flatNumber() == null || form.flatNumber().isBlank())) {
+            bindingResult.rejectValue("flatNumber", "flatNumber.required", "Flat number is required");
+        }
         if (!bindingResult.hasErrors()) {
             try {
-                userService.createUser(new CreateUserCmd(form.name(), form.email(), form.password(), type.role()));
+                userService.createUser(new CreateUserCmd(
+                        form.name(),
+                        form.email(),
+                        form.password(),
+                        type.role(),
+                        type.role() == Role.ROLE_USER ? form.flatNumber() : null,
+                        form.mobile(),
+                        form.permanentAddress()));
                 redirectAttributes.addFlashAttribute("successMessage", type.singular() + " created successfully");
                 return "redirect:/admin/" + type.path();
             } catch (EmailAlreadyExistsException e) {

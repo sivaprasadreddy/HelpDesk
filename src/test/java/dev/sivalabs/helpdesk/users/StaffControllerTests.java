@@ -35,7 +35,8 @@ class StaffControllerTests extends BaseIT {
     }
 
     Long createStaff(String email) {
-        userService.createUser(new CreateUserCmd("Bob Staff", email, "secret123", Role.ROLE_STAFF));
+        userService.createUser(
+                new CreateUserCmd("Bob Staff", email, "secret123", Role.ROLE_STAFF, null, "9876543210", null));
         return userRepository.findByEmailIgnoreCase(email).orElseThrow().getId();
     }
 
@@ -62,6 +63,8 @@ class StaffControllerTests extends BaseIT {
                 .with(csrf())
                 .param("name", "Bob Plumber")
                 .param("email", "Bob.P@Example.com")
+                .param("mobile", "9123456780")
+                .param("permanentAddress", "12 Gandhi Street, Chennai")
                 .param("categoryIds", "1", "2");
 
         assertThat(result).hasStatus3xxRedirection().hasRedirectedUrl("/admin/staff");
@@ -71,6 +74,10 @@ class StaffControllerTests extends BaseIT {
             assertThat(user.getEmail()).isEqualTo("bob.p@example.com");
             assertThat(user.getCategoryIds()).containsExactlyInAnyOrder(1L, 2L);
         });
+        assertThat(jdbcTemplate.queryForMap(
+                        "select mobile, permanent_address from staff_profiles where user_id = ?", id))
+                .containsEntry("mobile", "9123456780")
+                .containsEntry("permanent_address", "12 Gandhi Street, Chennai");
         assertThat(mvc.get().uri("/admin/staff"))
                 .bodyText()
                 .contains("Bob Plumber")
@@ -88,6 +95,7 @@ class StaffControllerTests extends BaseIT {
                 .with(csrf())
                 .param("name", "Bob")
                 .param("email", "bob@example.com")
+                .param("mobile", "9876543210")
                 .exchange();
 
         assertThat(jdbcTemplate.queryForObject(
@@ -105,6 +113,7 @@ class StaffControllerTests extends BaseIT {
                 .with(csrf())
                 .param("name", "Bob")
                 .param("email", "bob@example.com")
+                .param("mobile", "9876543210")
                 .param("categoryIds", "3");
 
         assertThat(result).hasStatusOk();
@@ -118,14 +127,16 @@ class StaffControllerTests extends BaseIT {
                         .uri("/admin/staff/{id}", id)
                         .with(csrf())
                         .param("name", "")
-                        .param("email", "bob@example.com"))
+                        .param("email", "bob@example.com")
+                        .param("mobile", "9876543210"))
                 .bodyText()
                 .contains("Name is required");
         assertThat(mvc.post()
                         .uri("/admin/staff/{id}", id)
                         .with(csrf())
                         .param("name", "Bob")
-                        .param("email", "admin@gmail.com"))
+                        .param("email", "admin@gmail.com")
+                        .param("mobile", "9876543210"))
                 .bodyText()
                 .contains("A user with this email already exists");
     }

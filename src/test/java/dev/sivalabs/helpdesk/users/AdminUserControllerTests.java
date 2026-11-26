@@ -16,6 +16,12 @@ class AdminUserControllerTests extends BaseIT {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    ResidentProfileRepository residentProfileRepository;
+
+    @Autowired
+    StaffProfileRepository staffProfileRepository;
+
     @ParameterizedTest
     @ValueSource(strings = {"/admin/residents", "/admin/staff", "/admin/residents/new", "/admin/staff/new"})
     @WithMockUser(roles = "ADMIN")
@@ -57,13 +63,25 @@ class AdminUserControllerTests extends BaseIT {
                 .with(csrf())
                 .param("name", "Jane Resident")
                 .param("email", "Jane@Example.com")
-                .param("password", "secret123");
+                .param("password", "secret123")
+                .param("flatNumber", " A-101 ")
+                .param("mobile", "9876543210")
+                .param("permanentAddress", "21 Marine Drive, Kochi");
 
         assertThat(result).hasStatus3xxRedirection().hasRedirectedUrl("/admin/residents");
         var user = userRepository.findByEmailIgnoreCase("jane@example.com").orElseThrow();
         assertThat(user.getRole()).isEqualTo(Role.ROLE_USER);
         assertThat(user.getEmail()).isEqualTo("jane@example.com");
-        assertThat(mvc.get().uri("/admin/residents")).bodyText().contains("Jane Resident");
+        var profile = residentProfileRepository.findById(user.getId()).orElseThrow();
+        assertThat(profile.getFlatNumber()).isEqualTo("A-101");
+        assertThat(profile.getMobile()).isEqualTo("9876543210");
+        assertThat(profile.getPermanentAddress()).isEqualTo("21 Marine Drive, Kochi");
+        assertThat(staffProfileRepository.existsById(user.getId())).isFalse();
+        assertThat(mvc.get().uri("/admin/residents"))
+                .bodyText()
+                .contains("Jane Resident")
+                .contains("A-101")
+                .contains("9876543210");
         assertThat(mvc.get().uri("/admin/staff")).bodyText().doesNotContain("Jane Resident");
     }
 
@@ -75,14 +93,35 @@ class AdminUserControllerTests extends BaseIT {
                 .with(csrf())
                 .param("name", "Bob Plumber")
                 .param("email", "bob@example.com")
-                .param("password", "secret123");
+                .param("password", "secret123")
+                .param("flatNumber", "Z-999")
+                .param("mobile", "+919876543210")
+                .param("permanentAddress", "");
 
         assertThat(result).hasStatus3xxRedirection().hasRedirectedUrl("/admin/staff");
-        assertThat(userRepository
-                        .findByEmailIgnoreCase("bob@example.com")
-                        .orElseThrow()
-                        .getRole())
-                .isEqualTo(Role.ROLE_STAFF);
+        var user = userRepository.findByEmailIgnoreCase("bob@example.com").orElseThrow();
+        assertThat(user.getRole()).isEqualTo(Role.ROLE_STAFF);
+        var profile = staffProfileRepository.findById(user.getId()).orElseThrow();
+        assertThat(profile.getMobile()).isEqualTo("+919876543210");
+        assertThat(profile.getPermanentAddress()).isNull();
+        assertThat(residentProfileRepository.existsById(user.getId())).isFalse();
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void shouldRequireFlatNumberAndValidMobileForResidents() {
+        var result = mvc.post()
+                .uri("/admin/residents")
+                .with(csrf())
+                .param("name", "Jane")
+                .param("email", "jane@example.com")
+                .param("password", "secret123")
+                .param("flatNumber", " ")
+                .param("mobile", "12ab");
+
+        assertThat(result).hasStatusOk();
+        assertThat(result).bodyText().contains("Flat number is required").contains("Enter a valid mobile number");
+        assertThat(userRepository.findByEmailIgnoreCase("jane@example.com")).isEmpty();
     }
 
     @Test
@@ -111,7 +150,9 @@ class AdminUserControllerTests extends BaseIT {
                 .with(csrf())
                 .param("name", "Another Admin")
                 .param("email", "ADMIN@gmail.com")
-                .param("password", "secret123");
+                .param("password", "secret123")
+                .param("flatNumber", "A-102")
+                .param("mobile", "9876543210");
 
         assertThat(result).hasStatusOk();
         assertThat(result).bodyText().contains("A user with this email already exists");

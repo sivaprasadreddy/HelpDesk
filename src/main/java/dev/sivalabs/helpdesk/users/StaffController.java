@@ -46,7 +46,8 @@ class StaffController {
         var current = userService.getStaffMember(id);
         if (!bindingResult.hasErrors()) {
             try {
-                userService.updateStaffMember(new UpdateStaffCmd(id, form.name(), form.email(), form.categoryIds()));
+                userService.updateStaffMember(new UpdateStaffCmd(
+                        id, form.name(), form.email(), form.mobile(), form.permanentAddress(), form.categoryIds()));
                 redirectAttributes.addFlashAttribute("successMessage", "Staff member updated successfully");
                 return REDIRECT_LIST;
             } catch (EmailAlreadyExistsException e) {
