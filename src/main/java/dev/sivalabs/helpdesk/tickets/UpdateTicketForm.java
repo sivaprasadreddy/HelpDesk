@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-/** REQ-020: the details an ADMIN can edit; status and assignee have their own actions on the details page. */
+/** The details an ADMIN can edit; status and assignee have their own actions on the details page. */
 record UpdateTicketForm(
         @NotBlank(message = "Title is required") @Size(max = 200, message = "Title must be at most 200 characters")
         String title,

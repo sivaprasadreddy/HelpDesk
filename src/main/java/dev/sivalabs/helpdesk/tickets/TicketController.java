@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.AccessDeniedException;
@@ -33,6 +35,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequestMapping("/tickets")
 class TicketController {
+    private static final Logger LOG = LoggerFactory.getLogger(TicketController.class);
+
     private static final String CREATE_VIEW = "tickets/create";
     private static final String EDIT_VIEW = "tickets/edit";
     private final TicketService ticketService;
@@ -75,6 +79,7 @@ class TicketController {
                 redirectAttributes.addFlashAttribute("successMessage", "Ticket #" + id + " created successfully");
                 return "redirect:" + ticketListUrl(authentication);
             } catch (InvalidTicketCategoryException e) {
+                LOG.warn("Ticket creation refused: {}", e.getMessage());
                 bindingResult.rejectValue("categoryId", "category.invalid", "Choose an active category");
             }
         }
@@ -82,7 +87,7 @@ class TicketController {
         return CREATE_VIEW;
     }
 
-    /** REQ-016: every ticket, filtered by status, priority, category and assignee ({@code assignee=none}). */
+    /** Every ticket, filtered by status, priority, category and assignee ({@code assignee=none}). */
     @GetMapping
     String allTickets(
             Authentication authentication,
@@ -113,7 +118,7 @@ class TicketController {
         return "tickets/list";
     }
 
-    /** REQ-017: one ticket; 404 when it does not exist or the user may not view it. */
+    /** One ticket; 404 when it does not exist or the user may not view it. */
     @GetMapping("/{id:\\d+}")
     String ticketDetails(Authentication authentication, @PathVariable Long id, Model model) {
         var ticket = ticketService.getTicket(id, authentication.getPrincipal());
@@ -144,7 +149,7 @@ class TicketController {
         return "tickets/details";
     }
 
-    /** REQ-018: moves the ticket to the next status; {@code from} is the status the user saw. */
+    /** Moves the ticket to the next status; {@code from} is the status the user saw. */
     @PostMapping("/{id:\\d+}/status")
     String changeStatus(
             Authentication authentication,
@@ -161,7 +166,7 @@ class TicketController {
         return "redirect:/tickets/" + id;
     }
 
-    /** REQ-019: assigns or reassigns the ticket to an active staff member (ADMIN only). */
+    /** Assigns or reassigns the ticket to an active staff member (ADMIN only). */
     @PostMapping("/{id:\\d+}/assignee")
     String assignTicket(
             Authentication authentication,
@@ -185,7 +190,7 @@ class TicketController {
         return "redirect:/tickets/" + id;
     }
 
-    /** REQ-020: the form to edit a ticket's details (ADMIN only). */
+    /** The form to edit a ticket's details (ADMIN only). */
     @GetMapping("/{id:\\d+}/edit")
     String editTicketForm(Authentication authentication, @PathVariable Long id, Model model) {
         requireCanUpdateDetails(authentication);
@@ -218,7 +223,7 @@ class TicketController {
         return EDIT_VIEW;
     }
 
-    /** REQ-021: adds a comment; on a validation error the details page shows it with the text kept. */
+    /** Adds a comment; on a validation error the details page shows it with the text kept. */
     @PostMapping("/{id:\\d+}/comments")
     String addComment(
             Authentication authentication,
@@ -242,7 +247,7 @@ class TicketController {
         return "redirect:/tickets/" + id + "#comments";
     }
 
-    /** REQ-014: the resident's own tickets, optionally of one status ({@code ?status=OPEN}). */
+    /** The resident's own tickets, optionally of one status ({@code ?status=OPEN}). */
     @GetMapping("/mine")
     String myTickets(
             Authentication authentication,
@@ -261,7 +266,7 @@ class TicketController {
         return renderList(TicketScope.RAISED_BY, status, pageable, model);
     }
 
-    /** REQ-015: the tickets assigned to the signed-in staff member, optionally of one status. */
+    /** The tickets assigned to the signed-in staff member, optionally of one status. */
     @GetMapping("/assigned")
     String assignedTickets(
             Authentication authentication,

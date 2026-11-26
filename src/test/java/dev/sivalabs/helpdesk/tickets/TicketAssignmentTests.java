@@ -14,7 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.support.TransactionTemplate;
 
-/** REQ-013: new tickets go to the least-loaded active staff member who handles the category. */
+/** New tickets go to the least-loaded active staff member who handles the category. */
 @Sql("/test-data.sql")
 class TicketAssignmentTests extends BaseIT {
     static final long RESIDENT_ID = 900L;

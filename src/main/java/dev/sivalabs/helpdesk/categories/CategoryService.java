@@ -2,11 +2,15 @@ package dev.sivalabs.helpdesk.categories;
 
 import dev.sivalabs.helpdesk.shared.ResourceNotFoundException;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CategoryService {
+    private static final Logger LOG = LoggerFactory.getLogger(CategoryService.class);
+
     private final CategoryRepository categoryRepository;
 
     CategoryService(CategoryRepository categoryRepository) {
@@ -48,6 +52,7 @@ public class CategoryService {
         category.setName(trimmed);
         category.setDescription(blankToNull(description));
         categoryRepository.save(category);
+        LOG.info("Category {} '{}' created", category.getId(), trimmed);
     }
 
     @Transactional
@@ -59,11 +64,13 @@ public class CategoryService {
         }
         category.setName(trimmed);
         category.setDescription(blankToNull(description));
+        LOG.info("Category {} updated, now named '{}'", id, trimmed);
     }
 
     @Transactional
     public void setActive(Long id, boolean active) {
         load(id).setActive(active);
+        LOG.info("Category {} {}", id, active ? "activated" : "deactivated");
     }
 
     private CategoryEntity load(Long id) {

@@ -13,7 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.support.TransactionTemplate;
 
-/** REQ-017: the ticket details page, visible to ADMIN, the assigned STAFF member and the resident who raised it. */
+/** The ticket details page, visible to ADMIN, the assigned STAFF member and the resident who raised it. */
 @Sql("/test-data.sql")
 class TicketDetailsTests extends BaseIT {
     static final SecurityUser ADMIN = new SecurityUser(1L, "Administrator", "admin@gmail.com", "x", Role.ROLE_ADMIN);

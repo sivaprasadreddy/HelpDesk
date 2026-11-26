@@ -10,6 +10,8 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -17,9 +19,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-/** REQ-027: the analytics dashboard (ADMIN only), over the last 7, 30 or 90 days. */
+/** The analytics dashboard (ADMIN only), over the last 7, 30 or 90 days. */
 @Controller
 class AnalyticsController {
+    private static final Logger LOG = LoggerFactory.getLogger(AnalyticsController.class);
+
     static final List<Integer> PERIODS = List.of(7, 30, 90);
     static final int DEFAULT_PERIOD = 30;
 
@@ -41,6 +45,7 @@ class AnalyticsController {
         var to = LocalDate.now(ZoneId.systemDefault());
         var from = to.minusDays(period - 1L);
 
+        LOG.debug("Analytics dashboard requested for {} to {}", from, to);
         var breakdowns = analytics.getBreakdowns();
         var flow = analytics.getCreatedVsResolved(from, to);
         var resolution = analytics.getResolutionTimes(from, to);

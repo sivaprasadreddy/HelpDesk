@@ -14,7 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.support.TransactionTemplate;
 
-/** REQ-027: the analytics dashboard (ADMIN only). */
+/** The analytics dashboard (ADMIN only). */
 @Sql("/test-data.sql")
 class AnalyticsDashboardTests extends BaseIT {
     static final SecurityUser ADMIN = new SecurityUser(1L, "Administrator", "admin@gmail.com", "x", Role.ROLE_ADMIN);

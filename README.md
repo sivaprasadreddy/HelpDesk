@@ -10,8 +10,9 @@ Administrators oversee the whole process and use analytics to monitor support pe
 * Docker and Docker Compose
 
 ## Docs
-- [Project Docs](docs/project.md)
+- [Project Overview](docs/project.md)
 - [Tech Stack](docs/tech-stack.md)
+- [Requirements](docs/requirements.md)
 
 ## Local Development
 This project uses [mise](https://mise.jdx.dev/) to install the required SDKs and run common tasks defined in `mise.toml`.

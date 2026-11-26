@@ -16,7 +16,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
-/** REQ-018: the status workflow, for the assigned STAFF member and ADMIN. */
+/** The status workflow, for the assigned STAFF member and ADMIN. */
 @Sql("/test-data.sql")
 class TicketStatusWorkflowTests extends BaseIT {
     static final SecurityUser ADMIN = new SecurityUser(1L, "Administrator", "admin@gmail.com", "x", Role.ROLE_ADMIN);

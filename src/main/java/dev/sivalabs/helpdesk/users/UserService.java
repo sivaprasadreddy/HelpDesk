@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 class UserService {
+    private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
+
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final PasswordEncoder passwordEncoder;
@@ -55,6 +59,7 @@ class UserService {
     public void createUser(CreateUserCmd cmd) {
         var email = cmd.email().trim().toLowerCase(Locale.ROOT);
         if (userRepository.existsByEmailIgnoreCase(email)) {
+            LOG.warn("Creating a {} account refused: the email address is already in use", cmd.role());
             throw new EmailAlreadyExistsException(email);
         }
         var user = new UserEntity();
@@ -64,6 +69,7 @@ class UserService {
         user.setRole(cmd.role());
         user.setCreatedAt(Instant.now());
         userRepository.save(user);
+        LOG.info("Created {} account {}", cmd.role(), user.getId());
     }
 
     /** Ids of active staff members who handle the category, in ascending order. */
@@ -115,6 +121,7 @@ class UserService {
         user.setName(cmd.name().trim());
         user.setEmail(email);
         user.setCategoryIds(cmd.categoryIds());
+        LOG.info("Staff member {} updated; handles categories {}", cmd.id(), cmd.categoryIds());
     }
 
     /** Deactivating an active staff member publishes {@link StaffDeactivatedEvent}. */
@@ -123,6 +130,7 @@ class UserService {
         var staff = loadStaff(id);
         var deactivating = staff.isActive() && !active;
         staff.setActive(active);
+        LOG.info("Staff member {} {}", id, active ? "activated" : "deactivated");
         if (deactivating) {
             userRepository.flush();
             eventPublisher.publishEvent(new StaffDeactivatedEvent(id));

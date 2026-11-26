@@ -14,7 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.support.TransactionTemplate;
 
-/** REQ-022: tickets whose assignee or category is deactivated. */
+/** Tickets whose assignee or category is deactivated. */
 @Sql("/test-data.sql")
 class DeactivationHandlingTests extends BaseIT {
     static final SecurityUser ADMIN = new SecurityUser(1L, "Administrator", "admin@gmail.com", "x", Role.ROLE_ADMIN);

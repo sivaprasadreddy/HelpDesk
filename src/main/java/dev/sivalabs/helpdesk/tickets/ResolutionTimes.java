@@ -5,7 +5,7 @@ import java.util.List;
 import org.jspecify.annotations.Nullable;
 
 /**
- * REQ-025: average time from creation to resolution of the tickets resolved in a period, overall and per
+ * Average time from creation to resolution of the tickets resolved in a period, overall and per
  * priority. An average is {@code null} when no ticket in its group was resolved.
  */
 public record ResolutionTimes(long resolvedCount, @Nullable Duration average, List<ByPriority> byPriority) {

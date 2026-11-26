@@ -13,7 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.support.TransactionTemplate;
 
-/** REQ-015: a staff member sees the tickets assigned to them. */
+/** A staff member sees the tickets assigned to them. */
 @Sql("/test-data.sql")
 class AssignedTicketsTests extends BaseIT {
     static final SecurityUser RAVI = new SecurityUser(901L, "Ravi Kumar", "ravi@example.com", "x", Role.ROLE_STAFF);

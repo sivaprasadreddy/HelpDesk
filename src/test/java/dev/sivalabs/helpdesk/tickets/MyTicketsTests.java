@@ -13,7 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.support.TransactionTemplate;
 
-/** REQ-014: a resident sees the tickets they raised, and their status. */
+/** A resident sees the tickets they raised, and their status. */
 @Sql("/test-data.sql")
 class MyTicketsTests extends BaseIT {
     static final SecurityUser PRIYA = new SecurityUser(900L, "Priya Nair", "priya@example.com", "x", Role.ROLE_USER);

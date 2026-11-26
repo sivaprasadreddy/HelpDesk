@@ -15,7 +15,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
-/** REQ-021: comments by ADMIN (any ticket), STAFF (assigned) and USER (own). */
+/** Comments by ADMIN (any ticket), STAFF (assigned) and USER (own). */
 @Sql("/test-data.sql")
 class TicketCommentsTests extends BaseIT {
     static final SecurityUser ADMIN = new SecurityUser(1L, "Administrator", "admin@gmail.com", "x", Role.ROLE_ADMIN);

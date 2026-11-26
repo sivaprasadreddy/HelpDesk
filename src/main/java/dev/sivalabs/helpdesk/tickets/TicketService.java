@@ -20,6 +20,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
@@ -33,6 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 class TicketService {
+    private static final Logger LOG = LoggerFactory.getLogger(TicketService.class);
+
     /** Tickets that still need work count towards a staff member's workload. */
     private static final EnumSet<TicketStatus> ACTIVE_STATUSES =
             EnumSet.of(TicketStatus.OPEN, TicketStatus.IN_PROGRESS);
@@ -84,6 +88,21 @@ class TicketService {
         ticket.setCreatedBy(cmd.createdBy());
         ticket.setAssignedTo(chooseAssignee(cmd.categoryId()).orElse(null));
         var saved = ticketRepository.save(ticket);
+        if (saved.getAssignedTo() == null) {
+            LOG.warn(
+                    "Ticket #{} created by user {} in category {} with no active staff to handle it; left unassigned",
+                    saved.getId(),
+                    cmd.createdBy(),
+                    cmd.categoryId());
+        } else {
+            LOG.info(
+                    "Ticket #{} created by user {} in category {} ({}), assigned to staff {}",
+                    saved.getId(),
+                    cmd.createdBy(),
+                    cmd.categoryId(),
+                    cmd.priority(),
+                    saved.getAssignedTo());
+        }
         events.publishEvent(new TicketCreatedEvent(TicketSnapshot.of(saved), cmd.createdBy()));
         return saved.getId();
     }
@@ -110,7 +129,7 @@ class TicketService {
         return toSummaries(page);
     }
 
-    /** REQ-016: a page of every ticket matching the filter, sorted as {@link #findTickets}. */
+    /** A page of every ticket matching the filter, sorted as {@link #findTickets}. */
     @Transactional(readOnly = true)
     @PreAuthorize("@accessPolicy.canViewAllTickets(principal)")
     public Page<TicketSummary> findAllTickets(TicketFilter filter, Pageable pageable) {
@@ -118,7 +137,7 @@ class TicketService {
     }
 
     /**
-     * REQ-017: the ticket, if the principal may view it ({@code AccessPolicy#canViewTicket}). A ticket the principal
+     * The ticket, if the principal may view it ({@code AccessPolicy#canViewTicket}). A ticket the principal
      * may not view is reported as not found, so its existence does not leak.
      */
     @Transactional(readOnly = true)
@@ -154,7 +173,7 @@ class TicketService {
     }
 
     /**
-     * REQ-018: moves the ticket from {@code expected} to {@code target} along the workflow
+     * Moves the ticket from {@code expected} to {@code target} along the workflow
      * ({@link TicketStatus#nextStatuses}). ADMIN may move any ticket, STAFF only those assigned to them; others get
      * not-found, as on the details page. Fails when the ticket is no longer in {@code expected} (someone else
      * changed it meanwhile) or the move is not allowed. Records when the ticket was resolved and closed; reopening
@@ -170,10 +189,17 @@ class TicketService {
             throw new AccessDeniedException("You cannot change the status of ticket #" + id);
         }
         if (t.getStatus() != expected) {
+            LOG.warn(
+                    "Status change on ticket #{} refused: user {} saw {} but it is now {}",
+                    id,
+                    userIdOf(principal),
+                    expected,
+                    t.getStatus());
             throw new InvalidStatusTransitionException(
                     "Ticket #" + id + " is now " + t.getStatus().getLabel() + "; review it and try again");
         }
         if (!expected.canMoveTo(target)) {
+            LOG.warn("Status change on ticket #{} refused: {} -> {} is not allowed", id, expected, target);
             throw new InvalidStatusTransitionException(
                     "A ticket that is " + expected.getLabel() + " cannot be moved to " + target.getLabel());
         }
@@ -184,11 +210,12 @@ class TicketService {
             case IN_PROGRESS, OPEN -> t.setResolvedAt(null);
         }
         t.setStatus(target);
+        LOG.info("Ticket #{} moved {} -> {} by user {}", id, expected, target, userIdOf(principal));
         events.publishEvent(new TicketStatusChangedEvent(TicketSnapshot.of(t), expected, userIdOf(principal)));
     }
 
     /**
-     * REQ-019: assigns the ticket to an active staff member, whether or not they handle its category. A CLOSED
+     * Assigns the ticket to an active staff member, whether or not they handle its category. A CLOSED
      * ticket keeps its assignee.
      *
      * @return {@code false} when the ticket was already assigned to that staff member
@@ -200,22 +227,31 @@ class TicketService {
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket #" + id + " not found"));
         if (t.getStatus() == TicketStatus.CLOSED) {
+            LOG.warn("Assignment of closed ticket #{} to staff {} refused", id, staffId);
             throw new InvalidStatusTransitionException("Ticket #" + id + " is closed and cannot be reassigned");
         }
         if (!userAPI.isActiveStaff(staffId)) {
+            LOG.warn("Assignment of ticket #{} refused: user {} is not an active staff member", id, staffId);
             throw new InvalidAssigneeException(staffId);
         }
         if (staffId.equals(t.getAssignedTo())) {
+            LOG.debug("Ticket #{} already assigned to staff {}; nothing to do", id, staffId);
             return false;
         }
         var previous = t.getAssignedTo();
         t.setAssignedTo(staffId);
+        LOG.info(
+                "Ticket #{} reassigned from {} to staff {} by user {}",
+                id,
+                previous == null ? "nobody" : "staff " + previous,
+                staffId,
+                AuthUtils.getCurrentUserId());
         events.publishEvent(new TicketAssignedEvent(TicketSnapshot.of(t), previous, AuthUtils.getCurrentUserId()));
         return true;
     }
 
     /**
-     * REQ-020: updates the ticket's title, description, priority and category. The category must be active, or
+     * Updates the ticket's title, description, priority and category. The category must be active, or
      * the one the ticket already has (so a ticket in a deactivated category can still be edited). Changing the
      * category does not reassign the ticket.
      */
@@ -226,16 +262,23 @@ class TicketService {
                 .findById(cmd.id())
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket #" + cmd.id() + " not found"));
         if (!cmd.categoryId().equals(t.getCategoryId()) && !categoryAPI.isActiveCategory(cmd.categoryId())) {
+            LOG.warn("Update of ticket #{} refused: category {} is not active", cmd.id(), cmd.categoryId());
             throw new InvalidTicketCategoryException(cmd.categoryId());
         }
         t.setTitle(cmd.title().trim());
         t.setDescription(cmd.description().trim());
         t.setPriority(cmd.priority());
         t.setCategoryId(cmd.categoryId());
+        LOG.info(
+                "Ticket #{} details updated by user {} (priority {}, category {})",
+                cmd.id(),
+                AuthUtils.getCurrentUserId(),
+                cmd.priority(),
+                cmd.categoryId());
         events.publishEvent(new TicketUpdatedEvent(TicketSnapshot.of(t), AuthUtils.getCurrentUserId()));
     }
 
-    /** REQ-021: the ticket's comments, oldest first, if the principal may view the ticket. */
+    /** The ticket's comments, oldest first, if the principal may view the ticket. */
     @Transactional(readOnly = true)
     public List<CommentView> findComments(Long ticketId, Object principal) {
         var ticket = loadVisible(ticketId, principal);
@@ -253,7 +296,7 @@ class TicketService {
     }
 
     /**
-     * REQ-021: adds a comment by {@code authorId}. ADMIN may comment on any ticket, STAFF on tickets assigned to
+     * Adds a comment by {@code authorId}. ADMIN may comment on any ticket, STAFF on tickets assigned to
      * them and USER on tickets they raised ({@code AccessPolicy#canComment}); others get not-found, as on the
      * details page. A CLOSED ticket takes no more comments.
      */
@@ -264,6 +307,7 @@ class TicketService {
             throw new AccessDeniedException("You cannot comment on ticket #" + ticketId);
         }
         if (ticket.getStatus() == TicketStatus.CLOSED) {
+            LOG.warn("Comment by user {} on closed ticket #{} refused", authorId, ticketId);
             throw new InvalidStatusTransitionException("Ticket #" + ticketId + " is closed and takes no more comments");
         }
         var comment = new CommentEntity();
@@ -271,6 +315,7 @@ class TicketService {
         comment.setAuthorId(authorId);
         comment.setContent(content.trim());
         commentRepository.save(comment);
+        LOG.info("Comment {} added to ticket #{} by user {}", comment.getId(), ticketId, authorId);
         events.publishEvent(new TicketCommentAddedEvent(TicketSnapshot.of(ticket), comment.getContent(), authorId));
     }
 
@@ -286,7 +331,7 @@ class TicketService {
     }
 
     /**
-     * REQ-022: when a staff member is deactivated, each of their OPEN and IN_PROGRESS tickets goes to another
+     * When a staff member is deactivated, each of their OPEN and IN_PROGRESS tickets goes to another
      * active staff member handling its category (the same rule as for new tickets), or is left unassigned for an
      * ADMIN when nobody does. RESOLVED and CLOSED tickets keep the assignee as a record of who did the work.
      * Runs in the deactivating transaction.
@@ -297,10 +342,19 @@ class TicketService {
     @Transactional
     public int onStaffDeactivated(StaffDeactivatedEvent event) {
         var tickets = ticketRepository.findByAssignedToAndStatusInOrderByIdAsc(event.staffId(), ACTIVE_STATUSES);
+        LOG.info("Staff {} deactivated; handing over {} open ticket(s)", event.staffId(), tickets.size());
         for (var t : tickets) {
             var previous = t.getAssignedTo();
             t.setAssignedTo(chooseAssignee(t.getCategoryId()).orElse(null));
             ticketRepository.flush(); // so the next ticket's choice sees this one's workload
+            if (t.getAssignedTo() == null) {
+                LOG.warn(
+                        "Ticket #{} left unassigned: no other active staff handles category {}",
+                        t.getId(),
+                        t.getCategoryId());
+            } else {
+                LOG.info("Ticket #{} handed over from staff {} to staff {}", t.getId(), previous, t.getAssignedTo());
+            }
             events.publishEvent(new TicketAssignedEvent(TicketSnapshot.of(t), previous, null));
         }
         return tickets.size();
@@ -336,7 +390,7 @@ class TicketService {
     }
 
     /**
-     * REQ-022: tickets keep a category that is deactivated later (it only stops taking new tickets), labelled so
+     * Tickets keep a category that is deactivated later (it only stops taking new tickets), labelled so
      * an ADMIN can recategorise them.
      */
     private static String categoryLabel(CategoryDto c) {
@@ -377,6 +431,7 @@ class TicketService {
         var workload = ticketRepository.countByAssignee(candidates, ACTIVE_STATUSES).stream()
                 .collect(Collectors.toMap(
                         TicketRepository.StaffWorkload::getStaffId, TicketRepository.StaffWorkload::getTickets));
+        LOG.debug("Choosing assignee for category {} from {} with workload {}", categoryId, candidates, workload);
         return candidates.stream()
                 .min(Comparator.<Long>comparingLong(id -> workload.getOrDefault(id, 0L))
                         .thenComparing(Comparator.naturalOrder()));

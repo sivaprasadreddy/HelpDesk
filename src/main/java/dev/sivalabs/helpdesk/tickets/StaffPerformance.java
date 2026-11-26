@@ -4,7 +4,7 @@ import java.time.Duration;
 import org.jspecify.annotations.Nullable;
 
 /**
- * REQ-026: one staff member's current workload (tickets assigned to them now) and performance in a period
+ * One staff member's current workload (tickets assigned to them now) and performance in a period
  * (tickets they resolved then, and how long those took on average; {@code null} when none).
  */
 public record StaffPerformance(

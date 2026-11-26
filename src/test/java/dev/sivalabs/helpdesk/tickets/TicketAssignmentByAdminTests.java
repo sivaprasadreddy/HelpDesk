@@ -15,7 +15,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
-/** REQ-019: ADMIN assigns or reassigns a ticket to any active staff member. */
+/** ADMIN assigns or reassigns a ticket to any active staff member. */
 @Sql("/test-data.sql")
 class TicketAssignmentByAdminTests extends BaseIT {
     static final SecurityUser ADMIN = new SecurityUser(1L, "Administrator", "admin@gmail.com", "x", Role.ROLE_ADMIN);

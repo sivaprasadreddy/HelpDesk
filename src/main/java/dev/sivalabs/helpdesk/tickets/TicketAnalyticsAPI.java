@@ -32,7 +32,7 @@ public class TicketAnalyticsAPI {
     }
 
     /**
-     * REQ-023: every ticket counted by status and by priority (each in workflow / severity order, zero groups
+     * Every ticket counted by status and by priority (each in workflow / severity order, zero groups
      * included) and by category (active categories, zero included, then deactivated ones that still have tickets,
      * labelled inactive; ordered by count, then name).
      */
@@ -65,7 +65,7 @@ public class TicketAnalyticsAPI {
     public static final int MAX_DAYS = 366;
 
     /**
-     * REQ-024: tickets created and resolved on each day from {@code from} to {@code to} inclusive, days without
+     * Tickets created and resolved on each day from {@code from} to {@code to} inclusive, days without
      * either included as zeros. Days are in the server's time zone, the one dates are shown in. A ticket counts
      * as resolved on the day it was last resolved; one reopened and not yet resolved again does not count.
      *
@@ -92,7 +92,7 @@ public class TicketAnalyticsAPI {
     }
 
     /**
-     * REQ-025: the average time from creation to resolution of the tickets resolved from {@code from} to
+     * The average time from creation to resolution of the tickets resolved from {@code from} to
      * {@code to} inclusive (server time zone), overall and per priority in severity order. As in
      * {@link #getCreatedVsResolved}, a ticket counts from its last resolution; closing does not change it.
      *
@@ -116,7 +116,7 @@ public class TicketAnalyticsAPI {
     }
 
     /**
-     * REQ-026: per staff member, the OPEN and IN_PROGRESS tickets assigned to them now, and the tickets they
+     * Per staff member, the OPEN and IN_PROGRESS tickets assigned to them now, and the tickets they
      * resolved from {@code from} to {@code to} inclusive with the average time those took (credited to whoever is
      * assigned, normally the one who resolved it). Lists every active staff member, and deactivated ones who still
      * have tickets or resolved some in the period; busiest first, then by name.
