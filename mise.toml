@@ -38,6 +38,7 @@ description = "Build Docker Image using Buildpacks"
 run = '''
 VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
 ./mvnw clean compile spring-boot:build-image -DskipTests -DdockerImageName=$DOCKER_IMAGE_NAME:$VERSION
+docker tag $DOCKER_IMAGE_NAME:$VERSION $DOCKER_IMAGE_NAME:latest
 '''
 
 [tasks.push_image]
@@ -45,7 +46,6 @@ description = "Push Docker Image to Registry"
 depends = ["build_image"]
 run = '''
 VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
-docker tag $DOCKER_IMAGE_NAME:$VERSION $DOCKER_IMAGE_NAME:latest
 docker push $DOCKER_IMAGE_NAME:$VERSION
 docker push $DOCKER_IMAGE_NAME:latest
 '''

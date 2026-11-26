@@ -33,15 +33,15 @@ services:
       - "4317:4317"
       - "4318:4318"
 
-  ollama:
-    image: ollama/ollama:0.40.17
-    container_name: ollama
-    ports:
-      - "11434:11434"
-    entrypoint: [ "/entrypoint.sh" ]
-    volumes:
-      - ollama_data:/root/.ollama
-      - ./ollama-entrypoint.sh:/entrypoint.sh:ro
+#  ollama:
+#    image: ollama/ollama:0.40.17
+#    container_name: ollama
+#    ports:
+#      - "11434:11434"
+#    entrypoint: [ "/entrypoint.sh" ]
+#    volumes:
+#      - ollama_data:/root/.ollama
+#      - ./ollama-entrypoint.sh:/entrypoint.sh:ro
 
   helpdesk:
     image: sivaprasadreddy/helpdesk
@@ -55,7 +55,7 @@ services:
       EMAIL_PORT: 1025
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
-      SPRING_AI_MODEL_CHAT: ${SPRING_AI_MODEL_CHAT:-ollama}
+      SPRING_AI_MODEL_CHAT: ${SPRING_AI_MODEL_CHAT:-openai}
       SPRING_AI_OLLAMA_BASE_URL: http://ollama:11434
       OPENAI_API_KEY: ${OPENAI_API_KEY:-your-openai-api-key}
       TRACING_ENABLED: true
@@ -69,9 +69,9 @@ services:
       - postgres
       - mailpit
       - rabbitmq
-      - ollama
+      #- ollama
       - grafana-lgtm
     restart: unless-stopped
 
-volumes:
-  ollama_data:
+#volumes:
+#  ollama_data:
