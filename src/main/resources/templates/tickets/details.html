@@ -31,6 +31,23 @@
                 <h2 id="description-heading" class="section-heading">Description</h2>
                 <p class="ticket-description" th:text="${ticket.description}">Water is leaking under the kitchen sink.</p>
             </section>
+            <section th:unless="${attachments.empty}" aria-labelledby="images-heading">
+                <h2 id="images-heading" class="section-heading" th:text="|Images (${#lists.size(attachments)})|">Images (2)</h2>
+                <sl:attachment-group layout="grid" label="Ticket images">
+                    <sl:attachment orientation="vertical" full-width th:each="a : ${attachments}"
+                                   th:with="url=@{/tickets/{id}/attachments/{aid}(id=${ticket.id},aid=${a.id})}">
+                        <sl:attachment-media variant="image">
+                            <img th:src="${url}" alt="" loading="lazy">
+                        </sl:attachment-media>
+                        <sl:attachment-content>
+                            <sl:attachment-title>[[${a.fileName}]]</sl:attachment-title>
+                            <sl:attachment-description>[[${a.displaySize()}]]</sl:attachment-description>
+                        </sl:attachment-content>
+                        <sl:attachment-trigger as="a" th:href="${url}" target="_blank"
+                                               th:aria-label="|Open ${a.fileName}|"/>
+                    </sl:attachment>
+                </sl:attachment-group>
+            </section>
             <dl class="ticket-meta">
                 <div><dt>Status</dt><dd th:text="${ticket.status.label}">Open</dd></div>
                 <div><dt>Priority</dt><dd th:text="${ticket.priority.label}">High</dd></div>

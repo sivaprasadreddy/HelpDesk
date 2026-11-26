@@ -9,7 +9,7 @@
 <div id="page-content" class="form-card">
     <sl:card>
         <sl:card-content>
-            <form th:object="${ticket}" th:action="@{/tickets}" method="post" novalidate class="form-stack">
+            <form th:object="${ticket}" th:action="@{/tickets}" method="post" enctype="multipart/form-data" novalidate class="form-stack">
                 <sl:form-errors/>
                 <sl:field th:field="*{title}">
                     <sl:field-label>Title</sl:field-label>
@@ -34,6 +34,13 @@
                 <sl:field th:field="*{description}">
                     <sl:field-label>Description</sl:field-label>
                     <sl:textarea rows="5" placeholder="Describe the issue and where it is (block, flat, floor)."/>
+                    <sl:field-error/>
+                </sl:field>
+                <sl:field th:field="*{images}">
+                    <sl:field-label>Images</sl:field-label>
+                    <sl:file-upload multiple accept="image/png,image/jpeg,image/gif,image/webp" max-size="5MB" previews>
+                        <sl:slot name="description">Up to 3 images (PNG, JPG, GIF or WebP), 5 MB each. Optional.</sl:slot>
+                    </sl:file-upload>
                     <sl:field-error/>
                 </sl:field>
                 <div class="toolbar">

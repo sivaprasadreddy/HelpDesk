@@ -51,6 +51,7 @@ class TicketService {
     private final AccessPolicy accessPolicy;
     private final CommentRepository commentRepository;
     private final TicketEventPublisher ticketEvents;
+    private final TicketAttachmentRepository attachmentRepository;
 
     TicketService(
             TicketRepository ticketRepository,
@@ -58,8 +59,10 @@ class TicketService {
             UserAPI userAPI,
             AccessPolicy accessPolicy,
             CommentRepository commentRepository,
-            TicketEventPublisher ticketEvents) {
+            TicketEventPublisher ticketEvents,
+            TicketAttachmentRepository attachmentRepository) {
         this.ticketEvents = ticketEvents;
+        this.attachmentRepository = attachmentRepository;
         this.ticketRepository = ticketRepository;
         this.commentRepository = commentRepository;
         this.categoryAPI = categoryAPI;
@@ -78,6 +81,7 @@ class TicketService {
         if (!categoryAPI.isActiveCategory(cmd.categoryId())) {
             throw new InvalidTicketCategoryException(cmd.categoryId());
         }
+        var imageTypes = TicketImages.validate(cmd.images());
         var ticket = new TicketEntity();
         ticket.setTitle(cmd.title().trim());
         ticket.setDescription(cmd.description().trim());
@@ -87,6 +91,17 @@ class TicketService {
         ticket.setCreatedBy(cmd.createdBy());
         ticket.setAssignedTo(chooseAssignee(cmd.categoryId()).orElse(null));
         var saved = ticketRepository.save(ticket);
+        for (int i = 0; i < cmd.images().size(); i++) {
+            var image = cmd.images().get(i);
+            attachmentRepository.save(new TicketAttachmentEntity(
+                    saved.getId(), TicketImages.cleanFileName(image.fileName()), imageTypes.get(i), image.data()));
+        }
+        if (!cmd.images().isEmpty()) {
+            LOG.info(
+                    "Ticket #{}: {} image(s) attached",
+                    saved.getId(),
+                    cmd.images().size());
+        }
         if (saved.getAssignedTo() == null) {
             LOG.warn(
                     "Ticket #{} created by user {} in category {} with no active staff to handle it; left unassigned",
@@ -275,6 +290,23 @@ class TicketService {
                 cmd.priority(),
                 cmd.categoryId());
         ticketEvents.publish(new TicketUpdatedEvent(TicketSnapshot.of(t), AuthUtils.getCurrentUserId()));
+    }
+
+    /** The ticket's image attachments without their bytes, if the principal may view the ticket. */
+    @Transactional(readOnly = true)
+    public List<AttachmentView> findAttachments(Long ticketId, Object principal) {
+        loadVisible(ticketId, principal);
+        return attachmentRepository.findViewsByTicketId(ticketId);
+    }
+
+    /** One attachment's bytes; not found unless the principal may view its ticket. */
+    @Transactional(readOnly = true)
+    public AttachmentContent getAttachment(Long ticketId, Long attachmentId, Object principal) {
+        loadVisible(ticketId, principal);
+        return attachmentRepository
+                .findByIdAndTicketId(attachmentId, ticketId)
+                .map(a -> new AttachmentContent(a.getFileName(), a.getContentType(), a.getData()))
+                .orElseThrow(() -> new ResourceNotFoundException("Attachment " + attachmentId + " not found"));
     }
 
     /** The ticket's comments, oldest first, if the principal may view the ticket. */

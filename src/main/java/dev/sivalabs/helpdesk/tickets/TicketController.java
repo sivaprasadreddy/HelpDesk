@@ -6,7 +6,12 @@ import dev.sivalabs.helpdesk.users.AuthUtils;
 import dev.sivalabs.helpdesk.users.UserAPI;
 import dev.sivalabs.helpdesk.users.UserDto;
 import jakarta.validation.Valid;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
@@ -14,6 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.CacheControl;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -25,6 +35,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
@@ -74,13 +85,17 @@ class TicketController {
                         form.description(),
                         form.priority(),
                         form.categoryId(),
-                        AuthUtils.getCurrentUserIdOrThrow());
+                        AuthUtils.getCurrentUserIdOrThrow(),
+                        readImages(form.images()));
                 var id = ticketService.createTicket(cmd);
                 redirectAttributes.addFlashAttribute("successMessage", "Ticket #" + id + " created successfully");
                 return "redirect:" + ticketListUrl(authentication);
             } catch (InvalidTicketCategoryException e) {
                 LOG.warn("Ticket creation refused: {}", e.getMessage());
                 bindingResult.rejectValue("categoryId", "category.invalid", "Choose an active category");
+            } catch (InvalidAttachmentException e) {
+                LOG.warn("Ticket creation refused: {}", e.getMessage());
+                bindingResult.rejectValue("images", "images.invalid", e.getMessage());
             }
         }
         addFormOptions(authentication, model);
@@ -132,6 +147,7 @@ class TicketController {
         model.addAttribute("canAssign", canAssign);
         model.addAttribute("canEdit", accessPolicy.canUpdateTicketDetails(authentication.getPrincipal()));
         model.addAttribute("comments", ticketService.findComments(id, authentication.getPrincipal()));
+        model.addAttribute("attachments", ticketService.findAttachments(id, authentication.getPrincipal()));
         model.addAttribute(
                 "canComment",
                 accessPolicy.canComment(authentication.getPrincipal(), ticket.createdBy(), ticket.assignedTo())
@@ -221,6 +237,38 @@ class TicketController {
         }
         addEditFormOptions(ticketService.getTicket(id, authentication.getPrincipal()), model);
         return EDIT_VIEW;
+    }
+
+    /**
+     * An attachment's image, for those who may view the ticket. Served with the type detected when it was stored, as
+     * an inline download that browsers keep private.
+     */
+    @GetMapping("/{id:\\d+}/attachments/{attachmentId:\\d+}")
+    ResponseEntity<byte[]> attachment(
+            Authentication authentication, @PathVariable Long id, @PathVariable Long attachmentId) {
+        var content = ticketService.getAttachment(id, attachmentId, authentication.getPrincipal());
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(content.contentType()))
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.inline()
+                                .filename(content.fileName(), StandardCharsets.UTF_8)
+                                .build()
+                                .toString())
+                .cacheControl(CacheControl.maxAge(Duration.ofHours(1)).cachePrivate())
+                .body(content.data());
+    }
+
+    private static List<ImageUpload> readImages(List<MultipartFile> files) {
+        var images = new ArrayList<ImageUpload>();
+        for (var file : files) {
+            try {
+                images.add(new ImageUpload(file.getOriginalFilename(), file.getBytes()));
+            } catch (IOException e) {
+                throw new UncheckedIOException("Could not read uploaded image", e);
+            }
+        }
+        return images;
     }
 
     /** Adds a comment; on a validation error the details page shows it with the text kept. */
