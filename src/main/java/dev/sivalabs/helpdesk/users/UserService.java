@@ -56,6 +56,12 @@ class UserService {
         userRepository.save(user);
     }
 
+    /** Ids of active staff members who handle the category, in ascending order. */
+    @Transactional(readOnly = true)
+    public List<Long> findActiveStaffIdsHandling(Long categoryId) {
+        return userRepository.findActiveStaffIdsByCategoryId(categoryId);
+    }
+
     @Transactional(readOnly = true)
     public UserDto getStaffMember(Long id) {
         return toUserDto(loadStaff(id));
