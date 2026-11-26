@@ -1,6 +1,7 @@
 package dev.sivalabs.helpdesk.analytics;
 
 import dev.sivalabs.helpdesk.tickets.CountByGroup;
+import dev.sivalabs.helpdesk.tickets.DailyTicketFlow;
 import dev.sivalabs.helpdesk.tickets.TicketAnalyticsAPI;
 import dev.sivalabs.helpdesk.tickets.TicketStatus;
 import dev.sivalabs.helpdesk.users.AccessPolicy;
@@ -36,8 +37,7 @@ class AnalyticsController {
     }
 
     @GetMapping("/admin/analytics")
-    String dashboard(
-            Authentication authentication, @RequestParam(required = false) @Nullable Integer days, Model model) {
+    String dashboard(Authentication authentication, @RequestParam(required = false) Integer days, Model model) {
         if (!accessPolicy.canViewAnalytics(authentication.getPrincipal())) {
             throw new AccessDeniedException("Only administrators can view analytics");
         }
@@ -57,7 +57,8 @@ class AnalyticsController {
         model.addAttribute("breakdowns", breakdowns);
         model.addAttribute("activeCount", count(breakdowns.byStatus(), TicketStatus.OPEN, TicketStatus.IN_PROGRESS));
         model.addAttribute(
-                "createdInPeriod", flow.stream().mapToLong(f -> f.created()).sum());
+                "createdInPeriod",
+                flow.stream().mapToLong(DailyTicketFlow::created).sum());
         model.addAttribute("flow", flow);
         model.addAttribute("resolvedInPeriod", resolution.resolvedCount());
         model.addAttribute("averageResolution", humanize(resolution.average()));

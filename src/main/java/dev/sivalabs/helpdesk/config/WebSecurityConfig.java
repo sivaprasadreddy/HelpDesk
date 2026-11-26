@@ -29,10 +29,6 @@ class WebSecurityConfig {
     };
 
     /**
-     * Coarse URL rules: whole areas that only ADMIN may enter. Per-ticket rules ("assigned", "own")
-     * need the ticket, so they are checked with {@link dev.sivalabs.helpdesk.users.AccessPolicy}.
-     */
-    /**
      * The MCP endpoint, for AI clients rather than browsers: HTTP Basic with the user's own email and password, no
      * session and no CSRF token. The tools check what each user may do, as the web pages do.
      */
@@ -47,6 +43,10 @@ class WebSecurityConfig {
         return http.build();
     }
 
+    /**
+     * Coarse URL rules: whole areas that only ADMIN may enter. Per-ticket rules ("assigned", "own")
+     * need the ticket, so they are checked with {@link dev.sivalabs.helpdesk.users.AccessPolicy}.
+     */
     @Bean
     @Order(2)
     SecurityFilterChain securityFilterChain(HttpSecurity http) {

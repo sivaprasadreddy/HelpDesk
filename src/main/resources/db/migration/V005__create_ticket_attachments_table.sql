@@ -9,8 +9,8 @@ create table ticket_attachments
     content_type text      not null,
     size_bytes   bigint    not null,
     data         bytea     not null,
-    created_at   timestamp not null default CURRENT_TIMESTAMP,
-    updated_at   timestamp,
+    created_at   timestamptz not null default CURRENT_TIMESTAMP,
+    updated_at   timestamptz,
     version      bigint    not null default 0,
     primary key (id)
 );

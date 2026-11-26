@@ -2,12 +2,14 @@
 HelpDesk is a web application for raising, tracking and resolving maintenance and service requests in a gated community.
 Residents report issues (a leaking pipe, a power outage, a broken lift) as tickets, which are assigned to staff members who work on them until they are resolved.
 Administrators oversee the whole process and use analytics to monitor support performance.
+[![Build](https://github.com/sivaprasadreddy/HelpDesk/actions/workflows/ci.yml/badge.svg)](https://github.com/sivaprasadreddy/HelpDesk/actions/workflows/ci.yml)
 
 ![HelpDesk: track tickets, manage customers, monitor performance and provide great support](docs/assets/helpdesk-banner.png)
 
 ## Prerequisites
 * JDK 25
 * Docker and Docker Compose
+* Ollama with `qwen3:8b` and `qwen3-embedding:0.6b` models
 
 ## Docs
 - [Project Overview](docs/project.md)
