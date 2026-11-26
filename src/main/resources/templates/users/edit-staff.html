@@ -1,0 +1,44 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sl="https://shadleaf.dev/sl"
+      th:replace="~{layout/main :: layout('Edit Staff member', ~{::breadcrumb}, ~{::#page-content})}">
+<body>
+<th:block th:ref="breadcrumb">
+    <sl:breadcrumb-item><sl:breadcrumb-link th:href="@{/home}">Home</sl:breadcrumb-link></sl:breadcrumb-item>
+    <sl:breadcrumb-separator/>
+    <sl:breadcrumb-item><sl:breadcrumb-link th:href="@{/admin/staff}">Staff</sl:breadcrumb-link></sl:breadcrumb-item>
+    <sl:breadcrumb-separator/>
+    <sl:breadcrumb-item><sl:breadcrumb-page>Edit</sl:breadcrumb-page></sl:breadcrumb-item>
+</th:block>
+<div id="page-content" class="form-card">
+    <sl:card>
+        <sl:card-content>
+            <form th:object="${staff}" th:action="@{/admin/staff/{id}(id=${staffId})}" method="post" novalidate class="form-stack">
+                <sl:form-errors/>
+                <sl:field th:field="*{name}">
+                    <sl:field-label>Name</sl:field-label>
+                    <sl:input autocomplete="off"/>
+                    <sl:field-error/>
+                </sl:field>
+                <sl:field th:field="*{email}">
+                    <sl:field-label>Email</sl:field-label>
+                    <sl:input type="email" autocomplete="off"/>
+                    <sl:field-error/>
+                </sl:field>
+                <sl:field th:field="*{categoryIds}">
+                    <sl:field-label>Categories</sl:field-label>
+                    <sl:combobox multiple auto-highlight placeholder="Add a category" empty="No categories found.">
+                        <sl:combobox-item th:each="c : ${categories}"
+                                          th:value="${c.id}">[[${c.active ? c.name : c.name + ' (inactive)'}]]</sl:combobox-item>
+                    </sl:combobox>
+                    <sl:field-description>Tickets in these categories can be assigned to this staff member.</sl:field-description>
+                    <sl:field-error/>
+                </sl:field>
+                <div class="toolbar">
+                    <sl:button as="a" th:href="@{/admin/staff}" variant="outline">Cancel</sl:button>
+                    <sl:button type="submit">Save Changes</sl:button>
+                </div>
+            </form>
+        </sl:card-content>
+    </sl:card>
+</div>
+</body>
+</html>

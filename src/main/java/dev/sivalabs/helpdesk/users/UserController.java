@@ -1,7 +1,11 @@
 package dev.sivalabs.helpdesk.users;
 
+import dev.sivalabs.helpdesk.categories.CategoryAPI;
+import dev.sivalabs.helpdesk.categories.CategoryDto;
 import dev.sivalabs.helpdesk.shared.ResourceNotFoundException;
 import jakarta.validation.Valid;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,9 +23,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/admin/{userType:residents|staff}")
 class UserController {
     private final UserService userService;
+    private final CategoryAPI categoryService;
 
-    UserController(UserService userService) {
+    UserController(UserService userService, CategoryAPI categoryService) {
         this.userService = userService;
+        this.categoryService = categoryService;
     }
 
     @GetMapping
@@ -29,6 +35,11 @@ class UserController {
         var type = UserType.of(userType);
         model.addAttribute("type", type);
         model.addAttribute("users", userService.findUsersByRole(type.role()));
+        if (type.role() == Role.ROLE_STAFF) {
+            Map<Long, String> categoryNames = categoryService.findAllCategories().stream()
+                    .collect(Collectors.toMap(CategoryDto::id, CategoryDto::name));
+            model.addAttribute("categoryNames", categoryNames);
+        }
         return "users/list";
     }
 

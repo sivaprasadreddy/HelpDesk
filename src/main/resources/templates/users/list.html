@@ -6,7 +6,7 @@
     <sl:breadcrumb-separator/>
     <sl:breadcrumb-item><sl:breadcrumb-page th:text="${type.title}">Residents</sl:breadcrumb-page></sl:breadcrumb-item>
 </th:block>
-<div id="page-content" class="stack">
+<div id="page-content" class="stack" th:with="isStaff=${type.path == 'staff'}">
     <div class="toolbar">
         <sl:button as="a" th:href="@{/admin/{p}/new(p=${type.path})}">
             <sl:slot name="icon-start"><sl:icon name="plus"/></sl:slot>
@@ -15,13 +15,39 @@
     </div>
     <sl:table th:unless="${users.isEmpty()}">
         <thead>
-        <tr><th>Name</th><th>Email</th><th>Created</th></tr>
+        <tr>
+            <th>Name</th><th>Email</th>
+            <th th:if="${isStaff}">Categories</th>
+            <th>Status</th><th>Created</th>
+            <sl:table-head th:if="${isStaff}" align="end">Actions</sl:table-head>
+        </tr>
         </thead>
         <tbody>
         <tr th:each="u : ${users}">
             <td th:text="${u.name}">Jane Doe</td>
             <td th:text="${u.email}">jane@example.com</td>
+            <td th:if="${isStaff}">
+                <div class="badge-list">
+                    <th:block th:each="cid : ${u.categoryIds}" th:with="catName=${categoryNames.get(cid)}"><sl:badge variant="outline">[[${catName}]]</sl:badge></th:block>
+                    <span th:if="${u.categoryIds.isEmpty()}" class="muted">None</span>
+                </div>
+            </td>
+            <td>
+                <sl:badge th:if="${u.active}" variant="secondary">Active</sl:badge>
+                <sl:badge th:unless="${u.active}" variant="outline">Inactive</sl:badge>
+            </td>
             <td th:text="${#temporals.format(u.createdAt, 'dd MMM yyyy', T(java.time.ZoneId).systemDefault())}">01 Jan 2026</td>
+            <td th:if="${isStaff}" data-align="end">
+                <div class="row-actions">
+                    <sl:button as="a" th:href="@{/admin/staff/{id}/edit(id=${u.id})}" variant="outline" size="sm">Edit</sl:button>
+                    <form th:if="${u.active}" method="post" th:action="@{/admin/staff/{id}/deactivate(id=${u.id})}">
+                        <sl:button type="submit" variant="destructive" size="sm">Deactivate</sl:button>
+                    </form>
+                    <form th:unless="${u.active}" method="post" th:action="@{/admin/staff/{id}/activate(id=${u.id})}">
+                        <sl:button type="submit" variant="secondary" size="sm">Activate</sl:button>
+                    </form>
+                </div>
+            </td>
         </tr>
         </tbody>
     </sl:table>

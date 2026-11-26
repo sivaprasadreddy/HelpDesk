@@ -16,8 +16,8 @@ Status values: `TODO`, `IN_PROGRESS`, `DONE`.
 | REQ-007 | Role-based authorization and access rules (permissions matrix)                                    | DONE   |
 | REQ-008 | Application shell: layout and role-based navigation                                                | DONE |
 | REQ-009 | ADMIN: manage ticket categories (list, add, update, deactivate)                                    | DONE   |
-| REQ-010 | ADMIN: manage staff members (update, deactivate)                                                    | TODO   |
-| REQ-011 | ADMIN: assign one or more categories to a staff member                                             | TODO   |
+| REQ-010 | ADMIN: manage staff members (update, deactivate)                                                    | DONE   |
+| REQ-011 | ADMIN: assign one or more categories to a staff member                                             | DONE   |
 | REQ-012 | Create ticket (ADMIN, USER) with title, description, priority and active category                 | TODO   |
 | REQ-013 | Automatic assignment of new tickets to an active staff member handling the category               | TODO   |
 | REQ-014 | USER: view own tickets and track their status                                                      | TODO   |

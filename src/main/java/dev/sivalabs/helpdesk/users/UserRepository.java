@@ -9,5 +9,7 @@ interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     boolean existsByEmailIgnoreCase(String email);
 
+    boolean existsByEmailIgnoreCaseAndIdNot(String email, Long id);
+
     List<UserEntity> findByRoleOrderByNameAsc(Role role);
 }

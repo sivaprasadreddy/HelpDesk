@@ -53,3 +53,5 @@
 .toolbar { display: flex; gap: 0.5rem; justify-content: flex-end; }
 .form-card { max-inline-size: 32rem; }
 .row-actions { display: inline-flex; gap: 0.5rem; justify-content: flex-end; }
+.badge-list { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+.muted { color: var(--muted-foreground); }

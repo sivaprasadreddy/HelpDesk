@@ -14,13 +14,19 @@ public class SecurityUser implements UserDetails {
     private final String email;
     private final String password;
     private final Role role;
+    private final boolean active;
 
     public SecurityUser(Long id, String name, String email, String password, Role role) {
+        this(id, name, email, password, role, true);
+    }
+
+    public SecurityUser(Long id, String name, String email, String password, Role role, boolean active) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.role = role;
+        this.active = active;
     }
 
     @Override
@@ -36,6 +42,12 @@ public class SecurityUser implements UserDetails {
     @Override
     public @NonNull String getUsername() {
         return email;
+    }
+
+    /** Deactivated users cannot sign in. */
+    @Override
+    public boolean isEnabled() {
+        return active;
     }
 
     public Long getId() {
