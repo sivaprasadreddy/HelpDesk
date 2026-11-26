@@ -60,7 +60,9 @@ class AssistantControllerTests extends BaseIT {
         ask(session, "When is the swimming pool open?");
 
         var system = chatModel.lastPrompt().getSystemMessage().getText();
-        assertThat(system).contains("Answer only from the CONTEXT").contains("6 AM to 9 AM");
+        assertThat(system)
+                .contains("Answer questions about the community only from the CONTEXT")
+                .contains("6 AM to 9 AM");
         assertThat(mvc.get().uri("/assistant").session(session).with(user(RESIDENT)))
                 .bodyText()
                 .contains("When is the swimming pool open?")

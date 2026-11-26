@@ -37,5 +37,5 @@ Status values: `TODO` (`📋`), `IN_PROGRESS` (`👷🏽`), `DONE` (`✅`).
 | ✅ | REQ-028 | Ticket image attachments: attach up to 3 images when creating a ticket and view them on the ticket details page | DONE   |
 | ✅ | REQ-029 | Knowledge base: load community documents from the classpath into a vector store for RAG           | DONE   |
 | ✅ | REQ-030 | AI chat interface: ask questions answered from the knowledge base (RAG)                            | DONE   |
-| 📋 | REQ-031 | AI chat interface: create tickets through the conversation (ADMIN, USER)                           | TODO   |
+| ✅ | REQ-031 | AI chat interface: create tickets through the conversation (ADMIN, USER)                           | DONE   |
 | 📋 | REQ-032 | MCP server: expose ticket operations as MCP tools, enforcing the same access rules as the UI       | TODO   |

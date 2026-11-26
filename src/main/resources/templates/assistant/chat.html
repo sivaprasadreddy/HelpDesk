@@ -10,7 +10,7 @@
     <sl:card>
         <sl:card-header border>
             <sl:card-title level="1">Ask the assistant</sl:card-title>
-            <sl:card-description>Questions about community rules, amenities, maintenance and emergencies, answered from the community's documents.</sl:card-description>
+            <sl:card-description>Questions about community rules, amenities, maintenance and emergencies, answered from the community's documents.<th:block th:if="${canCreateTickets}"> Describe a problem and the assistant will draft a ticket for you to create.</th:block></sl:card-description>
             <sl:card-action th:unless="${turns.empty}">
                 <form method="post" th:action="@{/assistant/clear}">
                     <sl:button type="submit" variant="outline" size="sm">
@@ -33,6 +33,26 @@
                     th:class="|chat-turn ${t.user ? 'chat-turn-user' : 'chat-turn-assistant'}${t.error ? ' chat-turn-error' : ''}|">
                     <span class="chat-author" th:text="${t.user ? 'You' : 'Assistant'}">You</span>
                     <p class="chat-text" th:text="${t.text}">When is the swimming pool open?</p>
+                    <div th:each="d : ${t.drafts}" class="ticket-draft" th:with="createdId=${createdTickets.get(d.id)}">
+                        <p class="ticket-draft-label">Draft ticket</p>
+                        <dl class="ticket-draft-fields">
+                            <div><dt>Title</dt><dd th:text="${d.title}">Kitchen sink leaking</dd></div>
+                            <div><dt>Category</dt><dd th:text="${d.categoryName}">Plumbing</dd></div>
+                            <div><dt>Priority</dt><dd th:text="${d.priority.label}">High</dd></div>
+                            <div class="ticket-draft-description"><dt>Description</dt><dd th:text="${d.description}">Water drips under the sink.</dd></div>
+                        </dl>
+                        <form th:if="${createdId == null}" method="post" th:action="@{/assistant/drafts/{id}/create(id=${d.id})}">
+                            <sl:button type="submit" size="sm">
+                                <sl:slot name="icon-start"><sl:icon name="circle-plus"/></sl:slot>
+                                Create ticket
+                            </sl:button>
+                        </form>
+                        <sl:button th:unless="${createdId == null}" as="a" size="sm" variant="secondary"
+                                   th:href="@{/tickets/{id}(id=${createdId})}">
+                            <sl:slot name="icon-start"><sl:icon name="ticket"/></sl:slot>
+                            <span th:text="|View ticket #${createdId}|">View ticket #100</span>
+                        </sl:button>
+                    </div>
                     <p th:unless="${t.sources.empty}" class="chat-sources">
                         <span class="muted">Sources:</span>
                         <sl:badge th:each="s : ${t.sources}" variant="outline" th:text="${s}">Amenities - Swimming pool</sl:badge>
