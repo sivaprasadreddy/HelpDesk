@@ -112,10 +112,32 @@ class TicketController {
     /** REQ-017: one ticket; 404 when it does not exist or the user may not view it. */
     @GetMapping("/{id:\\d+}")
     String ticketDetails(Authentication authentication, @PathVariable Long id, Model model) {
-        model.addAttribute("ticket", ticketService.getTicket(id, authentication.getPrincipal()));
+        var ticket = ticketService.getTicket(id, authentication.getPrincipal());
+        model.addAttribute("ticket", ticket);
+        model.addAttribute(
+                "canChangeStatus",
+                accessPolicy.canUpdateTicketStatus(authentication.getPrincipal(), ticket.assignedTo())
+                        && !ticket.status().nextStatuses().isEmpty());
         model.addAttribute("listUrl", ticketListUrl(authentication));
         model.addAttribute("listTitle", ticketListTitle(authentication));
         return "tickets/details";
+    }
+
+    /** REQ-018: moves the ticket to the next status; {@code from} is the status the user saw. */
+    @PostMapping("/{id:\\d+}/status")
+    String changeStatus(
+            Authentication authentication,
+            @PathVariable Long id,
+            @RequestParam TicketStatus from,
+            @RequestParam TicketStatus to,
+            RedirectAttributes redirectAttributes) {
+        try {
+            ticketService.changeStatus(id, from, to, authentication.getPrincipal());
+            redirectAttributes.addFlashAttribute("successMessage", "Ticket #" + id + " moved to " + to.getLabel());
+        } catch (InvalidStatusTransitionException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/tickets/" + id;
     }
 
     /** REQ-014: the resident's own tickets, optionally of one status ({@code ?status=OPEN}). */

@@ -5,6 +5,7 @@ import dev.sivalabs.helpdesk.categories.CategoryDto;
 import dev.sivalabs.helpdesk.shared.ResourceNotFoundException;
 import dev.sivalabs.helpdesk.users.AccessPolicy;
 import dev.sivalabs.helpdesk.users.UserAPI;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -131,6 +133,39 @@ class TicketService {
                 t.getUpdatedAt() == null ? t.getCreatedAt() : t.getUpdatedAt(),
                 t.getResolvedAt(),
                 t.getClosedAt());
+    }
+
+    /**
+     * REQ-018: moves the ticket from {@code expected} to {@code target} along the workflow
+     * ({@link TicketStatus#nextStatuses}). ADMIN may move any ticket, STAFF only those assigned to them; others get
+     * not-found, as on the details page. Fails when the ticket is no longer in {@code expected} (someone else
+     * changed it meanwhile) or the move is not allowed. Records when the ticket was resolved and closed; reopening
+     * clears the resolution time.
+     */
+    @Transactional
+    public void changeStatus(Long id, TicketStatus expected, TicketStatus target, Object principal) {
+        var t = ticketRepository
+                .findById(id)
+                .filter(ticket -> accessPolicy.canViewTicket(principal, ticket.getCreatedBy(), ticket.getAssignedTo()))
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket #" + id + " not found"));
+        if (!accessPolicy.canUpdateTicketStatus(principal, t.getAssignedTo())) {
+            throw new AccessDeniedException("You cannot change the status of ticket #" + id);
+        }
+        if (t.getStatus() != expected) {
+            throw new InvalidStatusTransitionException(
+                    "Ticket #" + id + " is now " + t.getStatus().getLabel() + "; review it and try again");
+        }
+        if (!expected.canMoveTo(target)) {
+            throw new InvalidStatusTransitionException(
+                    "A ticket that is " + expected.getLabel() + " cannot be moved to " + target.getLabel());
+        }
+        var now = Instant.now();
+        switch (target) {
+            case RESOLVED -> t.setResolvedAt(now);
+            case CLOSED -> t.setClosedAt(now);
+            case IN_PROGRESS, OPEN -> t.setResolvedAt(null);
+        }
+        t.setStatus(target);
     }
 
     /** Whether any ticket exists at all. */

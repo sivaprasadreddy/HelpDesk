@@ -42,6 +42,17 @@
                 <div th:if="${ticket.closedAt != null}"><dt>Closed</dt><dd th:text="${#temporals.format(ticket.closedAt, 'dd MMM yyyy, HH:mm')}">27 Nov 2026, 09:00</dd></div>
             </dl>
         </sl:card-content>
+        <sl:card-footer th:if="${canChangeStatus}" class="status-actions">
+            <form th:each="next, it : ${ticket.status.nextStatuses()}" method="post"
+                  th:action="@{/tickets/{id}/status(id=${ticket.id})}">
+                <input type="hidden" name="from" th:value="${ticket.status}"/>
+                <input type="hidden" name="to" th:value="${next}"/>
+                <sl:button type="submit" th:variant="${it.first ? 'default' : 'outline'}"
+                           th:text="${next.name() == 'IN_PROGRESS' ? (ticket.status.name() == 'OPEN' ? 'Start work' : 'Reopen')
+                                    : (next.name() == 'RESOLVED' ? 'Mark resolved'
+                                    : (next.name() == 'CLOSED' ? 'Close ticket' : 'Move back to Open'))}">Start work</sl:button>
+            </form>
+        </sl:card-footer>
     </sl:card>
 </div>
 </body>
