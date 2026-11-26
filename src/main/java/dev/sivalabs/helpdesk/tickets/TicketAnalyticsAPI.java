@@ -1,6 +1,7 @@
 package dev.sivalabs.helpdesk.tickets;
 
 import dev.sivalabs.helpdesk.categories.CategoryAPI;
+import dev.sivalabs.helpdesk.users.UserAPI;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -8,6 +9,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,10 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class TicketAnalyticsAPI {
     private final TicketRepository ticketRepository;
     private final CategoryAPI categoryAPI;
+    private final UserAPI userAPI;
 
-    TicketAnalyticsAPI(TicketRepository ticketRepository, CategoryAPI categoryAPI) {
+    TicketAnalyticsAPI(TicketRepository ticketRepository, CategoryAPI categoryAPI, UserAPI userAPI) {
         this.ticketRepository = ticketRepository;
         this.categoryAPI = categoryAPI;
+        this.userAPI = userAPI;
     }
 
     /**
@@ -109,6 +113,46 @@ public class TicketAnalyticsAPI {
                 })
                 .toList();
         return new ResolutionTimes(rows.size(), average(rows), perPriority);
+    }
+
+    /**
+     * REQ-026: per staff member, the OPEN and IN_PROGRESS tickets assigned to them now, and the tickets they
+     * resolved from {@code from} to {@code to} inclusive with the average time those took (credited to whoever is
+     * assigned, normally the one who resolved it). Lists every active staff member, and deactivated ones who still
+     * have tickets or resolved some in the period; busiest first, then by name.
+     *
+     * @throws IllegalArgumentException when {@code to} is before {@code from}
+     */
+    @Transactional(readOnly = true)
+    @PreAuthorize("@accessPolicy.canViewAnalytics(principal)")
+    public List<StaffPerformance> getStaffPerformance(LocalDate from, LocalDate to) {
+        if (to.isBefore(from)) {
+            throw new IllegalArgumentException("The period ends before it starts");
+        }
+        var counts = ticketRepository.countByAssigneeAndStatus(EnumSet.of(TicketStatus.OPEN, TicketStatus.IN_PROGRESS));
+        var resolved = ticketRepository.findResolutionsBetween(startOf(from), startOf(to.plusDays(1))).stream()
+                .filter(r -> r.getAssignedTo() != null)
+                .collect(Collectors.groupingBy(TicketRepository.Resolution::getAssignedTo));
+        return userAPI.findStaffMembers().stream()
+                .map(u -> {
+                    var open = count(counts, u.id(), TicketStatus.OPEN);
+                    var inProgress = count(counts, u.id(), TicketStatus.IN_PROGRESS);
+                    var done = resolved.getOrDefault(u.id(), List.of());
+                    return new StaffPerformance(
+                            u.id(), u.name(), u.active(), open, inProgress, done.size(), average(done));
+                })
+                .filter(p -> p.active() || p.workload() > 0 || p.resolvedInPeriod() > 0)
+                .sorted(Comparator.comparingLong(StaffPerformance::workload)
+                        .reversed()
+                        .thenComparing(StaffPerformance::name))
+                .toList();
+    }
+
+    private static long count(List<TicketRepository.AssigneeStatusCount> counts, Long staffId, TicketStatus status) {
+        return counts.stream()
+                .filter(c -> c.getStaffId().equals(staffId) && c.getStatus() == status)
+                .mapToLong(TicketRepository.AssigneeStatusCount::getTickets)
+                .sum();
     }
 
     private static @Nullable Duration average(List<TicketRepository.Resolution> rows) {

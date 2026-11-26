@@ -3,6 +3,7 @@ package dev.sivalabs.helpdesk.tickets;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -61,13 +62,31 @@ interface TicketRepository extends JpaRepository<TicketEntity, Long>, JpaSpecifi
     List<Instant> findResolvedAtBetween(Instant from, Instant to);
 
     @Query("""
-            select t.priority as priority, t.createdAt as createdAt, t.resolvedAt as resolvedAt from TicketEntity t
+            select t.priority as priority, t.assignedTo as assignedTo, t.createdAt as createdAt, t.resolvedAt as resolvedAt from TicketEntity t
             where t.resolvedAt >= :from and t.resolvedAt < :to
             """)
     List<Resolution> findResolutionsBetween(Instant from, Instant to);
 
+    @Query("""
+            select t.assignedTo as staffId, t.status as status, count(t) as tickets from TicketEntity t
+            where t.assignedTo is not null and t.status in :statuses
+            group by t.assignedTo, t.status
+            """)
+    List<AssigneeStatusCount> countByAssigneeAndStatus(Collection<TicketStatus> statuses);
+
+    interface AssigneeStatusCount {
+        Long getStaffId();
+
+        TicketStatus getStatus();
+
+        long getTickets();
+    }
+
     interface Resolution {
         TicketPriority getPriority();
+
+        @Nullable
+        Long getAssignedTo();
 
         Instant getCreatedAt();
 
