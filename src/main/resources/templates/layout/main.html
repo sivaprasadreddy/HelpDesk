@@ -64,6 +64,12 @@
             <sl:sidebar-group id="nav-admin" sec:authorize="hasRole('ADMIN')">
                 <sl:sidebar-group-label>Administration</sl:sidebar-group-label>
                 <sl:sidebar-menu>
+                    <sl:sidebar-menu-item sec:authorize="@accessPolicy.canViewAnalytics(principal)">
+                        <sl:sidebar-menu-button th:href="@{/admin/analytics}" th:active="${#slNav.current('/admin/analytics')}" tooltip="Analytics">
+                            <sl:slot name="icon-start"><sl:icon name="chart-column"/></sl:slot>
+                            Analytics
+                        </sl:sidebar-menu-button>
+                    </sl:sidebar-menu-item>
                     <sl:sidebar-menu-item>
                         <sl:sidebar-menu-button th:href="@{/admin/categories}" th:active="${#slNav.current('/admin/categories')}" tooltip="Categories">
                             <sl:slot name="icon-start"><sl:icon name="tags"/></sl:slot>

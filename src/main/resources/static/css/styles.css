@@ -80,3 +80,11 @@
 .comment { border-inline-start: 2px solid var(--border); padding-inline-start: 0.75rem; }
 .comment-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; font-size: 0.875rem; }
 .comment-content { margin: 0.25rem 0 0; white-space: pre-line; }
+
+/* Analytics dashboard */
+.period-range { margin: 0; }
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 1rem; }
+.kpi-value { font-size: 1.75rem; font-variant-numeric: tabular-nums; }
+.chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); gap: 1rem; }
+.chart-wide { aspect-ratio: auto; height: 280px; }
+.num { text-align: end; font-variant-numeric: tabular-nums; }

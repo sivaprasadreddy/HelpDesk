@@ -1,0 +1,155 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sl="https://shadleaf.dev/sl"
+      th:replace="~{layout/main :: layout('Analytics', ~{::breadcrumb}, ~{::#page-content})}">
+<body>
+<th:block th:ref="breadcrumb">
+    <sl:breadcrumb-item><sl:breadcrumb-link th:href="@{/home}">Home</sl:breadcrumb-link></sl:breadcrumb-item>
+    <sl:breadcrumb-separator/>
+    <sl:breadcrumb-item><sl:breadcrumb-page>Analytics</sl:breadcrumb-page></sl:breadcrumb-item>
+</th:block>
+<div id="page-content" class="stack analytics">
+    <div class="list-toolbar">
+        <p class="muted period-range"
+           th:text="|${#temporals.format(from, 'dd MMM yyyy')} – ${#temporals.format(to, 'dd MMM yyyy')}|">27 Oct 2026 – 26 Nov 2026</p>
+        <nav class="status-filter" aria-label="Period">
+            <sl:button as="a" size="sm" th:each="p : ${periods}" th:href="@{/admin/analytics(days=${p})}"
+                       th:variant="${p == period ? 'default' : 'outline'}"
+                       th:aria-current="${p == period ? 'page' : null}"
+                       th:text="|Last ${p} days|">Last 30 days</sl:button>
+        </nav>
+    </div>
+
+    <div class="kpi-grid">
+        <sl:card size="sm">
+            <sl:card-header>
+                <sl:card-description>All tickets</sl:card-description>
+                <sl:card-title level="2" class="kpi-value" th:text="${breakdowns.total}">120</sl:card-title>
+            </sl:card-header>
+        </sl:card>
+        <sl:card size="sm">
+            <sl:card-header>
+                <sl:card-description>Open or in progress</sl:card-description>
+                <sl:card-title level="2" class="kpi-value" th:text="${activeCount}">18</sl:card-title>
+            </sl:card-header>
+        </sl:card>
+        <sl:card size="sm">
+            <sl:card-header>
+                <sl:card-description th:text="|Created / resolved, last ${period} days|">Created / resolved</sl:card-description>
+                <sl:card-title level="2" class="kpi-value" th:text="|${createdInPeriod} / ${resolvedInPeriod}|">40 / 35</sl:card-title>
+            </sl:card-header>
+        </sl:card>
+        <sl:card size="sm">
+            <sl:card-header>
+                <sl:card-description th:text="|Average resolution time, last ${period} days|">Average resolution time</sl:card-description>
+                <sl:card-title level="2" class="kpi-value" th:text="${averageResolution}">1d 4h</sl:card-title>
+            </sl:card-header>
+        </sl:card>
+    </div>
+
+    <sl:card>
+        <sl:card-header>
+            <sl:card-title level="2">Created vs. resolved</sl:card-title>
+            <sl:card-description th:text="|Tickets per day, last ${period} days|">Tickets per day</sl:card-description>
+        </sl:card-header>
+        <sl:card-content>
+            <sl:chart th:data="${flow}" th:label="|Tickets created and resolved per day, last ${period} days|" class="chart-wide">
+                <sl:chart-grid/>
+                <sl:chart-x-axis key="date" format="day"/>
+                <sl:chart-tooltip label-format="date" value-format="integer"/>
+                <sl:chart-legend/>
+                <sl:chart-bar key="created" label="Created" radius="2"/>
+                <sl:chart-bar key="resolved" label="Resolved" radius="2"/>
+            </sl:chart>
+        </sl:card-content>
+    </sl:card>
+
+    <div class="chart-grid">
+        <sl:card>
+            <sl:card-header><sl:card-title level="2">By status</sl:card-title></sl:card-header>
+            <sl:card-content>
+                <sl:chart th:data="${breakdowns.byStatus}" label="Tickets by status">
+                    <sl:chart-grid/>
+                    <sl:chart-x-axis key="label"/>
+                    <sl:chart-tooltip value-format="integer"/>
+                    <sl:chart-bar key="count" label="Tickets" radius="4"/>
+                </sl:chart>
+            </sl:card-content>
+        </sl:card>
+        <sl:card>
+            <sl:card-header><sl:card-title level="2">By priority</sl:card-title></sl:card-header>
+            <sl:card-content>
+                <sl:chart th:data="${breakdowns.byPriority}" label="Tickets by priority">
+                    <sl:chart-grid/>
+                    <sl:chart-x-axis key="label"/>
+                    <sl:chart-tooltip value-format="integer"/>
+                    <sl:chart-bar key="count" label="Tickets" radius="4" color="var(--chart-2)"/>
+                </sl:chart>
+            </sl:card-content>
+        </sl:card>
+        <sl:card>
+            <sl:card-header><sl:card-title level="2">By category</sl:card-title></sl:card-header>
+            <sl:card-content>
+                <sl:chart th:data="${breakdowns.byCategory}" label="Tickets by category">
+                    <sl:chart-grid/>
+                    <sl:chart-x-axis key="label"/>
+                    <sl:chart-tooltip value-format="integer"/>
+                    <sl:chart-bar key="count" label="Tickets" radius="4" color="var(--chart-3)"/>
+                </sl:chart>
+            </sl:card-content>
+        </sl:card>
+        <sl:card>
+            <sl:card-header>
+                <sl:card-title level="2">Resolution time by priority</sl:card-title>
+                <sl:card-description th:text="|Tickets resolved in the last ${period} days|">Tickets resolved</sl:card-description>
+            </sl:card-header>
+            <sl:card-content>
+                <sl:table>
+                    <thead><tr><th>Priority</th><th class="num">Resolved</th><th class="num">Average time</th></tr></thead>
+                    <tbody>
+                    <tr th:each="r : ${resolutionByPriority}">
+                        <td th:text="${r.priority}">High</td>
+                        <td class="num" th:text="${r.resolved}">4</td>
+                        <td class="num" th:text="${r.average}">6h 0m</td>
+                    </tr>
+                    </tbody>
+                </sl:table>
+            </sl:card-content>
+        </sl:card>
+    </div>
+
+    <sl:card>
+        <sl:card-header>
+            <sl:card-title level="2">Staff workload and performance</sl:card-title>
+            <sl:card-description th:text="|Current workload; resolved tickets in the last ${period} days|">Workload</sl:card-description>
+        </sl:card-header>
+        <sl:card-content>
+            <sl:table>
+                <thead>
+                <tr>
+                    <th>Staff member</th>
+                    <th class="num">Open</th>
+                    <th class="num">In progress</th>
+                    <th class="num">Workload</th>
+                    <th class="num">Resolved</th>
+                    <th class="num">Average resolution time</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="s : ${staff}">
+                    <td>
+                        <span th:text="${s.name}">Ravi Kumar</span>
+                        <sl:badge th:unless="${s.active}" variant="outline">Inactive</sl:badge>
+                    </td>
+                    <td class="num" th:text="${s.open}">2</td>
+                    <td class="num" th:text="${s.inProgress}">1</td>
+                    <td class="num" th:text="${s.workload}">3</td>
+                    <td class="num" th:text="${s.resolved}">7</td>
+                    <td class="num" th:text="${s.average}">5h 30m</td>
+                </tr>
+                <sl:table-empty colspan="6" th:if="${staff.empty}">No staff members yet.</sl:table-empty>
+                </tbody>
+            </sl:table>
+        </sl:card-content>
+    </sl:card>
+</div>
+</body>
+</html>

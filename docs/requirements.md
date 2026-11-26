@@ -33,4 +33,4 @@ Status values: `TODO` (`📋`), `IN_PROGRESS` (`👷🏽`), `DONE` (`✅`).
 | ✅ | REQ-024 | Analytics: tickets created vs. resolved over time                                                  | DONE   |
 | ✅ | REQ-025 | Analytics: average resolution time                                                                 | DONE   |
 | ✅ | REQ-026 | Analytics: workload and performance per staff member                                               | DONE   |
-| 📋 | REQ-027 | Analytics dashboard page (ADMIN only)                                                              | TODO   |
+| ✅ | REQ-027 | Analytics dashboard page (ADMIN only)                                                              | DONE   |
