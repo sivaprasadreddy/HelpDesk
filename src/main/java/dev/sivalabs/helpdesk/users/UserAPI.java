@@ -29,6 +29,11 @@ public class UserAPI {
         return findStaffMembers().stream().anyMatch(u -> u.id().equals(id) && u.active());
     }
 
+    /** Names and email addresses by user id; ids that do not exist are left out. */
+    public Map<Long, UserContact> findContactsByIds(Collection<Long> ids) {
+        return userService.findContactsByIds(ids);
+    }
+
     /** Display names by user id; ids that do not exist are left out. */
     public Map<Long, String> findNamesByIds(Collection<Long> ids) {
         return userService.findNamesByIds(ids);

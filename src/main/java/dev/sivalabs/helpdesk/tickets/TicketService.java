@@ -4,6 +4,8 @@ import dev.sivalabs.helpdesk.categories.CategoryAPI;
 import dev.sivalabs.helpdesk.categories.CategoryDto;
 import dev.sivalabs.helpdesk.shared.ResourceNotFoundException;
 import dev.sivalabs.helpdesk.users.AccessPolicy;
+import dev.sivalabs.helpdesk.users.AuthUtils;
+import dev.sivalabs.helpdesk.users.SecurityUser;
 import dev.sivalabs.helpdesk.users.StaffDeactivatedEvent;
 import dev.sivalabs.helpdesk.users.UserAPI;
 import java.time.Instant;
@@ -18,6 +20,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -44,13 +47,16 @@ class TicketService {
     private final UserAPI userAPI;
     private final AccessPolicy accessPolicy;
     private final CommentRepository commentRepository;
+    private final ApplicationEventPublisher events;
 
     TicketService(
             TicketRepository ticketRepository,
             CategoryAPI categoryAPI,
             UserAPI userAPI,
             AccessPolicy accessPolicy,
-            CommentRepository commentRepository) {
+            CommentRepository commentRepository,
+            ApplicationEventPublisher events) {
+        this.events = events;
         this.ticketRepository = ticketRepository;
         this.commentRepository = commentRepository;
         this.categoryAPI = categoryAPI;
@@ -77,7 +83,9 @@ class TicketService {
         ticket.setCategoryId(cmd.categoryId());
         ticket.setCreatedBy(cmd.createdBy());
         ticket.setAssignedTo(chooseAssignee(cmd.categoryId()).orElse(null));
-        return ticketRepository.save(ticket).getId();
+        var saved = ticketRepository.save(ticket);
+        events.publishEvent(new TicketCreatedEvent(TicketSnapshot.of(saved), cmd.createdBy()));
+        return saved.getId();
     }
 
     /**
@@ -176,6 +184,7 @@ class TicketService {
             case IN_PROGRESS, OPEN -> t.setResolvedAt(null);
         }
         t.setStatus(target);
+        events.publishEvent(new TicketStatusChangedEvent(TicketSnapshot.of(t), expected, userIdOf(principal)));
     }
 
     /**
@@ -199,7 +208,9 @@ class TicketService {
         if (staffId.equals(t.getAssignedTo())) {
             return false;
         }
+        var previous = t.getAssignedTo();
         t.setAssignedTo(staffId);
+        events.publishEvent(new TicketAssignedEvent(TicketSnapshot.of(t), previous, AuthUtils.getCurrentUserId()));
         return true;
     }
 
@@ -221,6 +232,7 @@ class TicketService {
         t.setDescription(cmd.description().trim());
         t.setPriority(cmd.priority());
         t.setCategoryId(cmd.categoryId());
+        events.publishEvent(new TicketUpdatedEvent(TicketSnapshot.of(t), AuthUtils.getCurrentUserId()));
     }
 
     /** REQ-021: the ticket's comments, oldest first, if the principal may view the ticket. */
@@ -259,6 +271,11 @@ class TicketService {
         comment.setAuthorId(authorId);
         comment.setContent(content.trim());
         commentRepository.save(comment);
+        events.publishEvent(new TicketCommentAddedEvent(TicketSnapshot.of(ticket), comment.getContent(), authorId));
+    }
+
+    private static @Nullable Long userIdOf(Object principal) {
+        return principal instanceof SecurityUser user ? user.getId() : null;
     }
 
     private TicketEntity loadVisible(Long id, Object principal) {
@@ -281,8 +298,10 @@ class TicketService {
     public int onStaffDeactivated(StaffDeactivatedEvent event) {
         var tickets = ticketRepository.findByAssignedToAndStatusInOrderByIdAsc(event.staffId(), ACTIVE_STATUSES);
         for (var t : tickets) {
+            var previous = t.getAssignedTo();
             t.setAssignedTo(chooseAssignee(t.getCategoryId()).orElse(null));
             ticketRepository.flush(); // so the next ticket's choice sees this one's workload
+            events.publishEvent(new TicketAssignedEvent(TicketSnapshot.of(t), previous, null));
         }
         return tickets.size();
     }

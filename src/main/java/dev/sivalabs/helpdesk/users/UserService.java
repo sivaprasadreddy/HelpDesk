@@ -73,6 +73,16 @@ class UserService {
     }
 
     @Transactional(readOnly = true)
+    public Map<Long, UserContact> findContactsByIds(Collection<Long> ids) {
+        if (ids.isEmpty()) {
+            return Map.of();
+        }
+        return userRepository.findAllById(ids).stream()
+                .collect(Collectors.toMap(
+                        UserEntity::getId, u -> new UserContact(u.getId(), u.getName(), u.getEmail())));
+    }
+
+    @Transactional(readOnly = true)
     public Map<Long, String> findNamesByIds(Collection<Long> ids) {
         if (ids.isEmpty()) {
             return Map.of();
