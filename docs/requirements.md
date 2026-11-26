@@ -34,3 +34,8 @@ Status values: `TODO` (`📋`), `IN_PROGRESS` (`👷🏽`), `DONE` (`✅`).
 | ✅ | REQ-025 | Analytics: average resolution time                                                                 | DONE   |
 | ✅ | REQ-026 | Analytics: workload and performance per staff member                                               | DONE   |
 | ✅ | REQ-027 | Analytics dashboard page (ADMIN only)                                                              | DONE   |
+| 📋 | REQ-028 | Ticket image attachments: attach up to 3 images when creating a ticket and view them on the ticket details page | TODO   |
+| 📋 | REQ-029 | Knowledge base: load community documents from the classpath into a vector store for RAG           | TODO   |
+| 📋 | REQ-030 | AI chat interface: ask questions answered from the knowledge base (RAG)                            | TODO   |
+| 📋 | REQ-031 | AI chat interface: create tickets through the conversation (ADMIN, USER)                           | TODO   |
+| 📋 | REQ-032 | MCP server: expose ticket operations as MCP tools, enforcing the same access rules as the UI       | TODO   |
