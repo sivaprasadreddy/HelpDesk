@@ -6,6 +6,7 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 import com.enofex.taikai.Taikai;
 import com.enofex.taikai.core.ClassCriteria;
+import com.enofex.taikai.exports.MetricsMarkdownExport;
 import com.enofex.taikai.java.ImportsConfigurer;
 import com.tngtech.archunit.core.domain.Dependency;
 import com.tngtech.archunit.core.domain.JavaClass;
@@ -81,6 +82,16 @@ class ArchUnitTests {
                                 .shouldNotBeUsedInControllers()))
                 .build()
                 .checkAll();
+    }
+
+    @Test
+    void exportMetrics() {
+        Taikai.builder()
+                .namespace(BASE_PACKAGE)
+                .discoverExports(exports -> exports.configure(
+                        MetricsMarkdownExport.class, MetricsMarkdownExport.file("docs/taikai-metrics/METRICS.md")))
+                .build()
+                .export();
     }
 
     @Test
