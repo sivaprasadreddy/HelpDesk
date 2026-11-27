@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sl="https://shadleaf.dev/sl"
+<html lang="en" th:data-live-url="@{/live/tickets}" xmlns:th="http://www.thymeleaf.org" xmlns:sl="https://shadleaf.dev/sl"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:fragment="layout(pageTitle, breadcrumb, content)">
 <head>
@@ -9,6 +9,7 @@
     <th:block th:replace="~{sl/layout :: theme-script}"></th:block>
     <th:block th:replace="~{sl/layout :: assets}"></th:block>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <script th:src="@{/js/live.js}" defer></script>
 </head>
 <body>
 <sl:skip-link/>
@@ -127,5 +128,6 @@
     </sl:sidebar-inset>
 </sl:sidebar-provider>
 <div id="modal-root"></div>
+<div id="live-announcer" class="visually-hidden" role="status" aria-live="polite"></div>
 </body>
 </html>

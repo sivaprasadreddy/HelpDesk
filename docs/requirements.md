@@ -39,3 +39,4 @@ Status values: `TODO` (`📋`), `IN_PROGRESS` (`👷🏽`), `DONE` (`✅`).
 | ✅ | REQ-030 | AI chat interface: ask questions answered from the knowledge base (RAG)                            | DONE   |
 | ✅ | REQ-031 | AI chat interface: create tickets through the conversation (ADMIN, USER)                           | DONE   |
 | ✅ | REQ-032 | MCP server: expose ticket operations as MCP tools, enforcing the same access rules as the UI       | DONE   |
+| ✅ | REQ-033 | Live updates: ticket details and ticket lists refresh when a ticket changes (server-sent events)  | DONE   |

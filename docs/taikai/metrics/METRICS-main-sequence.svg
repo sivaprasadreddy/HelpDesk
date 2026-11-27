@@ -75,24 +75,25 @@
   <text x="34" y="332" text-anchor="middle" class="ink-2" transform="rotate(-90 34 332)">Abstractness (A)</text>
   <text x="34" y="72" text-anchor="end" class="muted" transform="rotate(-90 34 72)">abstract →</text>
   <g class="dot" data-zone="balanced">
-    <title>tickets: I = 0.58, A = 0.09, D = 0.33, 45 classes</title>
-    <circle cx="393.6" cy="545.2" r="14" class="balanced ring" fill-opacity="0.9" stroke-width="2"/>
-    <text x="411.6" y="549.2" text-anchor="start" class="ink halo" font-weight="500">tickets</text>
-  </g>
-  <g class="dot" data-zone="pain">
-    <title>users: I = 0.27, A = 0.11, D = 0.62, 27 classes</title>
-    <circle cx="232.4" cy="534.8" r="11.97" class="pain ring" fill-opacity="0.9" stroke-width="2"/>
-    <text x="248.37" y="538.8" text-anchor="start" class="ink halo" font-weight="500">users</text>
+    <title>tickets: I = 0.54, A = 0.09, D = 0.37, 45 classes</title>
+    <circle cx="372.8" cy="545.2" r="14" class="balanced ring" fill-opacity="0.9" stroke-width="2"/>
+    <text x="390.8" y="549.2" text-anchor="start" class="ink halo" font-weight="500">tickets</text>
   </g>
   <g class="dot" data-zone="balanced">
     <title>analytics: I = 1.00, A = 0.00, D = 0.00, 1 class
 assistant: I = 1.00, A = 0.00, D = 0.00, 10 classes
 config: I = 1.00, A = 0.00, D = 0.00, 9 classes
 home: I = 1.00, A = 0.00, D = 0.00, 2 classes
+live: I = 1.00, A = 0.00, D = 0.00, 5 classes
 notifications: I = 1.00, A = 0.00, D = 0.00, 3 classes</title>
-    <line x1="612" y1="592" x2="608" y2="562.29" class="leader"/>
-    <circle cx="612" cy="592" r="11.71" class="balanced ring" fill-opacity="0.9" stroke-width="2"/>
-    <text x="608" y="558.29" text-anchor="end" class="ink halo" font-weight="500">5 packages</text>
+    <line x1="612" y1="592" x2="608" y2="561.65" class="leader"/>
+    <circle cx="612" cy="592" r="12.35" class="balanced ring" fill-opacity="0.9" stroke-width="2"/>
+    <text x="608" y="557.65" text-anchor="end" class="ink halo" font-weight="500">6 packages</text>
+  </g>
+  <g class="dot" data-zone="pain">
+    <title>users: I = 0.24, A = 0.11, D = 0.65, 27 classes</title>
+    <circle cx="216.8" cy="534.8" r="11.97" class="pain ring" fill-opacity="0.9" stroke-width="2"/>
+    <text x="232.77" y="538.8" text-anchor="start" class="ink halo" font-weight="500">users</text>
   </g>
   <g class="dot" data-zone="pain">
     <title>categories: I = 0.18, A = 0.13, D = 0.69, 8 classes</title>

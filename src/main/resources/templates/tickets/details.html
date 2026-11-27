@@ -8,8 +8,8 @@
     <sl:breadcrumb-separator/>
     <sl:breadcrumb-item><sl:breadcrumb-page th:text="|Ticket #${ticket.id}|">Ticket #100</sl:breadcrumb-page></sl:breadcrumb-item>
 </th:block>
-<div id="page-content" class="stack ticket-details">
-    <sl:card>
+<div id="page-content" class="stack ticket-details" th:data-live-ticket="${ticket.id}">
+    <sl:card id="ticket-summary" data-live-region>
         <sl:card-header border>
             <sl:card-title level="1" th:text="${ticket.title}">Kitchen sink leaking</sl:card-title>
             <sl:card-description>
@@ -78,9 +78,10 @@
 
     <sl:card id="comments">
         <sl:card-header>
-            <sl:card-title level="2" th:text="|Comments (${#lists.size(comments)})|">Comments (2)</sl:card-title>
+            <sl:card-title id="comment-heading" data-live-region level="2" th:text="|Comments (${#lists.size(comments)})|">Comments (2)</sl:card-title>
         </sl:card-header>
         <sl:card-content class="stack">
+            <div id="comment-thread" data-live-region>
             <p th:if="${comments.empty}" class="muted">No comments yet.</p>
             <ol th:unless="${comments.empty}" class="comment-list">
                 <li th:each="c : ${comments}" class="comment">
@@ -92,6 +93,7 @@
                     <p class="comment-content" th:text="${c.content}">I will check this today.</p>
                 </li>
             </ol>
+            </div>
             <form th:if="${canComment}" th:object="${commentForm}" method="post"
                   th:action="@{/tickets/{id}/comments(id=${ticket.id})}" novalidate class="form-stack">
                 <sl:field th:field="*{content}">
