@@ -2,9 +2,9 @@ package dev.sivalabs.helpdesk;
 
 import static com.tngtech.archunit.core.domain.JavaModifier.*;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 import com.enofex.taikai.Taikai;
+import com.enofex.taikai.checks.RequiredFilesCheck;
 import com.enofex.taikai.core.ClassCriteria;
 import com.enofex.taikai.exports.MetricsMarkdownExport;
 import com.enofex.taikai.java.ImportsConfigurer;
@@ -35,9 +35,8 @@ class ArchUnitTests {
         importedClasses = new ClassFileImporter().importPackages(BASE_PACKAGE);
     }
 
-    @Test
-    void shouldFulfillConstraints() {
-        Taikai.builder()
+    private Taikai taikai() {
+        return Taikai.builder()
                 .namespace(BASE_PACKAGE)
                 .java(java -> java.noUsageOfDeprecatedAPIs()
                         .methodsShouldNotDeclareGenericExceptions()
@@ -80,29 +79,21 @@ class ArchUnitTests {
                                 .methodsShouldBePublic()
                                 .shouldNotBeSelfInvoked()
                                 .shouldNotBeUsedInControllers()))
-                .build()
-                .checkAll();
-    }
-
-    @Test
-    void exportMetrics() {
-        Taikai.builder()
-                .namespace(BASE_PACKAGE)
                 .discoverExports(exports -> exports.configure(
-                        MetricsMarkdownExport.class, MetricsMarkdownExport.file("docs/taikai-metrics/METRICS.md")))
-                .build()
-                .export();
+                        MetricsMarkdownExport.class, MetricsMarkdownExport.file("docs/taikai/metrics/METRICS.md")))
+                .discoverChecks(checks -> checks.configure(
+                        RequiredFilesCheck.class, RequiredFilesCheck.files("README.md", "AGENTS.md", "renovate.json")))
+                .build();
     }
 
     @Test
-    void controllersShouldNotBeAccessedByDomain() {
-        noClasses()
-                .that()
-                .resideInAPackage("..domain..")
-                .should()
-                .accessClassesThat()
-                .resideInAPackage("..web..")
-                .check(importedClasses);
+    void shouldFollowArchitectureRules() {
+        taikai().checkAll();
+    }
+
+    @Test
+    void exportTaikaiMetrics() {
+        taikai().export();
     }
 
     // Services are public (accessible to inbound handlers in the same module),

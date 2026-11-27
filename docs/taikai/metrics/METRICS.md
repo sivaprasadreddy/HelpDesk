@@ -46,18 +46,18 @@ Each tile is a package: its area is its number of classes and its color its zone
 
 | Package | Classes | Abstract | Ca | Ce | I | A | D | Visibility | Libraries | Zone |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| [`dev.sivalabs.helpdesk`](../../src/main/java/dev/sivalabs/helpdesk) | 2 | 0 | 0 | 0 | - | 0.00 | - | 1.00 | 1 |  |
-| [`analytics`](../../src/main/java/dev/sivalabs/helpdesk/analytics) | 1 | 0 | 0 | 1 | 1.00 | 0.00 | 0.00 | 0.00 | 2 |  |
-| [`assistant`](../../src/main/java/dev/sivalabs/helpdesk/assistant) | 10 | 0 | 0 | 4 | 1.00 | 0.00 | 0.00 | 0.30 | 4 |  |
-| [`categories`](../../src/main/java/dev/sivalabs/helpdesk/categories) | 8 | 1 | 9 | 2 | 0.18 | 0.13 | 0.69 | 0.50 | 4 | pain |
-| [`config`](../../src/main/java/dev/sivalabs/helpdesk/config) | 9 | 0 | 0 | 3 | 1.00 | 0.00 | 0.00 | 0.22 | 5 |  |
-| [`home`](../../src/main/java/dev/sivalabs/helpdesk/home) | 2 | 0 | 0 | 1 | 1.00 | 0.00 | 0.00 | 0.00 | 1 |  |
-| [`knowledgebase`](../../src/main/java/dev/sivalabs/helpdesk/knowledgebase) | 5 | 0 | 1 | 0 | 0.00 | 0.00 | 1.00 | 0.40 | 2 | pain |
-| [`notifications`](../../src/main/java/dev/sivalabs/helpdesk/notifications) | 3 | 0 | 0 | 1 | 1.00 | 0.00 | 0.00 | 0.00 | 3 |  |
-| [`shared`](../../src/main/java/dev/sivalabs/helpdesk/shared) | 3 | 1 | 11 | 0 | 0.00 | 0.33 | 0.67 | 1.00 | 2 | pain |
-| [`shared.email`](../../src/main/java/dev/sivalabs/helpdesk/shared/email) | 1 | 0 | 1 | 0 | 0.00 | 0.00 | 1.00 | 1.00 | 1 | pain |
-| [`tickets`](../../src/main/java/dev/sivalabs/helpdesk/tickets) | 45 | 4 | 5 | 7 | 0.58 | 0.09 | 0.33 | 0.51 | 4 |  |
-| [`users`](../../src/main/java/dev/sivalabs/helpdesk/users) | 27 | 3 | 11 | 4 | 0.27 | 0.11 | 0.62 | 0.33 | 4 | pain |
+| [`dev.sivalabs.helpdesk`](../../../src/main/java/dev/sivalabs/helpdesk) | 2 | 0 | 0 | 0 | - | 0.00 | - | 1.00 | 1 |  |
+| [`analytics`](../../../src/main/java/dev/sivalabs/helpdesk/analytics) | 1 | 0 | 0 | 1 | 1.00 | 0.00 | 0.00 | 0.00 | 2 |  |
+| [`assistant`](../../../src/main/java/dev/sivalabs/helpdesk/assistant) | 10 | 0 | 0 | 4 | 1.00 | 0.00 | 0.00 | 0.30 | 4 |  |
+| [`categories`](../../../src/main/java/dev/sivalabs/helpdesk/categories) | 8 | 1 | 9 | 2 | 0.18 | 0.13 | 0.69 | 0.50 | 4 | pain |
+| [`config`](../../../src/main/java/dev/sivalabs/helpdesk/config) | 9 | 0 | 0 | 3 | 1.00 | 0.00 | 0.00 | 0.22 | 5 |  |
+| [`home`](../../../src/main/java/dev/sivalabs/helpdesk/home) | 2 | 0 | 0 | 1 | 1.00 | 0.00 | 0.00 | 0.00 | 1 |  |
+| [`knowledgebase`](../../../src/main/java/dev/sivalabs/helpdesk/knowledgebase) | 5 | 0 | 1 | 0 | 0.00 | 0.00 | 1.00 | 0.40 | 2 | pain |
+| [`notifications`](../../../src/main/java/dev/sivalabs/helpdesk/notifications) | 3 | 0 | 0 | 1 | 1.00 | 0.00 | 0.00 | 0.00 | 3 |  |
+| [`shared`](../../../src/main/java/dev/sivalabs/helpdesk/shared) | 3 | 1 | 11 | 0 | 0.00 | 0.33 | 0.67 | 1.00 | 2 | pain |
+| [`shared.email`](../../../src/main/java/dev/sivalabs/helpdesk/shared/email) | 1 | 0 | 1 | 0 | 0.00 | 0.00 | 1.00 | 1.00 | 1 | pain |
+| [`tickets`](../../../src/main/java/dev/sivalabs/helpdesk/tickets) | 45 | 4 | 5 | 7 | 0.58 | 0.09 | 0.33 | 0.51 | 4 |  |
+| [`users`](../../../src/main/java/dev/sivalabs/helpdesk/users) | 27 | 3 | 11 | 4 | 0.27 | 0.11 | 0.62 | 0.33 | 4 | pain |
 
 Visibility is the relative visibility of Herbert Dowalil, the share of public classes, and Libraries the number of libraries that the package uses.
 
@@ -113,17 +113,17 @@ The inheritance depth of a class counts its superclasses, its subclasses only th
 
 | Class | Depth |
 | --- | ---: |
-| [`categories.CategoryEntity`](../../src/main/java/dev/sivalabs/helpdesk/categories/CategoryEntity.java) | 1 |
-| [`tickets.CommentEntity`](../../src/main/java/dev/sivalabs/helpdesk/tickets/CommentEntity.java) | 1 |
-| [`tickets.TicketAttachmentEntity`](../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketAttachmentEntity.java) | 1 |
-| [`tickets.TicketEntity`](../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketEntity.java) | 1 |
-| [`users.UserEntity`](../../src/main/java/dev/sivalabs/helpdesk/users/UserEntity.java) | 1 |
+| [`categories.CategoryEntity`](../../../src/main/java/dev/sivalabs/helpdesk/categories/CategoryEntity.java) | 1 |
+| [`tickets.CommentEntity`](../../../src/main/java/dev/sivalabs/helpdesk/tickets/CommentEntity.java) | 1 |
+| [`tickets.TicketAttachmentEntity`](../../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketAttachmentEntity.java) | 1 |
+| [`tickets.TicketEntity`](../../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketEntity.java) | 1 |
+| [`users.UserEntity`](../../../src/main/java/dev/sivalabs/helpdesk/users/UserEntity.java) | 1 |
 
 ### Most Extended Classes
 
 | Class | Subclasses |
 | --- | ---: |
-| [`shared.BaseEntity`](../../src/main/java/dev/sivalabs/helpdesk/shared/BaseEntity.java) | 5 |
+| [`shared.BaseEntity`](../../../src/main/java/dev/sivalabs/helpdesk/shared/BaseEntity.java) | 5 |
 
 ## Coupling
 
@@ -133,31 +133,31 @@ The fan-in of a class counts the classes that depend on it, its fan-out the clas
 
 | Class | Fan-in |
 | --- | ---: |
-| [`tickets.TicketPriority`](../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketPriority.java) | 18 |
-| [`tickets.TicketStatus`](../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketStatus.java) | 13 |
-| [`categories.CategoryDto`](../../src/main/java/dev/sivalabs/helpdesk/categories/CategoryDto.java) | 11 |
-| [`users.Role`](../../src/main/java/dev/sivalabs/helpdesk/users/Role.java) | 10 |
-| [`categories.CategoryAPI`](../../src/main/java/dev/sivalabs/helpdesk/categories/CategoryAPI.java) | 9 |
-| [`tickets.TicketSnapshot`](../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketSnapshot.java) | 9 |
-| [`tickets.TicketEvent`](../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketEvent.java) | 8 |
-| [`users.SecurityUser`](../../src/main/java/dev/sivalabs/helpdesk/users/SecurityUser.java) | 8 |
-| [`assistant.TicketDraft`](../../src/main/java/dev/sivalabs/helpdesk/assistant/TicketDraft.java) | 6 |
-| [`shared.ResourceNotFoundException`](../../src/main/java/dev/sivalabs/helpdesk/shared/ResourceNotFoundException.java) | 6 |
+| [`tickets.TicketPriority`](../../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketPriority.java) | 18 |
+| [`tickets.TicketStatus`](../../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketStatus.java) | 13 |
+| [`categories.CategoryDto`](../../../src/main/java/dev/sivalabs/helpdesk/categories/CategoryDto.java) | 11 |
+| [`users.Role`](../../../src/main/java/dev/sivalabs/helpdesk/users/Role.java) | 10 |
+| [`categories.CategoryAPI`](../../../src/main/java/dev/sivalabs/helpdesk/categories/CategoryAPI.java) | 9 |
+| [`tickets.TicketSnapshot`](../../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketSnapshot.java) | 9 |
+| [`tickets.TicketEvent`](../../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketEvent.java) | 8 |
+| [`users.SecurityUser`](../../../src/main/java/dev/sivalabs/helpdesk/users/SecurityUser.java) | 8 |
+| [`assistant.TicketDraft`](../../../src/main/java/dev/sivalabs/helpdesk/assistant/TicketDraft.java) | 6 |
+| [`shared.ResourceNotFoundException`](../../../src/main/java/dev/sivalabs/helpdesk/shared/ResourceNotFoundException.java) | 6 |
 
 ### Classes with the Most Dependencies
 
 | Class | Fan-out |
 | --- | ---: |
-| [`tickets.TicketService`](../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketService.java) | 36 |
-| [`tickets.TicketController`](../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketController.java) | 23 |
-| [`users.UserService`](../../src/main/java/dev/sivalabs/helpdesk/users/UserService.java) | 18 |
-| [`tickets.TicketMcpTools`](../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketMcpTools.java) | 14 |
-| [`notifications.TicketNotificationListener`](../../src/main/java/dev/sivalabs/helpdesk/notifications/TicketNotificationListener.java) | 12 |
-| [`tickets.TicketAnalyticsAPI`](../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketAnalyticsAPI.java) | 12 |
-| [`assistant.AssistantService`](../../src/main/java/dev/sivalabs/helpdesk/assistant/AssistantService.java) | 11 |
-| [`analytics.AnalyticsController`](../../src/main/java/dev/sivalabs/helpdesk/analytics/AnalyticsController.java) | 9 |
-| [`assistant.AssistantController`](../../src/main/java/dev/sivalabs/helpdesk/assistant/AssistantController.java) | 8 |
-| [`users.StaffController`](../../src/main/java/dev/sivalabs/helpdesk/users/StaffController.java) | 8 |
+| [`tickets.TicketService`](../../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketService.java) | 36 |
+| [`tickets.TicketController`](../../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketController.java) | 23 |
+| [`users.UserService`](../../../src/main/java/dev/sivalabs/helpdesk/users/UserService.java) | 18 |
+| [`tickets.TicketMcpTools`](../../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketMcpTools.java) | 14 |
+| [`notifications.TicketNotificationListener`](../../../src/main/java/dev/sivalabs/helpdesk/notifications/TicketNotificationListener.java) | 12 |
+| [`tickets.TicketAnalyticsAPI`](../../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketAnalyticsAPI.java) | 12 |
+| [`assistant.AssistantService`](../../../src/main/java/dev/sivalabs/helpdesk/assistant/AssistantService.java) | 11 |
+| [`analytics.AnalyticsController`](../../../src/main/java/dev/sivalabs/helpdesk/analytics/AnalyticsController.java) | 9 |
+| [`assistant.AssistantController`](../../../src/main/java/dev/sivalabs/helpdesk/assistant/AssistantController.java) | 8 |
+| [`users.StaffController`](../../../src/main/java/dev/sivalabs/helpdesk/users/StaffController.java) | 8 |
 
 ## Cohesion
 
@@ -167,4 +167,4 @@ The LCOM4 of a class counts the groups of its methods that have nothing in commo
 
 | Class | LCOM4 | Methods |
 | --- | ---: | ---: |
-| [`assistant.Conversation`](../../src/main/java/dev/sivalabs/helpdesk/assistant/Conversation.java) | 2 | 8 |
+| [`assistant.Conversation`](../../../src/main/java/dev/sivalabs/helpdesk/assistant/Conversation.java) | 2 | 8 |
