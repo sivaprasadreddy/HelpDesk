@@ -22,7 +22,7 @@
         <htmx-spring-boot-thymeleaf.version>6.0.1</htmx-spring-boot-thymeleaf.version>
         <shadleaf-spring-boot-starter.version>1.1.0</shadleaf-spring-boot-starter.version>
         <datasource-micrometer-spring-boot.version>2.3.1</datasource-micrometer-spring-boot.version>
-        <bootui.version>2.5.0</bootui.version>
+        <bootui.version>2.6.0</bootui.version>
         <jacoco-maven-plugin.version>0.8.16</jacoco-maven-plugin.version>
         <jacoco.minimum.coverage>75%</jacoco.minimum.coverage>
         <palantir-java-format.version>2.103.0</palantir-java-format.version>
