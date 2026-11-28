@@ -42,72 +42,76 @@
   <text x="538.4" y="40" text-anchor="start" class="ink-2">No couplings</text>
   <g class="tile" data-zone="isolated">
     <title>dev.sivalabs.helpdesk: 2 classes, I -, A 0.00, D -</title>
-    <rect x="492.75" y="377.73" width="82.83" height="44.89" rx="6" class="isolated" fill-opacity="0.14"/>
-    <text x="500.75" y="395.73" class="ink" font-size="12" font-weight="600">dev.siva…</text>
-    <text x="500.75" y="410.73" class="ink-2" font-size="11">2 classes</text>
+    <rect x="506.32" y="370.87" width="73.79" height="48.32" rx="6" class="isolated" fill-opacity="0.14"/>
+    <text x="514.32" y="388.87" class="ink" font-size="12" font-weight="600">dev.siv…</text>
+    <text x="514.32" y="403.87" class="ink-2" font-size="11">2 classes</text>
   </g>
   <g class="tile" data-zone="balanced">
     <title>analytics: 1 class, I 1.00, A 0.00, D 0.00</title>
-    <rect x="578.58" y="377.73" width="39.92" height="44.89" rx="6" class="balanced" fill-opacity="0.14"/>
-    <text x="586.58" y="395.73" class="ink" font-size="12" font-weight="600">an…</text>
+    <rect x="583.11" y="370.87" width="35.39" height="48.32" rx="6" class="balanced" fill-opacity="0.14"/>
   </g>
   <g class="tile" data-zone="balanced">
     <title>assistant: 10 classes, I 1.00, A 0.00, D 0.00</title>
-    <rect x="522.91" y="73.5" width="95.59" height="205.45" rx="6" class="balanced" fill-opacity="0.14"/>
-    <text x="530.91" y="91.5" class="ink" font-size="12" font-weight="600">assistant</text>
-    <text x="530.91" y="106.5" class="ink-2" font-size="11">D 0.00</text>
+    <rect x="520.33" y="73.5" width="98.17" height="191.74" rx="6" class="balanced" fill-opacity="0.14"/>
+    <text x="528.33" y="91.5" class="ink" font-size="12" font-weight="600">assistant</text>
+    <text x="528.33" y="106.5" class="ink-2" font-size="11">D 0.00</text>
   </g>
   <g class="tile" data-zone="pain">
     <title>categories: 8 classes, I 0.18, A 0.13, D 0.69</title>
-    <rect x="353.27" y="281.95" width="136.48" height="114.88" rx="6" class="pain" fill-opacity="0.49"/>
-    <text x="361.27" y="299.95" class="ink" font-size="12" font-weight="600">categories</text>
-    <text x="361.27" y="314.95" class="ink-2" font-size="11">8 classes · D 0.69</text>
+    <rect x="247.15" y="376.91" width="160.18" height="93.59" rx="6" class="pain" fill-opacity="0.49"/>
+    <text x="255.15" y="394.91" class="ink" font-size="12" font-weight="600">categories</text>
+    <text x="255.15" y="409.91" class="ink-2" font-size="11">8 classes · D 0.69</text>
   </g>
   <g class="tile" data-zone="balanced">
     <title>config: 9 classes, I 1.00, A 0.00, D 0.00</title>
-    <rect x="256.71" y="281.95" width="93.56" height="188.55" rx="6" class="balanced" fill-opacity="0.14"/>
-    <text x="264.71" y="299.95" class="ink" font-size="12" font-weight="600">config</text>
-    <text x="264.71" y="314.95" class="ink-2" font-size="11">D 0.00</text>
+    <rect x="247.15" y="268.24" width="160.18" height="105.67" rx="6" class="balanced" fill-opacity="0.14"/>
+    <text x="255.15" y="286.24" class="ink" font-size="12" font-weight="600">config</text>
+    <text x="255.15" y="301.24" class="ink-2" font-size="11">9 classes · D 0.00</text>
   </g>
   <g class="tile" data-zone="balanced">
     <title>home: 2 classes, I 1.00, A 0.00, D 0.00</title>
-    <rect x="492.75" y="425.61" width="82.83" height="44.89" rx="6" class="balanced" fill-opacity="0.14"/>
-    <text x="500.75" y="443.61" class="ink" font-size="12" font-weight="600">home</text>
-    <text x="500.75" y="458.61" class="ink-2" font-size="11">D 0.00</text>
+    <rect x="506.32" y="422.18" width="73.79" height="48.32" rx="6" class="balanced" fill-opacity="0.14"/>
+    <text x="514.32" y="440.18" class="ink" font-size="12" font-weight="600">home</text>
+    <text x="514.32" y="455.18" class="ink-2" font-size="11">D 0.00</text>
   </g>
   <g class="tile" data-zone="pain">
     <title>knowledgebase: 5 classes, I 0.00, A 0.00, D 1.00</title>
-    <rect x="353.27" y="399.83" width="136.48" height="70.67" rx="6" class="pain" fill-opacity="0.64"/>
-    <text x="361.27" y="417.83" class="ink" font-size="12" font-weight="600">knowledgebase</text>
-    <text x="361.27" y="432.83" class="ink-2" font-size="11">5 classes · D 1.00</text>
+    <rect x="410.33" y="268.24" width="92.99" height="99.63" rx="6" class="pain" fill-opacity="0.64"/>
+    <text x="418.33" y="286.24" class="ink" font-size="12" font-weight="600">knowledge…</text>
+    <text x="418.33" y="301.24" class="ink-2" font-size="11">D 1.00</text>
+  </g>
+  <g class="tile" data-zone="balanced">
+    <title>live: 5 classes, I 1.00, A 0.00, D 0.00</title>
+    <rect x="410.33" y="370.87" width="92.99" height="99.63" rx="6" class="balanced" fill-opacity="0.14"/>
+    <text x="418.33" y="388.87" class="ink" font-size="12" font-weight="600">live</text>
+    <text x="418.33" y="403.87" class="ink-2" font-size="11">D 0.00</text>
   </g>
   <g class="tile" data-zone="balanced">
     <title>notifications: 3 classes, I 1.00, A 0.00, D 0.00</title>
-    <rect x="492.75" y="281.95" width="61.38" height="92.77" rx="6" class="balanced" fill-opacity="0.14"/>
-    <text x="500.75" y="299.95" class="ink" font-size="12" font-weight="600">notif…</text>
-    <text x="500.75" y="314.95" class="ink-2" font-size="11">D 0.00</text>
+    <rect x="506.32" y="268.24" width="54.59" height="99.63" rx="6" class="balanced" fill-opacity="0.14"/>
+    <text x="514.32" y="286.24" class="ink" font-size="12" font-weight="600">noti…</text>
+    <text x="514.32" y="301.24" class="ink-2" font-size="11">D 0.00</text>
   </g>
   <g class="tile" data-zone="pain">
     <title>shared: 3 classes, I 0.00, A 0.33, D 0.67</title>
-    <rect x="557.12" y="281.95" width="61.38" height="92.77" rx="6" class="pain" fill-opacity="0.47"/>
-    <text x="565.12" y="299.95" class="ink" font-size="12" font-weight="600">shared</text>
-    <text x="565.12" y="314.95" class="ink-2" font-size="11">D 0.67</text>
+    <rect x="563.91" y="268.24" width="54.59" height="99.63" rx="6" class="pain" fill-opacity="0.47"/>
+    <text x="571.91" y="286.24" class="ink" font-size="12" font-weight="600">shar…</text>
+    <text x="571.91" y="301.24" class="ink-2" font-size="11">D 0.67</text>
   </g>
   <g class="tile" data-zone="pain">
     <title>shared.email: 1 class, I 0.00, A 0.00, D 1.00</title>
-    <rect x="578.58" y="425.61" width="39.92" height="44.89" rx="6" class="pain" fill-opacity="0.64"/>
-    <text x="586.58" y="443.61" class="ink" font-size="12" font-weight="600">sh…</text>
+    <rect x="583.11" y="422.18" width="35.39" height="48.32" rx="6" class="pain" fill-opacity="0.64"/>
   </g>
   <g class="tile" data-zone="balanced">
-    <title>tickets: 45 classes, I 0.58, A 0.09, D 0.33</title>
-    <rect x="25.5" y="73.5" width="228.21" height="397" rx="6" class="balanced" fill-opacity="0.3"/>
+    <title>tickets: 45 classes, I 0.54, A 0.09, D 0.37</title>
+    <rect x="25.5" y="73.5" width="218.65" height="397" rx="6" class="balanced" fill-opacity="0.33"/>
     <text x="33.5" y="91.5" class="ink" font-size="12" font-weight="600">tickets</text>
-    <text x="33.5" y="106.5" class="ink-2" font-size="11">45 classes · D 0.33</text>
+    <text x="33.5" y="106.5" class="ink-2" font-size="11">45 classes · D 0.37</text>
   </g>
   <g class="tile" data-zone="pain">
-    <title>users: 27 classes, I 0.27, A 0.11, D 0.62</title>
-    <rect x="256.71" y="73.5" width="263.2" height="205.45" rx="6" class="pain" fill-opacity="0.45"/>
-    <text x="264.71" y="91.5" class="ink" font-size="12" font-weight="600">users</text>
-    <text x="264.71" y="106.5" class="ink-2" font-size="11">27 classes · D 0.62</text>
+    <title>users: 27 classes, I 0.24, A 0.11, D 0.65</title>
+    <rect x="247.15" y="73.5" width="270.17" height="191.74" rx="6" class="pain" fill-opacity="0.47"/>
+    <text x="255.15" y="91.5" class="ink" font-size="12" font-weight="600">users</text>
+    <text x="255.15" y="106.5" class="ink-2" font-size="11">27 classes · D 0.65</text>
   </g>
 </svg>

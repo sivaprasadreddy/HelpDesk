@@ -50,107 +50,116 @@
     <marker id="unstable-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="unstable-head"/></marker>
     <marker id="cycle-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="cycle-head"/></marker>
   </defs>
-  <path d="M365.88,124 C365.88,154 371.13,154 371.13,184" class="edge" stroke-width="3.02" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>analytics → tickets: 8 dependencies</title></path>
-  <path d="M377.88,124 C377.88,165 467.29,165 467.29,206 C467.29,247 470.59,247 470.59,288" class="edge" stroke-width="1.87" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>analytics → users: 1 dependency</title></path>
-  <path d="M493.48,124 C493.48,165 459.29,165 459.29,206 C459.29,258 400.42,258 400.42,310 C400.42,351 427.34,351 427.34,392" class="edge" stroke-width="2.33" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>assistant → categories: 3 dependencies</title></path>
-  <path d="M529.48,124 C529.48,165 695.25,165 695.25,206 C695.25,258 608.3,258 608.3,310 C608.3,362 608.3,362 608.3,414 C608.3,455 600.27,455 600.27,496" class="edge" stroke-width="2.13" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>assistant → knowledgebase: 2 dependencies</title></path>
-  <path d="M517.48,124 C517.48,165 663.48,165 663.48,206 C663.48,258 552.76,258 552.76,310 C552.76,362 517.84,362 517.84,414 C517.84,455 451.34,455 451.34,496" class="edge" stroke-width="1.87" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>assistant → shared: 1 dependency</title></path>
-  <path d="M481.48,124 C481.48,154 383.13,154 383.13,184" class="edge" stroke-width="2.33" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>assistant → tickets: 3 dependencies</title></path>
-  <path d="M505.48,124 C505.48,165 613.39,165 613.39,206 C613.39,247 494.59,247 494.59,288" class="edge" stroke-width="2.13" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>assistant → users: 2 dependencies</title></path>
-  <path d="M427.34,436 C427.34,466 427.34,466 427.34,496" class="edge" stroke-width="2.13" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>categories → shared: 2 dependencies</title></path>
-  <path d="M255.91,228 C255.91,269 336.84,269 336.84,310 C336.84,362 336.84,362 336.84,414 C336.84,455 403.34,455 403.34,496" class="edge" stroke-width="1.87" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>config → shared: 1 dependency</title></path>
-  <path d="M267.91,228 C267.91,258 446.59,258 446.59,288" class="edge" stroke-width="2.5" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>config → users: 4 dependencies</title></path>
-  <path d="M540.34,228 C540.34,258 482.59,258 482.59,288" class="edge" stroke-width="1.87" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>home → users: 1 dependency</title></path>
-  <path d="M661.98,124 C661.98,165 773.11,165 773.11,206 C773.11,258 756.02,258 756.02,310 C756.02,362 756.02,362 756.02,414 C756.02,455 756.02,455 756.02,496" class="edge" stroke-width="1.87" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>notifications → shared.email: 1 dependency</title></path>
-  <path d="M637.98,124 C637.98,154 395.13,154 395.13,184" class="edge" stroke-width="3.02" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>notifications → tickets: 8 dependencies</title></path>
-  <path d="M649.98,124 C649.98,165 621.39,165 621.39,206 C621.39,247 506.59,247 506.59,288" class="edge" stroke-width="2.13" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>notifications → users: 2 dependencies</title></path>
-  <path d="M383.13,228 C383.13,269 392.42,269 392.42,310 C392.42,351 415.34,351 415.34,392" class="edge" stroke-width="3.02" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>tickets → categories: 8 dependencies</title></path>
-  <path d="M371.13,228 C371.13,269 344.84,269 344.84,310 C344.84,362 344.84,362 344.84,414 C344.84,455 415.34,455 415.34,496" class="edge" stroke-width="2.5" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>tickets → shared: 4 dependencies</title></path>
-  <path d="M395.13,228 C395.13,258 458.59,258 458.59,288" class="edge" stroke-width="3.5" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>tickets → users: 13 dependencies</title></path>
-  <path d="M470.59,332 C470.59,362 439.34,362 439.34,392" class="edge" stroke-width="2.78" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>users → categories: 6 dependencies</title></path>
-  <path d="M482.59,332 C482.59,373 509.84,373 509.84,414 C509.84,455 439.34,455 439.34,496" class="edge" stroke-width="2.33" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>users → shared: 3 dependencies</title></path>
+  <path d="M433.64,124 C433.64,154 433.98,154 433.98,184" class="edge" stroke-width="3.02" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>analytics → tickets: 8 dependencies</title></path>
+  <path d="M445.64,124 C445.64,165 524.15,165 524.15,206 C524.15,247 579.23,247 579.23,288" class="edge" stroke-width="1.87" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>analytics → users: 1 dependency</title></path>
+  <path d="M310.14,124 C310.14,165 363.82,165 363.82,206 C363.82,258 465.81,258 465.81,310 C465.81,351 488.73,351 488.73,392" class="edge" stroke-width="2.33" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>assistant → categories: 3 dependencies</title></path>
+  <path d="M286.14,124 C286.14,165 281.56,165 281.56,206 C281.56,258 317.3,258 317.3,310 C317.3,362 317.3,362 317.3,414 C317.3,455 317.3,455 317.3,496" class="edge" stroke-width="2.13" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>assistant → knowledgebase: 2 dependencies</title></path>
+  <path d="M298.14,124 C298.14,165 336.03,165 336.03,206 C336.03,258 418.23,258 418.23,310 C418.23,362 418.23,362 418.23,414 C418.23,455 484.73,455 484.73,496" class="edge" stroke-width="1.87" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>assistant → shared: 1 dependency</title></path>
+  <path d="M322.14,124 C322.14,154 421.98,154 421.98,184" class="edge" stroke-width="2.33" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>assistant → tickets: 3 dependencies</title></path>
+  <path d="M334.14,124 C334.14,165 516.15,165 516.15,206 C516.15,247 567.23,247 567.23,288" class="edge" stroke-width="2.13" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>assistant → users: 2 dependencies</title></path>
+  <path d="M500.73,436 C500.73,466 496.73,466 496.73,496" class="edge" stroke-width="2.13" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>categories → shared: 2 dependencies</title></path>
+  <path d="M737.3,228 C737.3,269 667.39,269 667.39,310 C667.39,362 599.23,362 599.23,414 C599.23,455 532.73,455 532.73,496" class="edge" stroke-width="1.87" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>config → shared: 1 dependency</title></path>
+  <path d="M725.3,228 C725.3,258 627.23,258 627.23,288" class="edge" stroke-width="2.5" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>config → users: 4 dependencies</title></path>
+  <path d="M613.2,228 C613.2,258 615.23,258 615.23,288" class="edge" stroke-width="1.87" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>home → users: 1 dependency</title></path>
+  <path d="M557.44,124 C557.44,154 445.98,154 445.98,184" class="edge" stroke-width="2.9" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>live → tickets: 7 dependencies</title></path>
+  <path d="M569.44,124 C569.44,165 532.15,165 532.15,206 C532.15,247 591.23,247 591.23,288" class="edge" stroke-width="2.33" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>live → users: 3 dependencies</title></path>
+  <path d="M714.58,124 C714.58,165 896.55,165 896.55,206 C896.55,258 886.75,258 886.75,310 C886.75,362 886.75,362 886.75,414 C886.75,455 886.75,455 886.75,496" class="edge" stroke-width="1.87" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>notifications → shared.email: 1 dependency</title></path>
+  <path d="M690.58,124 C690.58,154 457.98,154 457.98,184" class="edge" stroke-width="3.02" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>notifications → tickets: 8 dependencies</title></path>
+  <path d="M702.58,124 C702.58,165 540.15,165 540.15,206 C540.15,247 603.23,247 603.23,288" class="edge" stroke-width="2.13" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>notifications → users: 2 dependencies</title></path>
+  <path d="M427.98,228 C427.98,269 473.81,269 473.81,310 C473.81,351 500.73,351 500.73,392" class="edge" stroke-width="3.02" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>tickets → categories: 8 dependencies</title></path>
+  <path d="M439.98,228 C439.98,269 515.06,269 515.06,310 C515.06,362 583.23,362 583.23,414 C583.23,455 508.73,455 508.73,496" class="edge" stroke-width="2.5" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>tickets → shared: 4 dependencies</title></path>
+  <path d="M451.98,228 C451.98,258 555.23,258 555.23,288" class="edge" stroke-width="3.5" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>tickets → users: 13 dependencies</title></path>
+  <path d="M585.23,332 C585.23,362 512.73,362 512.73,392" class="edge" stroke-width="2.78" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>users → categories: 6 dependencies</title></path>
+  <path d="M597.23,332 C597.23,373 591.23,373 591.23,414 C591.23,455 520.73,455 520.73,496" class="edge" stroke-width="2.33" stroke-linecap="round" marker-end="url(#edge-arrow)"><title>users → shared: 3 dependencies</title></path>
   <g class="package" data-zone="isolated">
     <title>dev.sivalabs.helpdesk: 2 classes, Ca 0, Ce 0</title>
-    <rect x="159.78" y="496" width="197.5" height="44" rx="8" class="node" filter="url(#shadow)"/>
-    <circle cx="174.78" cy="511" r="4.5" class="isolated"/>
-    <text x="185.78" y="515" class="ink" font-size="12.5" font-weight="600">dev.sivalabs.helpdesk</text>
-    <text x="185.78" y="530" class="muted" font-size="11">2 classes</text>
+    <rect x="29.05" y="496" width="197.5" height="44" rx="8" class="node" filter="url(#shadow)"/>
+    <circle cx="44.05" cy="511" r="4.5" class="isolated"/>
+    <text x="55.05" y="515" class="ink" font-size="12.5" font-weight="600">dev.sivalabs.helpdesk</text>
+    <text x="55.05" y="530" class="muted" font-size="11">2 classes</text>
   </g>
   <g class="package" data-zone="balanced">
     <title>analytics: 1 class, Ca 0, Ce 1</title>
-    <rect x="318.13" y="80" width="107.5" height="44" rx="8" class="node" filter="url(#shadow)"/>
-    <circle cx="333.13" cy="95" r="4.5" class="balanced"/>
-    <text x="344.13" y="99" class="ink" font-size="12.5" font-weight="600">analytics</text>
-    <text x="344.13" y="114" class="muted" font-size="11">1 class</text>
+    <rect x="385.89" y="80" width="107.5" height="44" rx="8" class="node" filter="url(#shadow)"/>
+    <circle cx="400.89" cy="95" r="4.5" class="balanced"/>
+    <text x="411.89" y="99" class="ink" font-size="12.5" font-weight="600">analytics</text>
+    <text x="411.89" y="114" class="muted" font-size="11">1 class</text>
   </g>
   <g class="package" data-zone="balanced">
     <title>assistant: 10 classes, Ca 0, Ce 4</title>
-    <rect x="451.73" y="80" width="107.5" height="44" rx="8" class="node" filter="url(#shadow)"/>
-    <circle cx="466.73" cy="95" r="4.5" class="balanced"/>
-    <text x="477.73" y="99" class="ink" font-size="12.5" font-weight="600">assistant</text>
-    <text x="477.73" y="114" class="muted" font-size="11">10 classes</text>
+    <rect x="256.39" y="80" width="107.5" height="44" rx="8" class="node" filter="url(#shadow)"/>
+    <circle cx="271.39" cy="95" r="4.5" class="balanced"/>
+    <text x="282.39" y="99" class="ink" font-size="12.5" font-weight="600">assistant</text>
+    <text x="282.39" y="114" class="muted" font-size="11">10 classes</text>
   </g>
   <g class="package" data-zone="pain">
     <title>categories: 8 classes, Ca 9, Ce 2</title>
-    <rect x="369.84" y="392" width="115" height="44" rx="8" class="node" filter="url(#shadow)"/>
-    <circle cx="384.84" cy="407" r="4.5" class="pain"/>
-    <text x="395.84" y="411" class="ink" font-size="12.5" font-weight="600">categories</text>
-    <text x="395.84" y="426" class="muted" font-size="11">8 classes</text>
+    <rect x="443.23" y="392" width="115" height="44" rx="8" class="node" filter="url(#shadow)"/>
+    <circle cx="458.23" cy="407" r="4.5" class="pain"/>
+    <text x="469.23" y="411" class="ink" font-size="12.5" font-weight="600">categories</text>
+    <text x="469.23" y="426" class="muted" font-size="11">8 classes</text>
   </g>
   <g class="package" data-zone="balanced">
     <title>config: 9 classes, Ca 0, Ce 3</title>
-    <rect x="213.86" y="184" width="96.1" height="44" rx="8" class="node" filter="url(#shadow)"/>
-    <circle cx="228.86" cy="199" r="4.5" class="balanced"/>
-    <text x="239.86" y="203" class="ink" font-size="12.5" font-weight="600">config</text>
-    <text x="239.86" y="218" class="muted" font-size="11">9 classes</text>
+    <rect x="683.25" y="184" width="96.1" height="44" rx="8" class="node" filter="url(#shadow)"/>
+    <circle cx="698.25" cy="199" r="4.5" class="balanced"/>
+    <text x="709.25" y="203" class="ink" font-size="12.5" font-weight="600">config</text>
+    <text x="709.25" y="218" class="muted" font-size="11">9 classes</text>
   </g>
   <g class="package" data-zone="balanced">
     <title>home: 2 classes, Ca 0, Ce 1</title>
-    <rect x="492.29" y="184" width="96.1" height="44" rx="8" class="node" filter="url(#shadow)"/>
-    <circle cx="507.29" cy="199" r="4.5" class="balanced"/>
-    <text x="518.29" y="203" class="ink" font-size="12.5" font-weight="600">home</text>
-    <text x="518.29" y="218" class="muted" font-size="11">2 classes</text>
+    <rect x="565.15" y="184" width="96.1" height="44" rx="8" class="node" filter="url(#shadow)"/>
+    <circle cx="580.15" cy="199" r="4.5" class="balanced"/>
+    <text x="591.15" y="203" class="ink" font-size="12.5" font-weight="600">home</text>
+    <text x="591.15" y="218" class="muted" font-size="11">2 classes</text>
   </g>
   <g class="package" data-zone="pain">
     <title>knowledgebase: 5 classes, Ca 1, Ce 0</title>
-    <rect x="531.52" y="496" width="137.5" height="44" rx="8" class="node" filter="url(#shadow)"/>
-    <circle cx="546.52" cy="511" r="4.5" class="pain"/>
-    <text x="557.52" y="515" class="ink" font-size="12.5" font-weight="600">knowledgebase</text>
-    <text x="557.52" y="530" class="muted" font-size="11">5 classes</text>
+    <rect x="248.55" y="496" width="137.5" height="44" rx="8" class="node" filter="url(#shadow)"/>
+    <circle cx="263.55" cy="511" r="4.5" class="pain"/>
+    <text x="274.55" y="515" class="ink" font-size="12.5" font-weight="600">knowledgebase</text>
+    <text x="274.55" y="530" class="muted" font-size="11">5 classes</text>
+  </g>
+  <g class="package" data-zone="balanced">
+    <title>live: 5 classes, Ca 0, Ce 3</title>
+    <rect x="515.39" y="80" width="96.1" height="44" rx="8" class="node" filter="url(#shadow)"/>
+    <circle cx="530.39" cy="95" r="4.5" class="balanced"/>
+    <text x="541.39" y="99" class="ink" font-size="12.5" font-weight="600">live</text>
+    <text x="541.39" y="114" class="muted" font-size="11">5 classes</text>
   </g>
   <g class="package" data-zone="balanced">
     <title>notifications: 3 classes, Ca 0, Ce 1</title>
-    <rect x="581.23" y="80" width="137.5" height="44" rx="8" class="node" filter="url(#shadow)"/>
-    <circle cx="596.23" cy="95" r="4.5" class="balanced"/>
-    <text x="607.23" y="99" class="ink" font-size="12.5" font-weight="600">notifications</text>
-    <text x="607.23" y="114" class="muted" font-size="11">3 classes</text>
+    <rect x="633.83" y="80" width="137.5" height="44" rx="8" class="node" filter="url(#shadow)"/>
+    <circle cx="648.83" cy="95" r="4.5" class="balanced"/>
+    <text x="659.83" y="99" class="ink" font-size="12.5" font-weight="600">notifications</text>
+    <text x="659.83" y="114" class="muted" font-size="11">3 classes</text>
   </g>
   <g class="package" data-zone="pain">
     <title>shared: 3 classes, Ca 11, Ce 0</title>
-    <rect x="379.29" y="496" width="96.1" height="44" rx="8" class="node" filter="url(#shadow)"/>
-    <circle cx="394.29" cy="511" r="4.5" class="pain"/>
-    <text x="405.29" y="515" class="ink" font-size="12.5" font-weight="600">shared</text>
-    <text x="405.29" y="530" class="muted" font-size="11">3 classes</text>
+    <rect x="460.68" y="496" width="96.1" height="44" rx="8" class="node" filter="url(#shadow)"/>
+    <circle cx="475.68" cy="511" r="4.5" class="pain"/>
+    <text x="486.68" y="515" class="ink" font-size="12.5" font-weight="600">shared</text>
+    <text x="486.68" y="530" class="muted" font-size="11">3 classes</text>
   </g>
   <g class="package" data-zone="pain">
     <title>shared.email: 1 class, Ca 1, Ce 0</title>
-    <rect x="691.02" y="496" width="130" height="44" rx="8" class="node" filter="url(#shadow)"/>
-    <circle cx="706.02" cy="511" r="4.5" class="pain"/>
-    <text x="717.02" y="515" class="ink" font-size="12.5" font-weight="600">shared.email</text>
-    <text x="717.02" y="530" class="muted" font-size="11">1 class</text>
+    <rect x="821.75" y="496" width="130" height="44" rx="8" class="node" filter="url(#shadow)"/>
+    <circle cx="836.75" cy="511" r="4.5" class="pain"/>
+    <text x="847.75" y="515" class="ink" font-size="12.5" font-weight="600">shared.email</text>
+    <text x="847.75" y="530" class="muted" font-size="11">1 class</text>
   </g>
   <g class="package" data-zone="balanced">
-    <title>tickets: 45 classes, Ca 5, Ce 7</title>
-    <rect x="331.96" y="184" width="102.33" height="44" rx="8" class="node" filter="url(#shadow)"/>
-    <circle cx="346.96" cy="199" r="4.5" class="balanced"/>
-    <text x="357.96" y="203" class="ink" font-size="12.5" font-weight="600">tickets</text>
-    <text x="357.96" y="218" class="muted" font-size="11">45 classes</text>
+    <title>tickets: 45 classes, Ca 6, Ce 7</title>
+    <rect x="388.82" y="184" width="102.33" height="44" rx="8" class="node" filter="url(#shadow)"/>
+    <circle cx="403.82" cy="199" r="4.5" class="balanced"/>
+    <text x="414.82" y="203" class="ink" font-size="12.5" font-weight="600">tickets</text>
+    <text x="414.82" y="218" class="muted" font-size="11">45 classes</text>
   </g>
   <g class="package" data-zone="pain">
-    <title>users: 27 classes, Ca 11, Ce 4</title>
-    <rect x="425.42" y="288" width="102.33" height="44" rx="8" class="node" filter="url(#shadow)"/>
-    <circle cx="440.42" cy="303" r="4.5" class="pain"/>
-    <text x="451.42" y="307" class="ink" font-size="12.5" font-weight="600">users</text>
-    <text x="451.42" y="322" class="muted" font-size="11">27 classes</text>
+    <title>users: 27 classes, Ca 13, Ce 4</title>
+    <rect x="540.06" y="288" width="102.33" height="44" rx="8" class="node" filter="url(#shadow)"/>
+    <circle cx="555.06" cy="303" r="4.5" class="pain"/>
+    <text x="566.06" y="307" class="ink" font-size="12.5" font-weight="600">users</text>
+    <text x="566.06" y="322" class="muted" font-size="11">27 classes</text>
   </g>
 </svg>

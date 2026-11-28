@@ -26,7 +26,7 @@ Administrators oversee the whole process and use analytics to monitor support pe
 | Messaging        | RabbitMQ                                        |
 | Email            | JavaMail, Mailpit                               |
 | Observability    | BootUI, OpenTelemetry, Grafana LGTM, Prometheus         |
-| UI               | Thymeleaf, Shadleaf                     |
+| UI               | Thymeleaf, Shadleaf, Server-Sent Events (live updates) |
 | Build & Testing  | Maven, JUnit, Testcontainers, ArchUnit, Taikai  |
 | DevOps & Tooling | Docker, Docker Compose, Mise, Renovate, GitHub Actions |
 

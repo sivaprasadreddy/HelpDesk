@@ -3,12 +3,15 @@ package dev.sivalabs.helpdesk.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.savedrequest.NullRequestCache;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 @Configuration
@@ -44,11 +47,25 @@ class WebSecurityConfig {
     }
 
     /**
+     * The live updates stream ({@code /live/**}) uses the signed-in session like the pages do, but answers 401 instead
+     * of redirecting to the login page, and is never remembered as the page to return to after signing in.
+     */
+    @Bean
+    @Order(2)
+    SecurityFilterChain liveUpdatesSecurityFilterChain(HttpSecurity http) {
+        http.securityMatcher("/live/**")
+                .authorizeHttpRequests(r -> r.anyRequest().authenticated())
+                .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                .requestCache(c -> c.requestCache(new NullRequestCache()));
+        return http.build();
+    }
+
+    /**
      * Coarse URL rules: whole areas that only ADMIN may enter. Per-ticket rules ("assigned", "own")
      * need the ticket, so they are checked with {@link dev.sivalabs.helpdesk.users.AccessPolicy}.
      */
     @Bean
-    @Order(2)
+    @Order(3)
     SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http.authorizeHttpRequests(r -> r.requestMatchers(PUBLIC_RESOURCES)
                 .permitAll()

@@ -7,6 +7,7 @@
     <sl:breadcrumb-item><sl:breadcrumb-page th:text="${pageTitle}">My Tickets</sl:breadcrumb-page></sl:breadcrumb-item>
 </th:block>
 <div id="page-content" class="stack">
+<div id="ticket-results" class="stack" data-live-region>
     <th:block th:if="${totalCount == 0}">
         <sl:empty border>
             <sl:empty-header>
@@ -109,6 +110,7 @@
             <sl:pagination th:page="${tickets}" aria-label="Ticket pages"/>
         </div>
     </th:block>
+</div>
 </div>
 </body>
 </html>
