@@ -1,4 +1,4 @@
-package dev.sivalabs.helpdesk.users;
+package dev.sivalabs.helpdesk.staff;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -18,10 +18,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 @WithMockUser(roles = "ADMIN")
 class StaffControllerTests extends BaseIT {
     @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    UserService userService;
+    StaffService staffService;
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -35,9 +32,57 @@ class StaffControllerTests extends BaseIT {
     }
 
     Long createStaff(String email) {
-        userService.createUser(
-                new CreateUserCmd("Bob Staff", email, "secret123", Role.ROLE_STAFF, null, "9876543210", null));
-        return userRepository.findByEmailIgnoreCase(email).orElseThrow().getId();
+        staffService.createStaffMember(new CreateStaffCmd("Bob Staff", email, "secret123", "9876543210", null));
+        return jdbcTemplate.queryForObject("select id from users where email = ?", Long.class, email);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/admin/staff", "/admin/staff/new"})
+    void shouldRenderStaffPages(String uri) {
+        assertThat(mvc.get().uri(uri)).hasStatusOk();
+    }
+
+    @Test
+    void shouldCreateStaffMember() {
+        var result = mvc.post()
+                .uri("/admin/staff")
+                .with(csrf())
+                .param("name", "Bob Plumber")
+                .param("email", "Bob@Example.com")
+                .param("password", "secret123")
+                .param("flatNumber", "Z-999")
+                .param("mobile", "+919876543210")
+                .param("permanentAddress", "");
+
+        assertThat(result).hasStatus3xxRedirection().hasRedirectedUrl("/admin/staff");
+        var user = jdbcTemplate.queryForMap("select id, role from users where email = ?", "bob@example.com");
+        assertThat(user).containsEntry("role", "ROLE_STAFF");
+        assertThat(jdbcTemplate.queryForMap(
+                        "select mobile, permanent_address from staff_profiles where user_id = ?", user.get("id")))
+                .containsEntry("mobile", "+919876543210")
+                .containsEntry("permanent_address", null);
+        assertThat(jdbcTemplate.queryForObject(
+                        "select count(*) from resident_profiles where user_id = ?", Integer.class, user.get("id")))
+                .isZero();
+        assertThat(mvc.get().uri("/admin/staff")).bodyText().contains("Bob Plumber");
+        assertThat(mvc.get().uri("/admin/residents")).bodyText().doesNotContain("Bob Plumber");
+    }
+
+    @Test
+    void shouldShowCreateValidationErrors() {
+        var result = mvc.post()
+                .uri("/admin/staff")
+                .with(csrf())
+                .param("name", "")
+                .param("email", "not-an-email")
+                .param("password", "short");
+
+        assertThat(result).hasStatusOk();
+        assertThat(result)
+                .bodyText()
+                .contains("Name is required")
+                .contains("Enter a valid email address")
+                .contains("Password must be at least 8 characters");
     }
 
     @Test
@@ -68,12 +113,10 @@ class StaffControllerTests extends BaseIT {
                 .param("categoryIds", "1", "2");
 
         assertThat(result).hasStatus3xxRedirection().hasRedirectedUrl("/admin/staff");
-        tx.executeWithoutResult(s -> {
-            var user = userRepository.findById(id).orElseThrow();
-            assertThat(user.getName()).isEqualTo("Bob Plumber");
-            assertThat(user.getEmail()).isEqualTo("bob.p@example.com");
-            assertThat(user.getCategoryIds()).containsExactlyInAnyOrder(1L, 2L);
-        });
+        var staff = staffService.getStaffMember(id);
+        assertThat(staff.name()).isEqualTo("Bob Plumber");
+        assertThat(staff.email()).isEqualTo("bob.p@example.com");
+        assertThat(staff.categoryIds()).containsExactlyInAnyOrder(1L, 2L);
         assertThat(jdbcTemplate.queryForMap(
                         "select mobile, permanent_address from staff_profiles where user_id = ?", id))
                 .containsEntry("mobile", "9123456780")
@@ -147,14 +190,14 @@ class StaffControllerTests extends BaseIT {
 
         assertThat(mvc.post().uri("/admin/staff/{id}/deactivate", id).with(csrf()))
                 .hasRedirectedUrl("/admin/staff");
-        assertThat(userRepository.findById(id).orElseThrow().isActive()).isFalse();
+        assertThat(staffService.getStaffMember(id).active()).isFalse();
         assertThat(mvc.get().uri("/admin/staff"))
                 .bodyText()
                 .contains("Inactive")
                 .contains("Activate");
 
         mvc.post().uri("/admin/staff/{id}/activate", id).with(csrf()).exchange();
-        assertThat(userRepository.findById(id).orElseThrow().isActive()).isTrue();
+        assertThat(staffService.getStaffMember(id).active()).isTrue();
     }
 
     @Test

@@ -2,8 +2,6 @@ package dev.sivalabs.helpdesk.users;
 
 import dev.sivalabs.helpdesk.shared.BaseEntity;
 import jakarta.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -29,12 +27,6 @@ class UserEntity extends BaseEntity {
 
     @Column(nullable = false)
     private boolean active = true;
-
-    /** Ids of the categories a staff member handles (staff_categories). */
-    @ElementCollection
-    @CollectionTable(name = "staff_categories", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "category_id")
-    private Set<Long> categoryIds = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -82,14 +74,5 @@ class UserEntity extends BaseEntity {
 
     public void setActive(boolean active) {
         this.active = active;
-    }
-
-    public Set<Long> getCategoryIds() {
-        return categoryIds;
-    }
-
-    public void setCategoryIds(Set<Long> categoryIds) {
-        this.categoryIds.clear();
-        this.categoryIds.addAll(categoryIds);
     }
 }

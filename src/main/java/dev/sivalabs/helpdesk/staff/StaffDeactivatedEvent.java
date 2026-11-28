@@ -1,4 +1,4 @@
-package dev.sivalabs.helpdesk.users;
+package dev.sivalabs.helpdesk.staff;
 
 /**
  * Published in-process, within the deactivating transaction, when an active staff member is deactivated, so their open

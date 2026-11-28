@@ -1,36 +1,34 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sl="https://shadleaf.dev/sl"
-      th:replace="~{layout/main :: layout(${type.title}, ~{::breadcrumb}, ~{::#page-content})}">
+      th:replace="~{layout/main :: layout('Staff', ~{::breadcrumb}, ~{::#page-content})}">
 <body>
 <th:block th:ref="breadcrumb">
     <sl:breadcrumb-item><sl:breadcrumb-link th:href="@{/home}">Home</sl:breadcrumb-link></sl:breadcrumb-item>
     <sl:breadcrumb-separator/>
-    <sl:breadcrumb-item><sl:breadcrumb-page th:text="${type.title}">Residents</sl:breadcrumb-page></sl:breadcrumb-item>
+    <sl:breadcrumb-item><sl:breadcrumb-page>Staff</sl:breadcrumb-page></sl:breadcrumb-item>
 </th:block>
-<div id="page-content" class="stack" th:with="isStaff=${type.path == 'staff'}">
+<div id="page-content" class="stack">
     <div class="toolbar">
-        <sl:button as="a" th:href="@{/admin/{p}/new(p=${type.path})}">
+        <sl:button as="a" th:href="@{/admin/staff/new}">
             <sl:slot name="icon-start"><sl:icon name="plus"/></sl:slot>
-            <span th:text="|Add ${type.singular}|">Add Resident</span>
+            <span>Add Staff member</span>
         </sl:button>
     </div>
-    <sl:table th:unless="${users.isEmpty()}">
+    <sl:table th:unless="${staffMembers.isEmpty()}">
         <thead>
         <tr>
             <th>Name</th><th>Email</th>
-            <th th:unless="${isStaff}">Flat</th>
             <th>Mobile</th>
-            <th th:if="${isStaff}">Categories</th>
+            <th>Categories</th>
             <th>Status</th><th>Created</th>
-            <sl:table-head th:if="${isStaff}" align="end">Actions</sl:table-head>
+            <sl:table-head align="end">Actions</sl:table-head>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="u : ${users}">
+        <tr th:each="u : ${staffMembers}">
             <td th:text="${u.name}">Jane Doe</td>
             <td th:text="${u.email}">jane@example.com</td>
-            <td th:unless="${isStaff}" th:text="${u.flatNumber ?: '-'}">A-101</td>
             <td th:text="${u.mobile ?: '-'}">9876543210</td>
-            <td th:if="${isStaff}">
+            <td>
                 <div class="badge-list">
                     <th:block th:each="cid : ${u.categoryIds}" th:with="catName=${categoryNames.get(cid)}"><sl:badge variant="outline">[[${catName}]]</sl:badge></th:block>
                     <span th:if="${u.categoryIds.isEmpty()}" class="muted">None</span>
@@ -41,7 +39,7 @@
                 <sl:badge th:unless="${u.active}" variant="outline">Inactive</sl:badge>
             </td>
             <td th:text="${#temporals.format(u.createdAt, 'dd MMM yyyy', T(java.time.ZoneId).systemDefault())}">01 Jan 2026</td>
-            <td th:if="${isStaff}" data-align="end">
+            <td data-align="end">
                 <div class="row-actions">
                     <sl:button as="a" th:href="@{/admin/staff/{id}/edit(id=${u.id})}" variant="outline" size="sm">Edit</sl:button>
                     <form th:if="${u.active}" method="post" th:action="@{/admin/staff/{id}/deactivate(id=${u.id})}">
@@ -55,10 +53,10 @@
         </tr>
         </tbody>
     </sl:table>
-    <sl:empty th:if="${users.isEmpty()}">
+    <sl:empty th:if="${staffMembers.isEmpty()}">
         <sl:empty-header>
             <sl:empty-media variant="icon"><sl:icon name="users"/></sl:empty-media>
-            <sl:empty-title level="2" th:text="|No ${type.title.toLowerCase()} yet|">No residents yet</sl:empty-title>
+            <sl:empty-title level="2">No staff yet</sl:empty-title>
         </sl:empty-header>
     </sl:empty>
 </div>

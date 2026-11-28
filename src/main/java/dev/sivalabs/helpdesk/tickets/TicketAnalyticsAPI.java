@@ -1,7 +1,7 @@
 package dev.sivalabs.helpdesk.tickets;
 
 import dev.sivalabs.helpdesk.categories.CategoryAPI;
-import dev.sivalabs.helpdesk.users.UserAPI;
+import dev.sivalabs.helpdesk.staff.StaffAPI;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -23,12 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class TicketAnalyticsAPI {
     private final TicketRepository ticketRepository;
     private final CategoryAPI categoryAPI;
-    private final UserAPI userAPI;
+    private final StaffAPI staffAPI;
 
-    TicketAnalyticsAPI(TicketRepository ticketRepository, CategoryAPI categoryAPI, UserAPI userAPI) {
+    TicketAnalyticsAPI(TicketRepository ticketRepository, CategoryAPI categoryAPI, StaffAPI staffAPI) {
         this.ticketRepository = ticketRepository;
         this.categoryAPI = categoryAPI;
-        this.userAPI = userAPI;
+        this.staffAPI = staffAPI;
     }
 
     /**
@@ -133,7 +133,7 @@ public class TicketAnalyticsAPI {
         var resolved = ticketRepository.findResolutionsBetween(startOf(from), startOf(to.plusDays(1))).stream()
                 .filter(r -> r.getAssignedTo() != null)
                 .collect(Collectors.groupingBy(TicketRepository.Resolution::getAssignedTo));
-        return userAPI.findStaffMembers().stream()
+        return staffAPI.findStaffMembers().stream()
                 .map(u -> {
                     var open = count(counts, u.id(), TicketStatus.OPEN);
                     var inProgress = count(counts, u.id(), TicketStatus.IN_PROGRESS);

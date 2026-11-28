@@ -1,17 +1,17 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sl="https://shadleaf.dev/sl"
-      th:replace="~{layout/main :: layout(|Add ${type.singular}|, ~{::breadcrumb}, ~{::#page-content})}">
+      th:replace="~{layout/main :: layout('Add Resident', ~{::breadcrumb}, ~{::#page-content})}">
 <body>
 <th:block th:ref="breadcrumb">
     <sl:breadcrumb-item><sl:breadcrumb-link th:href="@{/home}">Home</sl:breadcrumb-link></sl:breadcrumb-item>
     <sl:breadcrumb-separator/>
-    <sl:breadcrumb-item><sl:breadcrumb-link th:href="@{/admin/{p}(p=${type.path})}" th:text="${type.title}">Residents</sl:breadcrumb-link></sl:breadcrumb-item>
+    <sl:breadcrumb-item><sl:breadcrumb-link th:href="@{/admin/residents}">Residents</sl:breadcrumb-link></sl:breadcrumb-item>
     <sl:breadcrumb-separator/>
     <sl:breadcrumb-item><sl:breadcrumb-page>Add</sl:breadcrumb-page></sl:breadcrumb-item>
 </th:block>
 <div id="page-content" class="form-card">
     <sl:card>
         <sl:card-content>
-            <form th:object="${user}" th:action="@{/admin/{p}(p=${type.path})}" method="post" novalidate class="form-stack">
+            <form th:object="${resident}" th:action="@{/admin/residents}" method="post" novalidate class="form-stack">
                 <sl:form-errors/>
                 <sl:field th:field="*{name}">
                     <sl:field-label>Name</sl:field-label>
@@ -29,7 +29,7 @@
                     <sl:field-description>At least 8 characters.</sl:field-description>
                     <sl:field-error/>
                 </sl:field>
-                <sl:field th:if="${type.path == 'residents'}" th:field="*{flatNumber}">
+                <sl:field th:field="*{flatNumber}">
                     <sl:field-label>Flat number</sl:field-label>
                     <sl:input autocomplete="off" placeholder="e.g. A-101"/>
                     <sl:field-error/>
@@ -46,8 +46,8 @@
                     <sl:field-error/>
                 </sl:field>
                 <div class="toolbar">
-                    <sl:button as="a" th:href="@{/admin/{p}(p=${type.path})}" variant="outline">Cancel</sl:button>
-                    <sl:button type="submit" th:text="|Create ${type.singular}|">Create</sl:button>
+                    <sl:button as="a" th:href="@{/admin/residents}" variant="outline">Cancel</sl:button>
+                    <sl:button type="submit">Create Resident</sl:button>
                 </div>
             </form>
         </sl:card-content>

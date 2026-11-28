@@ -1,4 +1,4 @@
-package dev.sivalabs.helpdesk.users;
+package dev.sivalabs.helpdesk.staff;
 
 class InvalidCategoryException extends RuntimeException {
     InvalidCategoryException() {

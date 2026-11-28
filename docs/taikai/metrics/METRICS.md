@@ -8,11 +8,11 @@ The metrics of `dev.sivalabs.helpdesk`, measured by Taikai. Every package counts
 
 | Metric | Value |
 | --- | ---: |
-| Packages | 12 |
-| Classes | 116 |
+| Packages | 14 |
+| Classes | 125 |
 | Abstract classes and interfaces | 9 |
-| Average distance from the main sequence | 0.39 |
-| Packages in the zone of pain | 5 |
+| Average distance from the main sequence | 0.40 |
+| Packages in the zone of pain | 6 |
 | Packages in the zone of uselessness | 0 |
 | Package cycles | 0 |
 | Dependencies on less stable packages | 0 |
@@ -49,15 +49,17 @@ Each tile is a package: its area is its number of classes and its color its zone
 | [`dev.sivalabs.helpdesk`](../../../src/main/java/dev/sivalabs/helpdesk) | 2 | 0 | 0 | 0 | - | 0.00 | - | 1.00 | 1 |  |
 | [`analytics`](../../../src/main/java/dev/sivalabs/helpdesk/analytics) | 1 | 0 | 0 | 1 | 1.00 | 0.00 | 0.00 | 0.00 | 2 |  |
 | [`assistant`](../../../src/main/java/dev/sivalabs/helpdesk/assistant) | 10 | 0 | 0 | 4 | 1.00 | 0.00 | 0.00 | 0.30 | 4 |  |
-| [`categories`](../../../src/main/java/dev/sivalabs/helpdesk/categories) | 8 | 1 | 9 | 2 | 0.18 | 0.13 | 0.69 | 0.50 | 4 | pain |
+| [`categories`](../../../src/main/java/dev/sivalabs/helpdesk/categories) | 8 | 1 | 8 | 2 | 0.20 | 0.13 | 0.68 | 0.50 | 4 | pain |
 | [`config`](../../../src/main/java/dev/sivalabs/helpdesk/config) | 9 | 0 | 0 | 3 | 1.00 | 0.00 | 0.00 | 0.22 | 5 |  |
 | [`home`](../../../src/main/java/dev/sivalabs/helpdesk/home) | 2 | 0 | 0 | 1 | 1.00 | 0.00 | 0.00 | 0.00 | 1 |  |
 | [`knowledgebase`](../../../src/main/java/dev/sivalabs/helpdesk/knowledgebase) | 5 | 0 | 1 | 0 | 0.00 | 0.00 | 1.00 | 0.40 | 2 | pain |
 | [`notifications`](../../../src/main/java/dev/sivalabs/helpdesk/notifications) | 3 | 0 | 0 | 1 | 1.00 | 0.00 | 0.00 | 0.00 | 3 |  |
-| [`shared`](../../../src/main/java/dev/sivalabs/helpdesk/shared) | 3 | 1 | 11 | 0 | 0.00 | 0.33 | 0.67 | 1.00 | 2 | pain |
+| [`residents`](../../../src/main/java/dev/sivalabs/helpdesk/residents) | 7 | 1 | 0 | 2 | 1.00 | 0.14 | 0.14 | 0.00 | 3 |  |
+| [`shared`](../../../src/main/java/dev/sivalabs/helpdesk/shared) | 3 | 1 | 10 | 0 | 0.00 | 0.33 | 0.67 | 1.00 | 2 | pain |
 | [`shared.email`](../../../src/main/java/dev/sivalabs/helpdesk/shared/email) | 1 | 0 | 1 | 0 | 0.00 | 0.00 | 1.00 | 1.00 | 1 | pain |
+| [`staff`](../../../src/main/java/dev/sivalabs/helpdesk/staff) | 13 | 1 | 3 | 2 | 0.40 | 0.08 | 0.52 | 0.23 | 4 | pain |
 | [`tickets`](../../../src/main/java/dev/sivalabs/helpdesk/tickets) | 45 | 4 | 5 | 7 | 0.58 | 0.09 | 0.33 | 0.51 | 4 |  |
-| [`users`](../../../src/main/java/dev/sivalabs/helpdesk/users) | 27 | 3 | 11 | 4 | 0.27 | 0.11 | 0.62 | 0.33 | 4 | pain |
+| [`users`](../../../src/main/java/dev/sivalabs/helpdesk/users) | 16 | 1 | 14 | 1 | 0.07 | 0.06 | 0.87 | 0.69 | 3 | pain |
 
 Visibility is the relative visibility of Herbert Dowalil, the share of public classes, and Libraries the number of libraries that the package uses.
 
@@ -91,10 +93,10 @@ A row is a package, numbered as in the dependency matrix, and a column a library
 
 | Library | Packages | Classes |
 | --- | ---: | ---: |
-| `org.springframework` | 12 | 54 |
-| `org.slf4j` | 8 | 13 |
-| `jakarta.validation` | 4 | 12 |
-| `jakarta.persistence` | 4 | 9 |
+| `org.springframework` | 14 | 58 |
+| `org.slf4j` | 9 | 14 |
+| `jakarta.validation` | 5 | 13 |
+| `jakarta.persistence` | 6 | 9 |
 | `jakarta.servlet` | 1 | 2 |
 | `io.github` | 1 | 1 |
 | `io.opentelemetry` | 1 | 1 |
@@ -135,29 +137,29 @@ The fan-in of a class counts the classes that depend on it, its fan-out the clas
 | --- | ---: |
 | [`tickets.TicketPriority`](../../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketPriority.java) | 18 |
 | [`tickets.TicketStatus`](../../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketStatus.java) | 13 |
-| [`categories.CategoryDto`](../../../src/main/java/dev/sivalabs/helpdesk/categories/CategoryDto.java) | 11 |
-| [`users.Role`](../../../src/main/java/dev/sivalabs/helpdesk/users/Role.java) | 10 |
-| [`categories.CategoryAPI`](../../../src/main/java/dev/sivalabs/helpdesk/categories/CategoryAPI.java) | 9 |
+| [`users.Role`](../../../src/main/java/dev/sivalabs/helpdesk/users/Role.java) | 11 |
+| [`categories.CategoryDto`](../../../src/main/java/dev/sivalabs/helpdesk/categories/CategoryDto.java) | 10 |
 | [`tickets.TicketSnapshot`](../../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketSnapshot.java) | 9 |
+| [`categories.CategoryAPI`](../../../src/main/java/dev/sivalabs/helpdesk/categories/CategoryAPI.java) | 8 |
 | [`tickets.TicketEvent`](../../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketEvent.java) | 8 |
 | [`users.SecurityUser`](../../../src/main/java/dev/sivalabs/helpdesk/users/SecurityUser.java) | 8 |
 | [`assistant.TicketDraft`](../../../src/main/java/dev/sivalabs/helpdesk/assistant/TicketDraft.java) | 6 |
-| [`shared.ResourceNotFoundException`](../../../src/main/java/dev/sivalabs/helpdesk/shared/ResourceNotFoundException.java) | 6 |
+| [`staff.StaffDto`](../../../src/main/java/dev/sivalabs/helpdesk/staff/StaffDto.java) | 6 |
 
 ### Classes with the Most Dependencies
 
 | Class | Fan-out |
 | --- | ---: |
-| [`tickets.TicketService`](../../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketService.java) | 36 |
-| [`tickets.TicketController`](../../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketController.java) | 23 |
-| [`users.UserService`](../../../src/main/java/dev/sivalabs/helpdesk/users/UserService.java) | 18 |
+| [`tickets.TicketService`](../../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketService.java) | 37 |
+| [`tickets.TicketController`](../../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketController.java) | 24 |
+| [`staff.StaffService`](../../../src/main/java/dev/sivalabs/helpdesk/staff/StaffService.java) | 16 |
 | [`tickets.TicketMcpTools`](../../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketMcpTools.java) | 14 |
 | [`notifications.TicketNotificationListener`](../../../src/main/java/dev/sivalabs/helpdesk/notifications/TicketNotificationListener.java) | 12 |
 | [`tickets.TicketAnalyticsAPI`](../../../src/main/java/dev/sivalabs/helpdesk/tickets/TicketAnalyticsAPI.java) | 12 |
 | [`assistant.AssistantService`](../../../src/main/java/dev/sivalabs/helpdesk/assistant/AssistantService.java) | 11 |
+| [`staff.StaffController`](../../../src/main/java/dev/sivalabs/helpdesk/staff/StaffController.java) | 10 |
 | [`analytics.AnalyticsController`](../../../src/main/java/dev/sivalabs/helpdesk/analytics/AnalyticsController.java) | 9 |
-| [`assistant.AssistantController`](../../../src/main/java/dev/sivalabs/helpdesk/assistant/AssistantController.java) | 8 |
-| [`users.StaffController`](../../../src/main/java/dev/sivalabs/helpdesk/users/StaffController.java) | 8 |
+| [`residents.ResidentService`](../../../src/main/java/dev/sivalabs/helpdesk/residents/ResidentService.java) | 9 |
 
 ## Cohesion
 

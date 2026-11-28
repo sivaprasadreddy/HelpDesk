@@ -3,10 +3,11 @@ package dev.sivalabs.helpdesk.tickets;
 import dev.sivalabs.helpdesk.categories.CategoryAPI;
 import dev.sivalabs.helpdesk.categories.CategoryDto;
 import dev.sivalabs.helpdesk.shared.ResourceNotFoundException;
+import dev.sivalabs.helpdesk.staff.StaffAPI;
+import dev.sivalabs.helpdesk.staff.StaffDeactivatedEvent;
 import dev.sivalabs.helpdesk.users.AccessPolicy;
 import dev.sivalabs.helpdesk.users.AuthUtils;
 import dev.sivalabs.helpdesk.users.SecurityUser;
-import dev.sivalabs.helpdesk.users.StaffDeactivatedEvent;
 import dev.sivalabs.helpdesk.users.UserAPI;
 import java.time.Instant;
 import java.util.Comparator;
@@ -48,6 +49,7 @@ class TicketService {
     private final TicketRepository ticketRepository;
     private final CategoryAPI categoryAPI;
     private final UserAPI userAPI;
+    private final StaffAPI staffAPI;
     private final AccessPolicy accessPolicy;
     private final CommentRepository commentRepository;
     private final TicketEventPublisher ticketEvents;
@@ -57,6 +59,7 @@ class TicketService {
             TicketRepository ticketRepository,
             CategoryAPI categoryAPI,
             UserAPI userAPI,
+            StaffAPI staffAPI,
             AccessPolicy accessPolicy,
             CommentRepository commentRepository,
             TicketEventPublisher ticketEvents,
@@ -67,6 +70,7 @@ class TicketService {
         this.commentRepository = commentRepository;
         this.categoryAPI = categoryAPI;
         this.userAPI = userAPI;
+        this.staffAPI = staffAPI;
         this.accessPolicy = accessPolicy;
     }
 
@@ -244,7 +248,7 @@ class TicketService {
             LOG.warn("Assignment of closed ticket #{} to staff {} refused", id, staffId);
             throw new InvalidStatusTransitionException("Ticket #" + id + " is closed and cannot be reassigned");
         }
-        if (!userAPI.isActiveStaff(staffId)) {
+        if (!staffAPI.isActiveStaff(staffId)) {
             LOG.warn("Assignment of ticket #{} refused: user {} is not an active staff member", id, staffId);
             throw new InvalidAssigneeException(staffId);
         }
@@ -455,7 +459,7 @@ class TicketService {
      * an ADMIN assigns it.
      */
     private Optional<Long> chooseAssignee(Long categoryId) {
-        var candidates = userAPI.findActiveStaffIdsHandling(categoryId);
+        var candidates = staffAPI.findActiveStaffIdsHandling(categoryId);
         if (candidates.isEmpty()) {
             return Optional.empty();
         }

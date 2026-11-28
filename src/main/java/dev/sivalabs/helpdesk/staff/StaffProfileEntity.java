@@ -1,4 +1,4 @@
-package dev.sivalabs.helpdesk.users;
+package dev.sivalabs.helpdesk.staff;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -6,17 +6,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 
-/** Resident-only details; shares its primary key with the user. */
+/** Staff-only details; shares its primary key with the user. */
 @Entity
-@Table(name = "resident_profiles")
-class ResidentProfileEntity {
+@Table(name = "staff_profiles")
+class StaffProfileEntity {
 
     @Id
     @Column(name = "user_id")
     private Long userId;
-
-    @Column(name = "flat_number", nullable = false)
-    private String flatNumber;
 
     @Column(nullable = false)
     private String mobile;
@@ -27,11 +24,10 @@ class ResidentProfileEntity {
     @Version
     private Long version;
 
-    protected ResidentProfileEntity() {}
+    protected StaffProfileEntity() {}
 
-    ResidentProfileEntity(Long userId, String flatNumber, String mobile, String permanentAddress) {
+    StaffProfileEntity(Long userId, String mobile, String permanentAddress) {
         this.userId = userId;
-        this.flatNumber = flatNumber;
         this.mobile = mobile;
         this.permanentAddress = permanentAddress;
     }
@@ -40,15 +36,19 @@ class ResidentProfileEntity {
         return userId;
     }
 
-    public String getFlatNumber() {
-        return flatNumber;
-    }
-
     public String getMobile() {
         return mobile;
     }
 
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
     public String getPermanentAddress() {
         return permanentAddress;
+    }
+
+    public void setPermanentAddress(String permanentAddress) {
+        this.permanentAddress = permanentAddress;
     }
 }

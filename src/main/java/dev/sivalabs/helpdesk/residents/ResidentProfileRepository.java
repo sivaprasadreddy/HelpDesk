@@ -1,4 +1,4 @@
-package dev.sivalabs.helpdesk.users;
+package dev.sivalabs.helpdesk.residents;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

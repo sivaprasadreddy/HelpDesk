@@ -1,0 +1,52 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sl="https://shadleaf.dev/sl"
+      th:replace="~{layout/main :: layout('Add Staff member', ~{::breadcrumb}, ~{::#page-content})}">
+<body>
+<th:block th:ref="breadcrumb">
+    <sl:breadcrumb-item><sl:breadcrumb-link th:href="@{/home}">Home</sl:breadcrumb-link></sl:breadcrumb-item>
+    <sl:breadcrumb-separator/>
+    <sl:breadcrumb-item><sl:breadcrumb-link th:href="@{/admin/staff}">Staff</sl:breadcrumb-link></sl:breadcrumb-item>
+    <sl:breadcrumb-separator/>
+    <sl:breadcrumb-item><sl:breadcrumb-page>Add</sl:breadcrumb-page></sl:breadcrumb-item>
+</th:block>
+<div id="page-content" class="form-card">
+    <sl:card>
+        <sl:card-content>
+            <form th:object="${staff}" th:action="@{/admin/staff}" method="post" novalidate class="form-stack">
+                <sl:form-errors/>
+                <sl:field th:field="*{name}">
+                    <sl:field-label>Name</sl:field-label>
+                    <sl:input autocomplete="off"/>
+                    <sl:field-error/>
+                </sl:field>
+                <sl:field th:field="*{email}">
+                    <sl:field-label>Email</sl:field-label>
+                    <sl:input type="email" autocomplete="off"/>
+                    <sl:field-error/>
+                </sl:field>
+                <sl:field th:field="*{password}">
+                    <sl:field-label>Initial password</sl:field-label>
+                    <sl:input type="password" autocomplete="new-password"/>
+                    <sl:field-description>At least 8 characters.</sl:field-description>
+                    <sl:field-error/>
+                </sl:field>
+                <sl:field th:field="*{mobile}">
+                    <sl:field-label>Mobile</sl:field-label>
+                    <sl:input type="tel" autocomplete="off" placeholder="e.g. 9876543210"/>
+                    <sl:field-error/>
+                </sl:field>
+                <sl:field th:field="*{permanentAddress}">
+                    <sl:field-label>Permanent address</sl:field-label>
+                    <sl:textarea rows="3"/>
+                    <sl:field-description>Optional.</sl:field-description>
+                    <sl:field-error/>
+                </sl:field>
+                <div class="toolbar">
+                    <sl:button as="a" th:href="@{/admin/staff}" variant="outline">Cancel</sl:button>
+                    <sl:button type="submit">Create Staff member</sl:button>
+                </div>
+            </form>
+        </sl:card-content>
+    </sl:card>
+</div>
+</body>
+</html>

@@ -1,10 +1,11 @@
 package dev.sivalabs.helpdesk.tickets;
 
 import dev.sivalabs.helpdesk.categories.CategoryAPI;
+import dev.sivalabs.helpdesk.staff.StaffAPI;
+import dev.sivalabs.helpdesk.staff.StaffDto;
 import dev.sivalabs.helpdesk.users.AccessPolicy;
 import dev.sivalabs.helpdesk.users.AuthUtils;
 import dev.sivalabs.helpdesk.users.UserAPI;
-import dev.sivalabs.helpdesk.users.UserDto;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -54,12 +55,19 @@ class TicketController {
     private final CategoryAPI categoryAPI;
     private final AccessPolicy accessPolicy;
     private final UserAPI userAPI;
+    private final StaffAPI staffAPI;
 
-    TicketController(TicketService ticketService, CategoryAPI categoryAPI, AccessPolicy accessPolicy, UserAPI userAPI) {
+    TicketController(
+            TicketService ticketService,
+            CategoryAPI categoryAPI,
+            AccessPolicy accessPolicy,
+            UserAPI userAPI,
+            StaffAPI staffAPI) {
         this.ticketService = ticketService;
         this.categoryAPI = categoryAPI;
         this.accessPolicy = accessPolicy;
         this.userAPI = userAPI;
+        this.staffAPI = staffAPI;
     }
 
     @GetMapping("/new")
@@ -129,7 +137,7 @@ class TicketController {
         model.addAttribute("statuses", TicketStatus.values());
         model.addAttribute("priorities", TicketPriority.values());
         model.addAttribute("categories", categoryAPI.findAllCategories());
-        model.addAttribute("staff", userAPI.findStaffMembers());
+        model.addAttribute("staff", staffAPI.findStaffMembers());
         return "tickets/list";
     }
 
@@ -158,7 +166,9 @@ class TicketController {
         if (canAssign) {
             model.addAttribute(
                     "activeStaff",
-                    userAPI.findStaffMembers().stream().filter(UserDto::active).toList());
+                    staffAPI.findStaffMembers().stream()
+                            .filter(StaffDto::active)
+                            .toList());
         }
         model.addAttribute("listUrl", ticketListUrl(authentication));
         model.addAttribute("listTitle", ticketListTitle(authentication));

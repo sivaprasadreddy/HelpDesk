@@ -1,0 +1,47 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sl="https://shadleaf.dev/sl"
+      th:replace="~{layout/main :: layout('Residents', ~{::breadcrumb}, ~{::#page-content})}">
+<body>
+<th:block th:ref="breadcrumb">
+    <sl:breadcrumb-item><sl:breadcrumb-link th:href="@{/home}">Home</sl:breadcrumb-link></sl:breadcrumb-item>
+    <sl:breadcrumb-separator/>
+    <sl:breadcrumb-item><sl:breadcrumb-page>Residents</sl:breadcrumb-page></sl:breadcrumb-item>
+</th:block>
+<div id="page-content" class="stack">
+    <div class="toolbar">
+        <sl:button as="a" th:href="@{/admin/residents/new}">
+            <sl:slot name="icon-start"><sl:icon name="plus"/></sl:slot>
+            <span>Add Resident</span>
+        </sl:button>
+    </div>
+    <sl:table th:unless="${residents.isEmpty()}">
+        <thead>
+        <tr>
+            <th>Name</th><th>Email</th>
+            <th>Flat</th>
+            <th>Mobile</th>
+            <th>Status</th><th>Created</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="u : ${residents}">
+            <td th:text="${u.name}">Jane Doe</td>
+            <td th:text="${u.email}">jane@example.com</td>
+            <td th:text="${u.flatNumber ?: '-'}">A-101</td>
+            <td th:text="${u.mobile ?: '-'}">9876543210</td>
+            <td>
+                <sl:badge th:if="${u.active}" variant="secondary">Active</sl:badge>
+                <sl:badge th:unless="${u.active}" variant="outline">Inactive</sl:badge>
+            </td>
+            <td th:text="${#temporals.format(u.createdAt, 'dd MMM yyyy', T(java.time.ZoneId).systemDefault())}">01 Jan 2026</td>
+        </tr>
+        </tbody>
+    </sl:table>
+    <sl:empty th:if="${residents.isEmpty()}">
+        <sl:empty-header>
+            <sl:empty-media variant="icon"><sl:icon name="users"/></sl:empty-media>
+            <sl:empty-title level="2">No residents yet</sl:empty-title>
+        </sl:empty-header>
+    </sl:empty>
+</div>
+</body>
+</html>

@@ -3,9 +3,10 @@ package dev.sivalabs.helpdesk.users;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 
-/** The users module's facade for other modules. */
+/** The users module's facade for other modules: accounts, without role-specific profiles. */
 @Component
 public class UserAPI {
     private final UserService userService;
@@ -14,19 +15,32 @@ public class UserAPI {
         this.userService = userService;
     }
 
-    /** Ids of active staff members who handle the category, in ascending order. */
-    public List<Long> findActiveStaffIdsHandling(Long categoryId) {
-        return userService.findActiveStaffIdsHandling(categoryId);
+    public Optional<UserDto> findById(Long id) {
+        return userService.findById(id);
     }
 
-    /** Every staff member, active or not, ordered by name. */
-    public List<UserDto> findStaffMembers() {
-        return userService.findUsersByRole(Role.ROLE_STAFF);
+    /** Every user with the role, active or not, ordered by name. */
+    public List<UserDto> findUsersByRole(Role role) {
+        return userService.findUsersByRole(role);
     }
 
-    /** Whether the id is a staff member who is active (and so can be given tickets). */
-    public boolean isActiveStaff(Long id) {
-        return findStaffMembers().stream().anyMatch(u -> u.id().equals(id) && u.active());
+    /**
+     * Creates an account and returns its id; joins the caller's transaction.
+     *
+     * @throws EmailAlreadyExistsException when the email address is in use
+     */
+    public Long createUser(CreateUserCmd cmd) {
+        return userService.createUser(cmd);
+    }
+
+    /** @throws EmailAlreadyExistsException when another user has the email address */
+    public void updateNameAndEmail(Long id, String name, String email) {
+        userService.updateNameAndEmail(id, name, email);
+    }
+
+    /** Activates or deactivates an account; deactivated users cannot sign in. */
+    public void setActive(Long id, boolean active) {
+        userService.setActive(id, active);
     }
 
     /** Names and email addresses by user id; ids that do not exist are left out. */
